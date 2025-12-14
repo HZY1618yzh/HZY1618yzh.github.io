@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏|推箱子</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f6f7f9;
+            margin-left: 60px;
+            padding: 20px;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100vh;
+            background-color: #fff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-x: hidden;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 200px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            position: relative;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            transition: background-color 0.2s ease;
+            min-height: 24px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f0f2f5;
+        }
+
+        .nav-icon {
+            min-width: 24px;
+            color: #495057;
+            font-size: 18px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-text {
+            color: #343a40;
+            font-size: 15px;
+            font-weight: 500;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease 0.1s;
+        }
+
+        .sidebar:hover .nav-text {
+            opacity: 1;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 10px 15px;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-card a {
+            position: relative;
+            z-index: 1;
+            color: black !important;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .special-card {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ff5252;
+            box-shadow: 0 4px 20px rgba(255, 82, 82, 0.4);
+        }
+        .special-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.1) 10px,
+                    rgba(255, 255, 255, 0.1) 20px);
+            animation: shine 3s infinite linear;
+            z-index: 0;
+        }
+        .special-card a {
+            position: relative;
+            z-index: 1;
+            color: white !important;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .special-card img {
+            filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        @keyframes shine {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .version-table thead tr {
+            background-color: #4a6cf7;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .version-table th,
+        .version-table td {
+            padding: 12px 15px;
+        }
+
+        .version-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .version-table tbody tr:nth-of-type(even) {
+            background-color: #f8f9fa;
+        }
+
+        .version-table tbody tr:last-of-type {
+            border-bottom: 2px solid #4a6cf7;
+        }
+
+        .version-table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-not-supported {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .game-description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a5568;
+        }
+
+    </style>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/'">
+                <i class="nav-icon fas fa-home"></i>
+                <span class="nav-text">首页</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/game'">
+                <i class="nav-icon fas fa-gamepad"></i>
+                <span class="nav-text">游戏</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/tools'">
+                <i class="nav-icon fas fa-wrench"></i>
+                <span class="nav-text">实用工具</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/article'">
+                <i class="nav-icon fas fa-newspaper"></i>
+                <span class="nav-text">文章</span>
+            </li>
+            <li class="nav-divider"></li>
+            <li class="nav-item" onclick="window.location='https://github.com/HZY1618yzh/home'">
+                <i class="nav-icon fab fa-github"></i>
+                <span class="nav-text">GitHub</span>
+            </li>
+        </ul>
+    </nav>
+
+    <main style="padding: 20px;">
+        <h1>推箱子游戏</h1>
+        <div class="link-card special-card">
+            <a href="https://vip.123pan.cn/1828128238/22388431" download>
+                <i class="fas fa-download" style="margin-right: 10px;"></i>
+                立即下载最新版本
+            </a>
+        </div>
+         <div class="link-card">
+            <h2><i class="fas fa-info-circle"></i> 游戏介绍</h2>
+            <p>推箱子是一款经典的益智游戏，玩家需要控制角色推动箱子到指定位置。</p>
+            <p>游戏特点：</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>锻炼逻辑思维和空间规划能力</li>
+                <li>简单易上手，难精通</li>
+                <li>多个关卡设计，挑战性逐步增加</li>
+            </ul>
+        </div>
+        <div class="link-card">
+            <h2><i class="fas fa-history"></i> 版本历史</h2>
+            <p>以下是推箱子游戏的版本更新记录：</p>
+            
+            <table class="version-table">
+                <thead>
+                    <tr>
+                        <th>下载链接</th>
+                        <th>版本号</th>
+                        <th>更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="status-badge status-not-supported">暂不支持</span></td>
+                        <td>1.0</td>
+                        <td>实现了最基础的显示，没有关卡，移动严重错误。</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-badge status-not-supported">暂不支持</span></td>
+                        <td>1.1</td>
+                        <td>重写移动方式，只有一个关卡，体验极差</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p style="margin-top: 20px; text-align: center; font-style: italic;">未完待续...</p>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.link-card');
+            const navItems = document.querySelectorAll('.nav-item');
+            cards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const link = this.querySelector('a');
+                    if (link) {
+                        window.location.href = link.href;
+                    }
+                });
+            });
+            navItems.forEach(item => {
+                item.setAttribute('tabindex', '0');
+                item.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        this.click();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

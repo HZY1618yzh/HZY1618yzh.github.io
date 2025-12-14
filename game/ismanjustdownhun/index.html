@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>是男人就下一百层 - HZY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f6f7f9;
+            margin-left: 60px;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100vh;
+            background-color: #fff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-x: hidden;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 200px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            position: relative;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            transition: background-color 0.2s ease;
+            min-height: 24px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f0f2f5;
+        }
+
+        .nav-icon {
+            min-width: 24px;
+            color: #495057;
+            font-size: 18px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-text {
+            color: #343a40;
+            font-size: 15px;
+            font-weight: 500;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease 0.1s;
+        }
+
+        .sidebar:hover .nav-text {
+            opacity: 1;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 10px 15px;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #ff4b2b;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .game-score {
+            font-weight: bold;
+            color: #ff4b2b;
+        }
+
+        .game-canvas {
+            border: 3px solid #333;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            background-color: #000;
+        }
+
+        .game-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(255, 75, 43, 0.4);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 75, 43, 0.6);
+        }
+
+        .game-instructions {
+            margin-top: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+
+        .instructions-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ff4b2b;
+        }
+
+        .instructions-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .instructions-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .instructions-list li:before {
+            content: "•";
+            color: #ff4b2b;
+            position: absolute;
+            left: 0;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 10;
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ff4b2b;
+        }
+
+        .game-over p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/'">
+                <i class="nav-icon fas fa-home"></i>
+                <span class="nav-text">首页</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/game'">
+                <i class="nav-icon fas fa-gamepad"></i>
+                <span class="nav-text">游戏</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/tools'">
+                <i class="nav-icon fas fa-wrench"></i>
+                <span class="nav-text">实用工具</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/article'">
+                <i class="nav-icon fas fa-newspaper"></i>
+                <span class="nav-text">文章</span>
+            </li>
+            <li class="nav-divider"></li>
+            <li class="nav-item" onclick="window.location='https://github.com/HZY1618yzh/home'">
+                <i class="nav-icon fab fa-github"></i>
+                <span class="nav-text">GitHub</span>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">是男人就下一百层</h1>
+        </div>
+        
+        <div class="game-info">
+            <div class="game-score">得分: <span id="score">0</span></div>
+            <div class="game-level">层数: <span id="level">0</span></div>
+        </div>
+        
+        <div style="position: relative;">
+            <canvas id="gameCanvas" width="364" height="520"></canvas>
+            <div class="game-over" id="gameOver">
+                <h2>游戏结束</h2>
+                <p>你的得分: <span id="finalScore">0</span></p>
+                <button class="control-btn" onclick="restartGame()">重新开始</button>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <button class="control-btn" onclick="startGame()">开始游戏</button>
+            <button class="control-btn" onclick="pauseGame()">暂停游戏</button>
+            <button class="control-btn" onclick="restartGame()">重新开始</button>
+        </div>
+        
+        <div class="game-instructions">
+            <h2 class="instructions-title">游戏说明</h2>
+            <ul class="instructions-list">
+                <li>使用左右方向键控制角色移动</li>
+                <li>避开红色致命平台和橙色易碎平台</li>
+                <li>站在绿色传送带上会被自动移动</li>
+                <li>尽可能向下走，获得更高分数</li>
+                <li>每成功下一层得1分</li>
+                <li>碰到屏幕顶部或底部游戏结束</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 游戏常量
+        const GAME_ROW = 40;
+        const GAME_COL = 28;
+        const SIDE = 13;
+        const SCREEN_WIDTH = SIDE * GAME_COL;
+        const SCREEN_HEIGHT = SIDE * GAME_ROW;
+        
+        // 平台类型
+        const SOLID = 1;
+        const FRAGILE = 2;
+        const DEADLY = 3;
+        const BELT_LEFT = 4;
+        const BELT_RIGHT = 5;
+        const BODY = 6;
+        
+        // 颜色定义
+        const COLOR = {
+            [SOLID]: "#00ffff",
+            [FRAGILE]: "#ff5500",
+            [DEADLY]: "#ff2222",
+            [BELT_LEFT]: "#ffff44",
+            [BELT_RIGHT]: "#ff99ff",
+            [BODY]: "#00ff00"
+        };
+        
+        // 平台类型选择
+        const CHOICE = [SOLID, SOLID, SOLID, FRAGILE, FRAGILE, BELT_LEFT, BELT_RIGHT, DEADLY];
+        
+        // 游戏变量
+        let canvas, ctx;
+        let gameRunning = false;
+        let gamePaused = false;
+        let score = 0;
+        let level = 0;
+        let lastPlatformDistance = 6 * SIDE;
+        let direction = 0; // 0: 无, 1: 左, 2: 右
+        let barriers = [];
+        let player;
+        let animationId;
+        
+        // 初始化游戏
+        function initGame() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // 创建初始平台
+            barriers = [new Barrier(SOLID)];
+            
+            // 创建玩家
+            player = {
+                x: barriers[0].rect.x + barriers[0].rect.width / 2 - SIDE / 2,
+                y: 200,
+                width: SIDE,
+                height: SIDE
+            };
+            
+            // 重置分数和层数
+            score = 0;
+            level = 0;
+            updateScore();
+            updateLevel();
+            
+            // 隐藏游戏结束界面
+            document.getElementById('gameOver').style.display = 'none';
+        }
+        
+        // 平台类
+        class Barrier {
+            constructor(type) {
+                this.type = type;
+                this.fragTouched = false;
+                this.fragTime = 12;
+                this.scored = false;
+                this.beltDirection = this.type === BELT_LEFT ? 1 : (this.type === BELT_RIGHT ? 2 : 0);
+                
+                // 随机生成平台位置
+                const left = Math.floor(Math.random() * (SCREEN_WIDTH - 7 * SIDE - 1));
+                const top = SCREEN_HEIGHT - SIDE - 1;
+                
+                this.rect = {
+                    x: left,
+                    y: top,
+                    width: 7 * SIDE,
+                    height: SIDE
+                };
+            }
+            
+            // 平台上升
+            rise() {
+                if (this.fragTouched) {
+                    this.fragTime--;
+                }
+                if (this.fragTime === 0) {
+                    return false;
+                }
+                this.rect.y -= 2;
+                return this.rect.y >= 0;
+            }
+            
+            // 绘制平台
+            draw() {
+                for (let i = 0; i < 7; i++) {
+                    this.drawSegment(i * SIDE + this.rect.x, this.rect.y);
+                }
+            }
+            
+            // 绘制平台片段
+            drawSegment(x, y) {
+                ctx.fillStyle = COLOR[this.type];
+                
+                switch (this.type) {
+                    case SOLID:
+                        ctx.fillRect(x, y, SIDE, SIDE);
+                        break;
+                    case FRAGILE:
+                        ctx.fillRect(x + 2, y, SIDE - 4, SIDE);
+                        break;
+                    case BELT_LEFT:
+                    case BELT_RIGHT:
+                        ctx.beginPath();
+                        ctx.arc(x + SIDE/2, y + SIDE/2, SIDE/2 + 1, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                    case DEADLY:
+                        ctx.beginPath();
+                        ctx.moveTo(x + SIDE/2 + 1, y);
+                        ctx.lineTo(x, y + SIDE);
+                        ctx.lineTo(x + SIDE, y + SIDE);
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                }
+            }
+        }
+        
+        // 创建新平台
+        function createBarrier() {
+            // 确保至少有一个坚固平台
+            const solidBarriers = barriers.filter(barrier => barrier.type === SOLID);
+            if (solidBarriers.length < 1) {
+                barriers.push(new Barrier(SOLID));
+            } else {
+                barriers.push(new Barrier(CHOICE[Math.floor(Math.random() * CHOICE.length)]));
+            }
+            lastPlatformDistance = Math.floor(Math.random() * 3 + 3) * SIDE;
+        }
+        
+        // 移动玩家
+        function movePlayer() {
+            if (direction === 0) return true;
+            
+            const newX = direction === 1 ? player.x - 2 : player.x + 2;
+            
+            // 检查边界
+            if (newX < 0 || newX + SIDE >= SCREEN_WIDTH) {
+                return false;
+            }
+            
+            // 检查与平台的碰撞
+            for (const barrier of barriers) {
+                if (checkCollision(
+                    {x: newX, y: player.y, width: player.width, height: player.height},
+                    barrier.rect
+                )) {
+                    return false;
+                }
+            }
+            
+            player.x = newX;
+            return true;
+        }
+        
+        // 玩家下落
+        function playerFall() {
+            player.y += 2;
+            
+            for (const barrier of barriers) {
+                if (!checkCollision(player, barrier.rect)) {
+                    checkScore(barrier);
+                    continue;
+                }
+                
+                if (barrier.type === DEADLY) {
+                    endGame();
+                    return;
+                }
+                
+                player.y = barrier.rect.y - SIDE - 2;
+                
+                if (barrier.type === FRAGILE) {
+                    barrier.fragTouched = true;
+                } else if (barrier.type === BELT_LEFT || barrier.type === BELT_RIGHT) {
+                    // 传送带移动玩家
+                    player.x += barrier.beltDirection === 1 ? -1 : 1;
+                }
+                break;
+            }
+            
+            // 检查是否碰到顶部或底部
+            if (player.y < 0 || player.y + SIDE >= SCREEN_HEIGHT) {
+                endGame();
+            }
+        }
+        
+        // 检查碰撞
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        // 检查得分
+        function checkScore(barrier) {
+            if (player.y > barrier.rect.y && !barrier.scored) {
+                score++;
+                level++;
+                barrier.scored = true;
+                updateScore();
+                updateLevel();
+            }
+        }
+        
+        // 更新分数显示
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        // 更新层数显示
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        // 游戏主循环
+        function gameLoop() {
+            if (!gameRunning || gamePaused) return;
+            
+            // 更新游戏状态
+            lastPlatformDistance--;
+            if (lastPlatformDistance === 0) {
+                createBarrier();
+            }
+            
+            // 更新平台
+            for (let i = barriers.length - 1; i >= 0; i--) {
+                if (!barriers[i].rise()) {
+                    if (barriers[i].type === FRAGILE && barriers[i].rect.y > 0) {
+                        score++;
+                        updateScore();
+                    }
+                    barriers.splice(i, 1);
+                }
+            }
+            
+            // 移动玩家
+            movePlayer();
+            movePlayer();
+            
+            // 玩家下落
+            playerFall();
+            
+            // 绘制游戏
+            drawGame();
+            
+            // 继续游戏循环
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        // 绘制游戏
+        function drawGame() {
+            // 清空画布
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            
+            // 绘制平台
+            for (const barrier of barriers) {
+                barrier.draw();
+            }
+            
+            // 绘制玩家
+            ctx.fillStyle = COLOR[BODY];
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            // 绘制分数
+            ctx.fillStyle = '#3c3c3c';
+            ctx.font = '130px Calibri';
+            ctx.textAlign = 'center';
+            ctx.fillText(score.toString(), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (!gameRunning) {
+                initGame();
+                gameRunning = true;
+                gamePaused = false;
+                animationId = requestAnimationFrame(gameLoop);
+            } else if (gamePaused) {
+                gamePaused = false;
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // 暂停游戏
+        function pauseGame() {
+            if (gameRunning && !gamePaused) {
+                gamePaused = true;
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        // 重新开始游戏
+        function restartGame() {
+            gameRunning = false;
+            gamePaused = false;
+            cancelAnimationFrame(animationId);
+            initGame();
+            startGame();
+        }
+        
+        // 结束游戏
+        function endGame() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            
+            // 显示游戏结束界面
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                direction = 1;
+            } else if (e.key === 'ArrowRight') {
+                direction = 2;
+            } else if (e.key === ' ') {
+                // 空格键暂停/继续
+                if (gameRunning) {
+                    if (gamePaused) {
+                        startGame();
+                    } else {
+                        pauseGame();
+                    }
+                }
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                direction = 0;
+            }
+        });
+        
+        // 初始化游戏
+        window.onload = function() {
+            initGame();
+            drawGame();
+        };
+    </script>
+</body>
+</html>

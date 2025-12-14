@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洛谷访问-HZY</title>
+    <script>
+        document.title = 'Loading... 洛谷访问-HZY';
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f6f7f9;
+            margin-left: 60px;
+            padding: 20px;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100vh;
+            background-color: #fff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-x: hidden;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 200px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            position: relative;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            transition: background-color 0.2s ease;
+            min-height: 24px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f0f2f5;
+        }
+
+        .nav-icon {
+            min-width: 24px;
+            color: #495057;
+            font-size: 18px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-text {
+            color: #343a40;
+            font-size: 15px;
+            font-weight: 500;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease 0.1s;
+        }
+
+        .sidebar:hover .nav-text {
+            opacity: 1;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 10px 15px;
+        }
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+        }
+
+        .url-input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e5ee;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .url-input:focus {
+            border-color: #4a6cf7;
+            outline: none;
+        }
+
+        .visit-btn {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .visit-btn:hover {
+            background: #3a5ce5;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #4a6cf7;
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .info-box p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-loading {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav">侧边栏</div>
+    <main style="padding: 20px;">
+        <div class="url-input-section">
+            <h2 style="margin-bottom: 20px; color: #333;">网站代理访问</h2>
+            <div class="input-group">
+                <input type="text" id="urlInput" class="url-input" placeholder="请输入要访问的网址 (例如: www.luogu.com.cn)"
+                    value="www.luogu.com.cn">
+                <button class="visit-btn" onclick="loadWebsite()">
+                    <i class="fas fa-external-link-alt"></i> 访问网站
+                </button>
+            </div>
+            <div id="statusMessage"></div>
+        </div>
+
+        <div id="contentArea">
+            <iframe id="contentFrame" class="iframe-container" style="display: none;"></iframe>
+        </div>
+
+        <div class="info-box">
+            <h3>使用说明</h3>
+            <p>1. 在输入框中输入您想要访问的网站地址，然后点击"访问网站"按钮</p>
+            <p>2. 您也可以通过URL参数访问，例如：在页面URL后添加 <code>?a=www.luogu.com.cn</code></p>
+            <p>3. 由于浏览器安全限制，某些网站可能无法完全正常显示或交互</p>
+            <p>4. 本工具仅用于教育目的，请遵守相关法律法规</p>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.link-card');
+            const navItems = document.querySelectorAll('.nav-item');
+            cards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const link = this.querySelector('a');
+                    if (link) {
+                        window.location.href = link.href;
+                    }
+                });
+            });
+            navItems.forEach(item => {
+                item.setAttribute('tabindex', '0');
+                item.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        this.click();
+                    }
+                });
+            });
+        });
+        function wait(islod, chyt) {
+            const interval = setInterval(() => {
+                if (islod()) {
+                    document.title = chyt;
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+        wait(
+            () => document.readyState === 'complete',
+            '洛谷访问-HZY'
+        );
+        document.getElementById("nav").innerHTML='<nav class="sidebar">\
+        <ul class="sidebar-nav">\
+            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/\'">\
+                <i class="nav-icon fas fa-home"></i>\
+                <span class="nav-text">首页</span>\
+            </li>\
+            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/game\'">\
+                <i class="nav-icon fas fa-gamepad"></i>\
+                <span class="nav-text">游戏</span>\
+            </li>\
+            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/tools\'">\
+                <i class="nav-icon fas fa-wrench"></i>\
+                <span class="nav-text">实用工具</span>\
+            </li>\
+            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/article\'">\
+                <i class="nav-icon fas fa-newspaper"></i>\
+                <span class="nav-text">文章</span>\
+            </li>\
+            <li class="nav-divider"></li>\
+            <li class="nav-item" onclick="window.location=\'https://github.com/HZY1618yzh/home\'">\
+                <i class="nav-icon fab fa-github"></i>\
+                <span class="nav-text">GitHub</span>\
+            </li>\
+        </ul>\
+        </nav>'
+        function loadWebsite(customUrl) {
+            const urlInput = document.getElementById('urlInput');
+            const contentFrame = document.getElementById('contentFrame');
+            const statusMessage = document.getElementById('statusMessage');
+
+            let url = customUrl || urlInput.value.trim();
+
+            if (!url) {
+                showStatus('请输入有效的网址', 'error');
+                return;
+            }
+
+            // 确保URL有协议前缀
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+
+            showStatus('正在加载网站内容，请稍候...', 'loading');
+            contentFrame.style.display = 'none';
+
+            try {
+                // 更新URL参数
+                const urlObj = new URL(url);
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('a', urlObj.hostname + urlObj.pathname);
+                window.history.replaceState({}, '', newUrl);
+
+                // 设置iframe源
+                contentFrame.src = url;
+                contentFrame.onload = function () {
+                    showStatus('网站加载完成', 'success');
+                    contentFrame.style.display = 'block';
+                    document.title = `${urlObj.hostname} - 洛谷访问-HZY`;
+                };
+
+                contentFrame.onerror = function () {
+                    showStatus('无法加载该网站，请检查网址是否正确', 'error');
+                };
+
+            } catch (error) {
+                showStatus('网址格式不正确，请检查后重试', 'error');
+                console.error('URL错误:', error);
+            }
+        }
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message';
+
+            switch (type) {
+                case 'loading':
+                    statusMessage.classList.add('status-loading');
+                    break;
+                case 'error':
+                    statusMessage.classList.add('status-error');
+                    break;
+                case 'success':
+                    setTimeout(() => {
+                        statusMessage.textContent = '';
+                        statusMessage.className = 'status-message';
+                    }, 2000);
+                    break;
+            }
+        }
+    </script>
+</body>
+
+</html>
