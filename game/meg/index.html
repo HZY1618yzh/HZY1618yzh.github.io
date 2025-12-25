@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记忆卡片游戏 - HZY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            margin-left: 60px;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100vh;
+            background-color: #fff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-x: hidden;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 200px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            position: relative;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            transition: background-color 0.2s ease;
+            min-height: 24px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f0f2f5;
+        }
+
+        .nav-icon {
+            min-width: 24px;
+            color: #495057;
+            font-size: 18px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-text {
+            color: #343a40;
+            font-size: 15px;
+            font-weight: 500;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease 0.1s;
+        }
+
+        .sidebar:hover .nav-text {
+            opacity: 1;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 10px 15px;
+        }
+
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-title {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .game-subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 25px 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px auto;
+            max-width: 600px;
+            min-height: 500px;
+        }
+
+        .card {
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(600px) rotateY(0deg);
+        }
+
+        .card.flipped {
+            transform: perspective(600px) rotateY(180deg);
+        }
+
+        .card.matched {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            transform: perspective(600px) rotateY(180deg) scale(0.95);
+            cursor: default;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: rotateY(0deg);
+        }
+
+        .card-back {
+            background: white;
+            color: #2c3e50;
+            transform: rotateY(180deg);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .win-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .win-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .win-title {
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .win-stats {
+            font-size: 1.2rem;
+            margin: 20px 0;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/'">
+                <i class="nav-icon fas fa-home"></i>
+                <span class="nav-text">首页</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/game'">
+                <i class="nav-icon fas fa-gamepad"></i>
+                <span class="nav-text">游戏</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/tools'">
+                <i class="nav-icon fas fa-wrench"></i>
+                <span class="nav-text">实用工具</span>
+            </li>
+            <li class="nav-item" onclick="window.location='https://hzy.us.kg/article'">
+                <i class="nav-icon fas fa-newspaper"></i>
+                <span class="nav-text">文章</span>
+            </li>
+            <li class="nav-divider"></li>
+            <li class="nav-item" onclick="window.location='https://github.com/HZY1618yzh/home'">
+                <i class="nav-icon fab fa-github"></i>
+                <span class="nav-text">GitHub</span>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">🎮 记忆卡片游戏</h1>
+            <p class="game-subtitle">点击卡片，找到所有匹配的卡片对！</p>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">时间</div>
+                    <div class="stat-value" id="timer">0s</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">步数</div>
+                    <div class="stat-value" id="moves">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">匹配</div>
+                    <div class="stat-value" id="matches">0/8</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <!-- 卡片将通过JS生成 -->
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="startNewGame()">
+                <i class="fas fa-play"></i> 新游戏
+            </button>
+            <button class="btn btn-restart" onclick="restartGame()">
+                <i class="fas fa-redo"></i> 重新开始
+            </button>
+            <button class="btn" onclick="showHint()">
+                <i class="fas fa-lightbulb"></i> 提示
+            </button>
+        </div>
+    </div>
+
+    <div class="win-message" id="winMessage">
+        <div class="win-content">
+            <h2 class="win-title">🎉 恭喜！</h2>
+            <div class="win-stats">
+                <p>用时: <span id="finalTime">0</span> 秒</p>
+                <p>步数: <span id="finalMoves">0</span> 步</p>
+                <p>得分: <span id="finalScore">0</span> 分</p>
+            </div>
+            <button class="btn" onclick="startNewGame()" style="margin-top: 20px;">
+                <i class="fas fa-redo"></i> 再玩一次
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        let gameState = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            totalPairs: 8,
+            moves: 0,
+            timer: 0,
+            timerInterval: null,
+            gameStarted: false,
+            canFlip: true
+        };
+
+        // 表情符号集合
+        const emojiSets = [
+            ['😀', '😎', '🤖', '👻', '🐱', '🐶', '🦊', '🐼'],
+            ['🍎', '🍌', '🍇', '🍓', '🍊', '🍉', '🍒', '🥝'],
+            ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱'],
+            ['🚗', '✈️', '🚢', '🚂', '🚁', '🚀', '🛵', '🚲']
+        ];
+
+        let currentEmojiSet = 0;
+
+        // 初始化游戏
+        function initGame() {
+            console.log("初始化游戏...");
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            
+            // 重置游戏状态
+            gameState.flippedCards = [];
+            gameState.matchedPairs = 0;
+            gameState.moves = 0;
+            gameState.timer = 0;
+            gameState.gameStarted = false;
+            gameState.canFlip = true;
+            
+            // 获取当前表情集
+            const selectedEmojis = emojiSets[currentEmojiSet].slice(0, gameState.totalPairs);
+            gameState.cards = [...selectedEmojis, ...selectedEmojis];
+            
+            // 洗牌
+            shuffleArray(gameState.cards);
+            
+            // 创建卡片
+            gameState.cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.emoji = emoji;
+                
+                const cardFront = document.createElement('div');
+                cardFront.className = 'card-front';
+                cardFront.textContent = '?';
+                
+                const cardBack = document.createElement('div');
+                cardBack.className = 'card-back';
+                cardBack.textContent = emoji;
+                
+                card.appendChild(cardFront);
+                card.appendChild(cardBack);
+                
+                card.addEventListener('click', () => handleCardClick(card));
+                gameBoard.appendChild(card);
+            });
+            
+            updateStats();
+            hideWinMessage();
+            console.log("游戏初始化完成，共创建" + gameState.cards.length + "张卡片");
+        }
+
+        // 洗牌算法
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 处理卡片点击
+        function handleCardClick(card) {
+            console.log("点击卡片，index:", card.dataset.index);
+            
+            if (!gameState.canFlip || 
+                card.classList.contains('flipped') || 
+                card.classList.contains('matched') ||
+                gameState.flippedCards.length >= 2) {
+                console.log("无法翻转卡片");
+                return;
+            }
+            
+            if (!gameState.gameStarted) {
+                startGame();
+            }
+            
+            // 翻转卡片
+            card.classList.add('flipped');
+            gameState.flippedCards.push(card);
+            
+            console.log("当前翻开的卡片:", gameState.flippedCards.length);
+            
+            // 如果有两张卡片被翻开
+            if (gameState.flippedCards.length === 2) {
+                gameState.moves++;
+                updateStats();
+                gameState.canFlip = false;
+                
+                const card1 = gameState.flippedCards[0];
+                const card2 = gameState.flippedCards[1];
+                
+                console.log("比较卡片:", card1.dataset.emoji, card2.dataset.emoji);
+                
+                // 检查是否匹配
+                if (card1.dataset.emoji === card2.dataset.emoji) {
+                    console.log("匹配成功！");
+                    
+                    setTimeout(() => {
+                        card1.classList.add('matched');
+                        card2.classList.add('matched');
+                        gameState.flippedCards = [];
+                        gameState.matchedPairs++;
+                        gameState.canFlip = true;
+                        updateStats();
+                        
+                        // 检查游戏是否完成
+                        if (gameState.matchedPairs === gameState.totalPairs) {
+                            endGame();
+                        }
+                    }, 500);
+                } else {
+                    console.log("匹配失败");
+                    
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        gameState.flippedCards = [];
+                        gameState.canFlip = true;
+                    }, 1000);
+                }
+            }
+        }
+
+        // 开始游戏
+        function startGame() {
+            if (!gameState.gameStarted) {
+                console.log("游戏开始");
+                gameState.gameStarted = true;
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = setInterval(() => {
+                    gameState.timer++;
+                    updateStats();
+                }, 1000);
+            }
+        }
+
+        // 新游戏（切换表情集）
+        function startNewGame() {
+            console.log("开始新游戏");
+            currentEmojiSet = (currentEmojiSet + 1) % emojiSets.length;
+            clearInterval(gameState.timerInterval);
+            initGame();
+        }
+
+        // 重新开始当前游戏
+        function restartGame() {
+            console.log("重新开始游戏");
+            clearInterval(gameState.timerInterval);
+            initGame();
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            document.getElementById('timer').textContent = gameState.timer + 's';
+            document.getElementById('moves').textContent = gameState.moves;
+            document.getElementById('matches').textContent = 
+                gameState.matchedPairs + '/' + gameState.totalPairs;
+        }
+
+        // 显示提示
+        function showHint() {
+            if (!gameState.gameStarted || gameState.canFlip === false) return;
+            
+            // 找到所有未匹配的卡片
+            const unmatchedCards = Array.from(document.querySelectorAll('.card:not(.matched)'));
+            
+            if (unmatchedCards.length === 0) return;
+            
+            // 随机选择一张未匹配的卡片
+            const hintCard = unmatchedCards[Math.floor(Math.random() * unmatchedCards.length)];
+            
+            // 暂时显示卡片内容
+            hintCard.classList.add('flipped');
+            
+            // 1秒后隐藏
+            setTimeout(() => {
+                if (!hintCard.classList.contains('matched')) {
+                    hintCard.classList.remove('flipped');
+                }
+            }, 1000);
+        }
+
+        // 结束游戏
+        function endGame() {
+            console.log("游戏结束！用时:" + gameState.timer + "秒，步数:" + gameState.moves);
+            clearInterval(gameState.timerInterval);
+            
+            // 计算得分
+            const score = Math.max(1000 - (gameState.moves * 10) - (gameState.timer * 5), 100);
+            
+            // 显示获胜消息
+            document.getElementById('finalTime').textContent = gameState.timer;
+            document.getElementById('finalMoves').textContent = gameState.moves;
+            document.getElementById('finalScore').textContent = score;
+            
+            const winMessage = document.getElementById('winMessage');
+            winMessage.style.display = 'flex';
+            
+            // 显示庆祝效果
+            setTimeout(showCelebration, 300);
+        }
+
+        // 隐藏获胜消息
+        function hideWinMessage() {
+            document.getElementById('winMessage').style.display = 'none';
+        }
+
+        // 庆祝效果
+        function showCelebration() {
+            // 简单的彩色飘带效果
+            for (let i = 0; i < 50; i++) {
+                createConfetti();
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fdcb6e', '#e17055', '#d63031'];
+            
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '15px';
+            confetti.style.height = '15px';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-20px';
+            confetti.style.opacity = '0.9';
+            confetti.style.zIndex = '1999';
+            confetti.style.pointerEvents = 'none';
+            
+            document.body.appendChild(confetti);
+            
+            // 动画
+            const animation = confetti.animate([
+                { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 3000 + 2000,
+                easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }
+
+        // 页面加载时初始化游戏
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM加载完成");
+            initGame();
+            document.title = '记忆卡片游戏 - HZY';
+        });
+
+        // 页面加载完成
+        window.onload = function() {
+            console.log("页面完全加载");
+        };
+    </script>
+</body>
+
+</html>
