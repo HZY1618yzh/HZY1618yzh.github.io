@@ -190,6 +190,12 @@
             color: #d32f2f;
             border: 1px solid #ffcdd2;
         }
+        
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
     </style>
 </head>
 
@@ -241,6 +247,7 @@
                 });
             });
         });
+        
         function wait(islod, chyt) {
             const interval = setInterval(() => {
                 if (islod()) {
@@ -249,35 +256,53 @@
                 }
             }, 100);
         }
+        
         wait(
             () => document.readyState === 'complete',
             '洛谷访问-HZY'
         );
-        document.getElementById("nav").innerHTML='<nav class="sidebar">\
-        <ul class="sidebar-nav">\
-            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/\'">\
-                <i class="nav-icon fas fa-home"></i>\
-                <span class="nav-text">首页</span>\
-            </li>\
-            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/game\'">\
-                <i class="nav-icon fas fa-gamepad"></i>\
-                <span class="nav-text">游戏</span>\
-            </li>\
-            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/tools\'">\
-                <i class="nav-icon fas fa-wrench"></i>\
-                <span class="nav-text">实用工具</span>\
-            </li>\
-            <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/article\'">\
-                <i class="nav-icon fas fa-newspaper"></i>\
-                <span class="nav-text">文章</span>\
-            </li>\
-            <li class="nav-divider"></li>\
-            <li class="nav-item" onclick="window.location=\'https://github.com/HZY1618yzh/home\'">\
-                <i class="nav-icon fab fa-github"></i>\
-                <span class="nav-text">GitHub</span>\
-            </li>\
-        </ul>\
-        </nav>'
+        
+        // 初始化侧边栏
+        document.getElementById("nav").innerHTML = '<nav class="sidebar">\
+            <ul class="sidebar-nav">\
+                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/\'">\
+                    <i class="nav-icon fas fa-home"></i>\
+                    <span class="nav-text">首页</span>\
+                </li>\
+                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/game\'">\
+                    <i class="nav-icon fas fa-gamepad"></i>\
+                    <span class="nav-text">游戏</span>\
+                </li>\
+                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/tools\'">\
+                    <i class="nav-icon fas fa-wrench"></i>\
+                    <span class="nav-text">实用工具</span>\
+                </li>\
+                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/article\'">\
+                    <i class="nav-icon fas fa-newspaper"></i>\
+                    <span class="nav-text">文章</span>\
+                </li>\
+                <li class="nav-divider"></li>\
+                <li class="nav-item" onclick="window.location=\'https://github.com/HZY1618yzh/home\'">\
+                    <i class="nav-icon fab fa-github"></i>\
+                    <span class="nav-text">GitHub</span>\
+                </li>\
+            </ul>\
+        </nav>';
+        
+        // 页面加载时检查URL参数
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlFromParam = urlParams.get('a');
+            
+            if (urlFromParam) {
+                // 解码URL参数并设置到输入框
+                const decodedUrl = decodeURIComponent(urlFromParam);
+                document.getElementById('urlInput').value = decodedUrl;
+                // 加载网站
+                setTimeout(() => loadWebsite(decodedUrl), 500);
+            }
+        });
+        
         function loadWebsite(customUrl) {
             const urlInput = document.getElementById('urlInput');
             const contentFrame = document.getElementById('contentFrame');
@@ -299,14 +324,19 @@
             contentFrame.style.display = 'none';
 
             try {
-                // 更新URL参数
+                // 解析URL
                 const urlObj = new URL(url);
-                const newUrl = new URL(window.location);
-                newUrl.searchParams.set('a', urlObj.hostname + urlObj.pathname);
+                const hostAndPath = urlObj.hostname + urlObj.pathname + urlObj.search;
+                
+                // 更新URL参数 - 使用encodeURIComponent确保特殊字符被正确编码
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('a', encodeURIComponent(url));
                 window.history.replaceState({}, '', newUrl);
 
                 // 设置iframe源
                 contentFrame.src = url;
+                
+                // 重置iframe事件监听器
                 contentFrame.onload = function () {
                     showStatus('网站加载完成', 'success');
                     contentFrame.style.display = 'block';
@@ -314,12 +344,14 @@
                 };
 
                 contentFrame.onerror = function () {
-                    showStatus('无法加载该网站，请检查网址是否正确', 'error');
+                    showStatus('无法加载该网站，请检查网址是否正确或网站是否支持嵌入', 'error');
+                    contentFrame.style.display = 'none';
                 };
 
             } catch (error) {
                 showStatus('网址格式不正确，请检查后重试', 'error');
                 console.error('URL错误:', error);
+                contentFrame.style.display = 'none';
             }
         }
 
@@ -337,6 +369,7 @@
                     statusMessage.classList.add('status-error');
                     break;
                 case 'success':
+                    statusMessage.classList.add('status-success');
                     setTimeout(() => {
                         statusMessage.textContent = '';
                         statusMessage.className = 'status-message';
@@ -344,7 +377,14 @@
                     break;
             }
         }
+        
+        // 允许通过回车键触发访问
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadWebsite();
+            }
+        });
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
-
 </html>
