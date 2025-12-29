@@ -492,6 +492,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.js"></script>
 
     <script>
+        // Supabase配置（注意：在生产环境中建议通过后端代理隐藏密钥）
         const SUPABASE_URL = 'https://hdhpftgjhvorrwtsdpgb.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkaHBmdGdqaHZvcnJ3dHNkcGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTM5NjMsImV4cCI6MjA4MDkyOTk2M30.CEuXyk7ENGWV-huR8Tfbbu_fm55057GnQyZ_PMamook';
 
@@ -501,6 +502,7 @@
         let editorInstance = null;
         let articleToDelete = null;
 
+        // 生成随机ID
         function generateId() {
             const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
             let id = '';
@@ -509,6 +511,8 @@
             }
             return id;
         }
+        
+        // 检查认证状态
         async function checkAuth() {
             try {
                 console.log('开始检查登录状态...');
@@ -547,6 +551,7 @@
             }
         }
 
+        // 显示登录弹窗
         function showLoginPopup() {
             const overlay = document.createElement('div');
             overlay.className = 'login-modal';
@@ -613,6 +618,7 @@
             }, 100);
         }
 
+        // 登出
         async function logout() {
             try {
                 const { error } = await supabase.auth.signOut();
@@ -628,6 +634,7 @@
             }
         }
 
+        // 显示管理员UI
         function showAdminUI() {
             const existingInfo = document.querySelector('.user-info');
             if (existingInfo) existingInfo.remove();
@@ -645,6 +652,7 @@
             document.body.appendChild(userInfo);
         }
 
+        // 显示删除确认弹窗
         function showDeleteConfirm(article) {
             articleToDelete = article;
 
@@ -694,6 +702,7 @@
             });
         }
 
+        // 删除文章
         async function deleteArticle(articleId) {
             if (!currentUser) {
                 alert('请先登录！');
@@ -726,6 +735,7 @@
             }
         }
 
+        // 路由配置
         const router = {
             routes: {
                 '/article': showArticleList,
@@ -776,6 +786,7 @@
             }
         };
 
+        // 显示文章列表
         async function showArticleList() {
             console.log('显示文章列表');
             document.title = '文章列表 - HZY';
@@ -916,6 +927,7 @@
             }
         }
 
+        // 显示文章详情
         async function showArticleDetail(params) {
             console.log('显示文章详情:', params.id);
             document.title = '文章详情 - HZY';
@@ -978,6 +990,7 @@
             }
         }
 
+        // 显示新建文章页面
         function showNewArticle() {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1015,6 +1028,7 @@
             initEditor();
         }
 
+        // 显示编辑文章页面
         async function showEditArticle(params) {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1087,6 +1101,7 @@
             }
         }
 
+        // 初始化编辑器
         function initEditor(initialContent = '') {
             const editorConfig = {
                 placeholder: '开始写作吧...',
@@ -1161,6 +1176,7 @@
             }
         }
 
+        // 保存文章
         async function saveArticle() {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1208,6 +1224,7 @@
             }
         }
 
+        // 更新文章
         async function updateArticle(articleId) {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1248,6 +1265,7 @@
             }
         }
 
+        // 测试数据库连接
         async function testDatabase() {
             try {
                 console.log('开始测试数据库...');
@@ -1279,6 +1297,7 @@
             }
         }
 
+        // 转义HTML
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -1286,6 +1305,7 @@
             return div.innerHTML;
         }
 
+        // 格式化日期
         function formatDate(dateString) {
             if (!dateString) return '未知时间';
             try {
@@ -1302,6 +1322,7 @@
             }
         }
 
+        // 截断内容
         function truncateContent(html, maxLength = 200) {
             if (!html) return '';
             const tempDiv = document.createElement('div');
@@ -1310,6 +1331,7 @@
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
+        // 初始化侧边栏
         function initSidebar() {
             document.getElementById("nav").innerHTML = '<nav class="sidebar">\
                 <ul class="sidebar-nav">\
@@ -1338,6 +1360,7 @@
             </nav>';
         }
 
+        // 页面初始化
         document.addEventListener('DOMContentLoaded', async function () {
             console.log('页面加载完成，开始初始化...');
             initSidebar();
@@ -1362,6 +1385,6 @@
             );
         });
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
-
 </html>
