@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/css/style.css">
+    <!-- 添加KaTeX支持LaTeX公式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
         * {
             margin: 0;
@@ -292,52 +294,158 @@
             }
         }
 
+        /* 修复文章内容样式 - 支持Markdown */
         .article-content {
             line-height: 1.8;
             font-size: 1.1rem;
             color: #34495e;
         }
 
-        .article-content h1,
-        .article-content h2,
-        .article-content h3 {
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
+        .article-content h1 {
+            font-size: 2.2rem;
+            margin: 1.5em 0 0.8em;
             color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .article-content h2 {
+            font-size: 1.8rem;
+            margin: 1.3em 0 0.6em;
+            color: #34495e;
+        }
+
+        .article-content h3 {
+            font-size: 1.5rem;
+            margin: 1.2em 0 0.5em;
+            color: #4a6572;
         }
 
         .article-content p {
-            margin-bottom: 1em;
+            margin-bottom: 1.2em;
+            line-height: 1.7;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            margin: 1.2em 0;
+            padding-left: 2em;
+        }
+
+        .article-content li {
+            margin-bottom: 0.5em;
         }
 
         .article-content code {
             background-color: #f8f9fa;
             padding: 2px 6px;
             border-radius: 4px;
-            font-family: 'Consolas', monospace;
+            font-family: 'Consolas', Monaco, 'Courier New', monospace;
             font-size: 0.9em;
+            color: #d63384;
         }
 
         .article-content pre {
-            background-color: #2d2d2d;
-            color: #fff;
-            padding: 15px;
+            background-color: #1a1a1a;
+            color: #f8f8f2;
+            padding: 20px;
             border-radius: 8px;
             overflow-x: auto;
-            margin: 20px 0;
+            margin: 1.5em 0;
+            font-family: 'Consolas', Monaco, 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.5;
         }
 
         .article-content pre code {
             background: none;
             padding: 0;
+            color: inherit;
         }
 
         .article-content blockquote {
             border-left: 4px solid #3498db;
-            padding-left: 15px;
-            margin: 20px 0;
-            color: #7f8c8d;
+            padding-left: 20px;
+            margin: 1.5em 0;
+            color: #5a6c7d;
             font-style: italic;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .article-content th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .article-content td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .article-content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .article-content a {
+            color: #3498db;
+            text-decoration: underline;
+        }
+
+        .article-content a:hover {
+            color: #2980b9;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1.5em 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* LaTeX公式样式 */
+        .katex {
+            font-size: 1.1em;
+        }
+
+        .katex-display {
+            margin: 1.5em 0;
+            text-align: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .katex-display>.katex {
+            display: inline-block;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+
+        /* Markdown预览样式 */
+        .markdown-preview {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
         }
 
         .action-buttons {
@@ -490,6 +598,9 @@
     <main id="content" style="padding: 20px;"></main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <script>
         const SUPABASE_URL = 'https://hdhpftgjhvorrwtsdpgb.supabase.co';
@@ -500,7 +611,63 @@
         let currentUser = null;
         let editorInstance = null;
         let articleToDelete = null;
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: false,
+            mangle: false
+        });
+        const renderer = new marked.Renderer();
+        renderer.codespan = function (code) {
+            if (code.startsWith('$') && code.endsWith('$') && code.length > 1) {
+                const latex = code.substring(1, code.length - 1);
+                try {
+                    return katex.renderToString(latex, { displayMode: false, throwOnError: false });
+                } catch (e) {
+                    return `<code style="color: red;">LaTeX错误: ${e.message}</code>`;
+                }
+            }
+            return `<code>${escapeHtml(code)}</code>`;
+        };
+        renderer.code = function (code, language) {
+            if (code.startsWith('$$') && code.endsWith('$$') && code.length > 3) {
+                const latex = code.substring(2, code.length - 2);
+                try {
+                    return `<div class="katex-display">${katex.renderToString(latex, { displayMode: true, throwOnError: false })}</div>`;
+                } catch (e) {
+                    return `<div style="color: red; padding: 10px; background: #fee;">LaTeX错误: ${e.message}</div>`;
+                }
+            }
+            const validLang = language || 'plaintext';
+            const escapedCode = escapeHtml(code);
+            return `<pre><code class="language-${validLang}">${escapedCode}</code></pre>`;
+        };
+        function renderMarkdownWithLatex(markdown) {
+            if (!markdown) return '';
 
+            try {
+                let html = marked.parse(markdown, { renderer });
+                return html;
+            } catch (error) {
+                console.error('Markdown解析错误:', error);
+                return `<div style="color: red;">Markdown解析错误: ${error.message}</div>`;
+            }
+        }
+
+        function renderLatexInElement(element) {
+            if (!element) return;
+
+            renderMathInElement(element, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false,
+                errorColor: '#cc0000'
+            });
+        }
         function generateId() {
             const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
             let id = '';
@@ -509,14 +676,49 @@
             }
             return id;
         }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '未知时间';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function truncateContent(html, maxLength = 200) {
+            if (!html) return '';
+            if (html.includes('#') || html.includes('*') || html.includes('`')) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = renderMarkdownWithLatex(html);
+                const text = tempDiv.textContent || tempDiv.innerText || '';
+                return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+            }
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const text = tempDiv.textContent || tempDiv.innerText || '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
         async function checkAuth() {
             try {
-                console.log('开始检查登录状态...');
                 const savedToken = localStorage.getItem('supabase.auth.token');
                 const savedUser = localStorage.getItem('supabase.auth.user');
 
                 if (savedToken && savedUser) {
-                    console.log('从本地存储恢复用户:', JSON.parse(savedUser));
                     currentUser = JSON.parse(savedUser);
                 }
                 const { data: { session }, error } = await supabase.auth.getSession();
@@ -524,7 +726,6 @@
                 if (error) {
                     console.error('获取会话失败:', error);
                 } else if (session) {
-                    console.log('Supabase会话存在:', session.user);
                     currentUser = session.user;
                     localStorage.setItem('supabase.auth.token', JSON.stringify({
                         access_token: session.access_token,
@@ -533,14 +734,11 @@
                     }));
                     localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
                 } else {
-                    console.log('Supabase会话不存在');
                     localStorage.removeItem('supabase.auth.token');
                     localStorage.removeItem('supabase.auth.user');
                     currentUser = null;
                 }
-                console.log('用户状态:', currentUser);
                 return session;
-
             } catch (error) {
                 console.error('检查登录状态失败:', error);
                 return null;
@@ -566,18 +764,14 @@
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
 
-                console.log('尝试登录:', email);
-
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
 
                 if (error) {
-                    console.error('登录失败:', error);
                     alert('登录失败: ' + error.message);
                 } else {
-                    console.log('登录成功:', data);
                     if (data.session) {
                         localStorage.setItem('supabase.auth.token', JSON.stringify({
                             access_token: data.session.access_token,
@@ -647,7 +841,6 @@
 
         function showDeleteConfirm(article) {
             articleToDelete = article;
-
             const overlay = document.createElement('div');
             overlay.className = 'delete-confirm-modal';
             overlay.innerHTML = `
@@ -686,12 +879,6 @@
                     overlay.remove();
                 }
             });
-
-            overlay.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    overlay.remove();
-                }
-            });
         }
 
         async function deleteArticle(articleId) {
@@ -702,24 +889,18 @@
             }
 
             try {
-                console.log('开始删除文章:', articleId);
-
                 const { error } = await supabase
                     .from('article')
                     .delete()
                     .eq('id', articleId);
 
                 if (error) {
-                    console.error('删除失败:', error);
                     alert('删除失败: ' + error.message);
                     return;
                 }
 
-                console.log('文章删除成功');
                 alert('文章删除成功！');
-
                 router.handleRoute();
-
             } catch (error) {
                 console.error('删除异常:', error);
                 alert('删除异常: ' + error.message);
@@ -742,9 +923,6 @@
             async handleRoute() {
                 let path = window.location.pathname;
                 let params = {};
-
-                console.log('路由跳转:', path);
-                console.log('当前用户状态:', currentUser);
 
                 if (path.endsWith('/')) {
                     path = path.slice(0, -1);
@@ -770,16 +948,13 @@
             },
 
             navigate(path) {
-                console.log('导航到:', path);
                 history.pushState(null, '', path);
                 this.handleRoute();
             }
         };
 
         async function showArticleList() {
-            console.log('显示文章列表');
             document.title = '文章列表 - HZY';
-
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="article-header">
@@ -791,9 +966,6 @@
                     '<button class="btn btn-success" onclick="showLoginPopup()">' +
                     '<i class="fas fa-lock"></i> 管理员登录' +
                     '</button>'}
-                    <button class="btn btn-primary" onclick="testDatabase()" style="margin-left: 10px;">
-                        <i class="fas fa-database"></i> 测试数据库
-                    </button>
                 </div>
                 <div id="articles-container" class="loading">
                     <i class="fas fa-spinner"></i>
@@ -802,24 +974,14 @@
             `;
 
             try {
-                console.log('开始查询文章数据...');
-
-                const { data: articles, error, count } = await supabase
+                const { data: articles, error } = await supabase
                     .from('article')
-                    .select('*', { count: 'exact' })
+                    .select('*')
                     .order('created_at', { ascending: false });
 
-                console.log('查询结果:', { articles, error, count });
-
-                if (error) {
-                    console.error('查询失败:', error);
-                    throw error;
-                }
-
-                console.log('找到文章数量:', articles?.length || 0);
+                if (error) throw error;
 
                 if (!articles || articles.length === 0) {
-                    console.log('没有文章，显示空状态');
                     content.innerHTML = `
                         <div class="article-header">
                             <h1>文章列表</h1>
@@ -830,25 +992,15 @@
                             '<button class="btn btn-success" onclick="showLoginPopup()">' +
                             '<i class="fas fa-lock"></i> 管理员登录' +
                             '</button>'}
-                            <button class="btn btn-primary" onclick="testDatabase()" style="margin-left: 10px;">
-                                <i class="fas fa-database"></i> 测试数据库
-                            </button>
                         </div>
                         <div class="empty-state">
                             <i class="fas fa-newspaper"></i>
                             <h3>暂无文章</h3>
                             <p>${currentUser ? '点击上方按钮创建第一篇文章吧！' : '管理员登录后可以创建文章'}</p>
-                            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
-                                <p><strong>数据库连接状态：</strong></p>
-                                <p>✅ 连接成功</p>
-                                <p>📊 文章数量: ${articles?.length || 0}</p>
-                            </div>
                         </div>
                     `;
                     return;
                 }
-
-                console.log('开始渲染文章...');
 
                 const articlesHTML = articles.map(article => {
                     return `
@@ -877,49 +1029,31 @@
                     `;
                 }).join('');
 
-                console.log('HTML生成完成，开始渲染');
-
                 document.getElementById('articles-container').outerHTML = `
                     <div id="articles-container">
                         ${articlesHTML}
                     </div>
                 `;
-
-                console.log('文章列表渲染完成');
-
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
                     <div class="article-header">
                         <h1>文章列表</h1>
-                        ${currentUser ?
-                        '<button class="btn btn-success" onclick="router.navigate(\'/article/new\')">' +
-                        '<i class="fas fa-plus"></i> 新建文章' +
-                        '</button>' :
-                        '<button class="btn btn-success" onclick="showLoginPopup()">' +
-                        '<i class="fas fa-lock"></i> 管理员登录' +
-                        '</button>'}
-                        <button class="btn btn-primary" onclick="testDatabase()" style="margin-left: 10px;">
-                            <i class="fas fa-database"></i> 测试数据库
+                        <button class="btn btn-success" onclick="showLoginPopup()">
+                            <i class="fas fa-lock"></i> 管理员登录
                         </button>
                     </div>
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
                         <h3>加载失败</h3>
                         <p>${error.message}</p>
-                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
-                            <p><strong>错误详情：</strong></p>
-                            <pre style="font-size: 12px; overflow: auto;">${JSON.stringify(error, null, 2)}</pre>
-                        </div>
                     </div>
                 `;
             }
         }
 
         async function showArticleDetail(params) {
-            console.log('显示文章详情:', params.id);
             document.title = '文章详情 - HZY';
-
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="loading">
@@ -946,8 +1080,8 @@
                             ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                         </div>
                     </div>
-                    <div class="article-content">
-                        ${article.content}
+                    <div class="article-content" id="article-content">
+                        ${renderMarkdownWithLatex(article.content)}
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="router.navigate('/article')">
@@ -963,6 +1097,10 @@
                         ` : ''}
                     </div>
                 `;
+
+                setTimeout(() => {
+                    renderLatexInElement(document.getElementById('article-content'));
+                }, 100);
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
@@ -986,21 +1124,8 @@
             }
 
             document.title = '新建文章 - HZY';
-
             const content = document.getElementById('content');
             content.innerHTML = `
-                <div class="article-header">
-                    <h1>新建文章</h1>
-                </div>
-                <div class="editor-container">
-                    <div class="form-group">
-                        <label class="form-label">标题</label>
-                        <input type="text" id="article-title" class="form-input" placeholder="请输入文章标题">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">内容</label>
-                        <div id="editor-container"></div>
-                    </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="saveArticle()">
                             <i class="fas fa-save"></i> 保存文章
@@ -1011,8 +1136,6 @@
                     </div>
                 </div>
             `;
-
-            initEditor();
         }
 
         async function showEditArticle(params) {
@@ -1023,7 +1146,6 @@
             }
 
             document.title = '编辑文章 - HZY';
-
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="loading">
@@ -1044,6 +1166,11 @@
                 content.innerHTML = `
                     <div class="article-header">
                         <h1>编辑文章</h1>
+                        <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; font-size: 0.9rem;">
+                            <p><strong>提示：</strong>支持Markdown语法和LaTeX公式</p>
+                            <p>• 行内LaTeX: $E = mc^2$</p>
+                            <p>• 块级LaTeX: $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$</p>
+                        </div>
                     </div>
                     <div class="editor-container">
                         <div class="form-group">
@@ -1051,8 +1178,8 @@
                             <input type="text" id="article-title" class="form-input" value="${escapeHtml(article.title)}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">内容</label>
-                            <div id="editor-container"></div>
+                            <label class="form-label">内容（支持Markdown和LaTeX）</label>
+                            <textarea id="article-content-input" class="form-input" rows="20">${escapeHtml(article.content)}</textarea>
                         </div>
                         <div class="action-buttons">
                             <button class="btn btn-success" onclick="updateArticle('${article.id}')">
@@ -1070,8 +1197,6 @@
                         </div>
                     </div>
                 `;
-
-                initEditor(article.content);
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
@@ -1087,80 +1212,6 @@
             }
         }
 
-        function initEditor(initialContent = '') {
-            const editorConfig = {
-                placeholder: '开始写作吧...',
-                MENU_CONF: {
-                    codeSelectLang: {
-                        codeLangs: [
-                            { text: 'C', value: 'c' },
-                            { text: 'C++', value: 'cpp' },
-                            { text: 'Java', value: 'java' },
-                            { text: 'Python', value: 'python' },
-                            { text: 'JavaScript', value: 'javascript' },
-                            { text: 'HTML', value: 'html' },
-                            { text: 'CSS', value: 'css' },
-                            { text: 'Markdown', value: 'markdown' }
-                        ]
-                    }
-                }
-            };
-
-            if (editorInstance) {
-                editorInstance.destroy();
-            }
-
-            editorInstance = window.wangEditor.createEditor({
-                selector: '#editor-container',
-                config: editorConfig,
-                mode: 'default'
-            });
-
-            const toolbarConfig = {
-                toolbarKeys: [
-                    'headerSelect',
-                    '|',
-                    'bold',
-                    'underline',
-                    'italic',
-                    'color',
-                    'bgColor',
-                    '|',
-                    'fontSize',
-                    'fontFamily',
-                    'lineHeight',
-                    '|',
-                    'bulletedList',
-                    'numberedList',
-                    'todo',
-                    '|',
-                    'emotion',
-                    'insertLink',
-                    'insertImage',
-                    'insertVideo',
-                    'insertTable',
-                    'codeBlock',
-                    'blockquote',
-                    '|',
-                    'undo',
-                    'redo',
-                    '|',
-                    'fullScreen'
-                ]
-            };
-
-            const toolbar = window.wangEditor.createToolbar({
-                editor: editorInstance,
-                selector: '#editor-container',
-                config: toolbarConfig,
-                mode: 'default'
-            });
-
-            if (initialContent) {
-                editorInstance.setHtml(initialContent);
-            }
-        }
-
         async function saveArticle() {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1169,14 +1220,14 @@
             }
 
             const title = document.getElementById('article-title').value.trim();
-            const content = editorInstance.getHtml();
+            const content = document.getElementById('article-content-input').value;
 
             if (!title) {
                 alert('请输入文章标题');
                 return;
             }
 
-            if (!content || content === '<p><br></p>') {
+            if (!content) {
                 alert('请输入文章内容');
                 return;
             }
@@ -1184,8 +1235,6 @@
             const articleId = generateId();
 
             try {
-                console.log('开始保存文章:', { id: articleId, title });
-
                 const { error } = await supabase
                     .from('article')
                     .insert({
@@ -1195,10 +1244,7 @@
                         created_at: new Date().toISOString()
                     });
 
-                if (error) {
-                    console.error('保存失败:', error);
-                    throw error;
-                }
+                if (error) throw error;
 
                 alert('文章创建成功！');
                 router.navigate(`/article/${articleId}`);
@@ -1216,14 +1262,14 @@
             }
 
             const title = document.getElementById('article-title').value.trim();
-            const content = editorInstance.getHtml();
+            const content = document.getElementById('article-content-input').value;
 
             if (!title) {
                 alert('请输入文章标题');
                 return;
             }
 
-            if (!content || content === '<p><br></p>') {
+            if (!content) {
                 alert('请输入文章内容');
                 return;
             }
@@ -1248,80 +1294,18 @@
             }
         }
 
-        async function testDatabase() {
-            try {
-                console.log('开始测试数据库...');
-
-                const { data, error } = await supabase
-                    .from('article')
-                    .select('count')
-                    .limit(1);
-
-                if (error) {
-                    console.error('数据库测试失败:', error);
-                    alert('数据库连接失败: ' + error.message);
-                } else {
-                    console.log('数据库测试成功:', data);
-
-                    const { count, error: countError } = await supabase
-                        .from('article')
-                        .select('*', { count: 'exact', head: true });
-
-                    if (countError) {
-                        alert('数据库连接成功！无法获取文章数量');
-                    } else {
-                        alert(`数据库连接成功！当前有 ${count} 篇文章`);
-                    }
-                }
-            } catch (error) {
-                console.error('测试异常:', error);
-                alert('测试异常: ' + error.message);
-            }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '未知时间';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleString('zh-CN', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                return dateString;
-            }
-        }
-
-        function truncateContent(html, maxLength = 200) {
-            if (!html) return '';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const text = tempDiv.textContent || tempDiv.innerText || '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
         function initSidebar() {
             document.getElementById("nav").innerHTML = '<nav class="sidebar">\
                 <ul class="sidebar-nav">\
-                    <li class="nav-item" onclick="window.location=\'https://hzy1618yzh.qzz.io/\'">\
+                    <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/\'">\
                         <i class="nav-icon fas fa-home"></i>\
                         <span class="nav-text">首页</span>\
                     </li>\
-                    <li class="nav-item" onclick="window.location=\'https://hzy1618yzh.qzz.io/game\'">\
+                    <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/game\'">\
                         <i class="nav-icon fas fa-gamepad"></i>\
                         <span class="nav-text">游戏</span>\
                     </li>\
-                    <li class="nav-item" onclick="window.location=\'https://hzy1618yzh.qzz.io/tools\'">\
+                    <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/tools\'">\
                         <i class="nav-icon fas fa-wrench"></i>\
                         <span class="nav-text">实用工具</span>\
                     </li>\
@@ -1365,4 +1349,3 @@
 </body>
 
 </html>
-
