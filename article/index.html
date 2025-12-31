@@ -292,6 +292,7 @@
             line-height: 1.8;
             font-size: 1.1rem;
             color: #34495e;
+            white-space: pre-wrap;
         }
 
         .article-content h1,
@@ -853,7 +854,7 @@
                                 <span> | 创建时间：${formatDate(article.created_at)}</span>
                                 ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                             </div>
-                            <div class="article-content-preview">${truncateMarkdown(article.md || '无内容')}</div>
+                            <div class="article-content-preview">${truncateContent(article.md || '无内容')}</div>
                             <div class="action-buttons">
                                 <button class="btn btn-primary" onclick="router.navigate('/article/${article.id}')">
                                     <i class="fas fa-eye"></i> 阅读
@@ -941,7 +942,7 @@
                         </div>
                     </div>
                     <div class="article-content">
-                        ${marked.parse(article.md || '')}
+                        ${escapeHtml(article.md || '')}
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="router.navigate('/article')">
@@ -1108,7 +1109,6 @@
                         id: articleId,
                         title: title,
                         md: md,
-                        content: marked.parse(md),
                         created_at: new Date().toISOString()
                     });
 
@@ -1151,7 +1151,6 @@
                     .update({
                         title: title,
                         md: md,
-                        content: marked.parse(md),
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', articleId);
@@ -1220,9 +1219,8 @@
             }
         }
 
-        function truncateMarkdown(markdown, maxLength = 200) {
-            if (!markdown) return '';
-            const text = markdown.replace(/[#*`_\-\[\]\(\)]/g, '').replace(/\s+/g, ' ');
+        function truncateContent(text, maxLength = 200) {
+            if (!text) return '';
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
@@ -1256,58 +1254,26 @@
 
         document.addEventListener('DOMContentLoaded', async function () {
             console.log('页面加载完成，开始初始化...');
-            
-            if (typeof marked === 'undefined') {
-                console.log('正在加载Marked.js...');
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-                script.onload = async function() {
-                    console.log('Marked.js加载完成');
-                    initSidebar();
-                    await checkAuth();
-                    await router.init();
-                    if (currentUser) {
-                        showAdminUI();
-                    }
-
-                    const wait = (islod, chyt) => {
-                        const interval = setInterval(() => {
-                            if (islod()) {
-                                document.title = chyt;
-                                clearInterval(interval);
-                            }
-                        }, 100);
-                    };
-
-                    wait(
-                        () => document.readyState === 'complete',
-                        '文章-HZY'
-                    );
-                };
-                document.head.appendChild(script);
-            } else {
-                console.log('Marked.js已加载');
-                initSidebar();
-                await checkAuth();
-                await router.init();
-                if (currentUser) {
-                    showAdminUI();
-                }
-
-                const wait = (islod, chyt) => {
-                    const interval = setInterval(() => {
-                        if (islod()) {
-                            document.title = chyt;
-                            clearInterval(interval);
-                        }
-                    }, 100);
-                };
-
-                wait(
-                    () => document.readyState === 'complete',
-                    '文章-HZY'
-                );
+            initSidebar();
+            await checkAuth();
+            await router.init();
+            if (currentUser) {
+                showAdminUI();
             }
+
+            const wait = (islod, chyt) => {
+                const interval = setInterval(() => {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
+                    }
+                }, 100);
+            };
+
+            wait(
+                () => document.readyState === 'complete',
+                '文章-HZY'
+            );
         });
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
