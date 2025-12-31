@@ -480,6 +480,48 @@
         .delete-btn-cancel:hover {
             background-color: #7f8c8d;
         }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+
+        .tag:hover {
+            background-color: #dee2e6;
+            transform: translateY(-1px);
+        }
+
+        .tag-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .tag-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .tag-help {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -769,7 +811,7 @@
             try {
                 const { data: articles, error } = await supabase
                     .from('article')
-                    .select('id, title, created_at, updated_at, md')
+                    .select('id, title, created_at, updated_at, md, tag')
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -798,6 +840,7 @@
                 }
 
                 const articlesHTML = articles.map(article => {
+                    const tags = parseTags(article.tag);
                     return `
                         <div class="article-card">
                             <h2 class="article-title">${escapeHtml(article.title || '无标题')}</h2>
@@ -806,6 +849,11 @@
                                 <span> | 创建时间：${formatDate(article.created_at)}</span>
                                 ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                             </div>
+                            ${tags.length > 0 ? `
+                                <div class="tags-container">
+                                    ${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                                </div>
+                            ` : ''}
                             <div class="article-content-preview">${truncateMarkdown(article.md || '无内容')}</div>
                             <div class="action-buttons">
                                 <button class="btn btn-primary" onclick="router.navigate('/article/${article.id}')">
@@ -868,12 +916,13 @@
             try {
                 const { data: article, error } = await supabase
                     .from('article')
-                    .select('id, title, created_at, updated_at, md')
+                    .select('id, title, created_at, updated_at, md, tag')
                     .eq('id', params.id)
                     .single();
 
                 if (error) throw error;
 
+                const tags = parseTags(article.tag);
                 content.innerHTML = `
                     <div class="article-header">
                         <h1 class="article-title-full">${escapeHtml(article.title)}</h1>
@@ -882,6 +931,11 @@
                             <span> | 创建时间：${formatDate(article.created_at)}</span>
                             ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                         </div>
+                        ${tags.length > 0 ? `
+                            <div class="tags-container">
+                                ${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                     <div id="article-content-container" class="article-content">
                     </div>
@@ -938,6 +992,11 @@
                         <input type="text" id="article-title" class="form-input" placeholder="请输入文章标题">
                     </div>
                     <div class="form-group">
+                        <label class="form-label">标签</label>
+                        <input type="text" id="article-tag" class="tag-input" placeholder="多个标签用逗号分隔，例如：JavaScript,前端,教程">
+                        <div class="tag-help">多个标签用逗号分隔</div>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">内容 (Markdown格式)</label>
                         <textarea id="article-md" class="form-textarea" placeholder="请输入文章内容（支持Markdown和LaTeX）"></textarea>
                     </div>
@@ -973,7 +1032,7 @@
             try {
                 const { data: article, error } = await supabase
                     .from('article')
-                    .select('id, title, md')
+                    .select('id, title, md, tag')
                     .eq('id', params.id)
                     .single();
 
@@ -987,6 +1046,11 @@
                         <div class="form-group">
                             <label class="form-label">标题</label>
                             <input type="text" id="article-title" class="form-input" value="${escapeHtml(article.title)}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">标签</label>
+                            <input type="text" id="article-tag" class="tag-input" value="${escapeHtml(article.tag || '')}" placeholder="多个标签用逗号分隔，例如：JavaScript,前端,教程">
+                            <div class="tag-help">多个标签用逗号分隔</div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">内容 (Markdown格式)</label>
@@ -1033,6 +1097,7 @@
             }
 
             const title = document.getElementById('article-title').value.trim();
+            const tag = document.getElementById('article-tag').value.trim();
             const md = document.getElementById('article-md').value.trim();
 
             if (!title) {
@@ -1053,6 +1118,7 @@
                     .insert({
                         id: articleId,
                         title: title,
+                        tag: tag,
                         md: md,
                         created_at: new Date().toISOString()
                     });
@@ -1076,6 +1142,7 @@
             }
 
             const title = document.getElementById('article-title').value.trim();
+            const tag = document.getElementById('article-tag').value.trim();
             const md = document.getElementById('article-md').value.trim();
 
             if (!title) {
@@ -1093,6 +1160,7 @@
                     .from('article')
                     .update({
                         title: title,
+                        tag: tag,
                         md: md,
                         updated_at: new Date().toISOString()
                     })
@@ -1134,6 +1202,13 @@
             if (!markdown) return '';
             const text = markdown.replace(/[#*`_\-\[\]\(\)]/g, '').replace(/\s+/g, ' ');
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function parseTags(tagString) {
+            if (!tagString) return [];
+            return tagString.split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag.length > 0);
         }
 
         function initSidebar() {
