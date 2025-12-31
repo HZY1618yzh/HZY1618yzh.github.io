@@ -11,7 +11,6 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
-    <!-- 引入KaTeX样式 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
     <style>
         * {
@@ -181,15 +180,6 @@
             background-color: #c0392b;
         }
 
-        .btn-warning {
-            background-color: #f39c12;
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background-color: #d68910;
-        }
-
         .article-header {
             margin-bottom: 30px;
         }
@@ -338,7 +328,6 @@
             font-style: italic;
         }
 
-        /* KaTeX样式调整 */
         .katex {
             font-size: 1.1em !important;
         }
@@ -517,41 +506,29 @@
             return id;
         }
         async function checkAuth() {
-            try {
-                console.log('开始检查登录状态...');
-                const savedToken = localStorage.getItem('supabase.auth.token');
-                const savedUser = localStorage.getItem('supabase.auth.user');
+            const savedToken = localStorage.getItem('supabase.auth.token');
+            const savedUser = localStorage.getItem('supabase.auth.user');
 
-                if (savedToken && savedUser) {
-                    console.log('从本地存储恢复用户:', JSON.parse(savedUser));
-                    currentUser = JSON.parse(savedUser);
-                }
-                const { data: { session }, error } = await supabase.auth.getSession();
-
-                if (error) {
-                    console.error('获取会话失败:', error);
-                } else if (session) {
-                    console.log('Supabase会话存在:', session.user);
-                    currentUser = session.user;
-                    localStorage.setItem('supabase.auth.token', JSON.stringify({
-                        access_token: session.access_token,
-                        refresh_token: session.refresh_token,
-                        expires_at: session.expires_at
-                    }));
-                    localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
-                } else {
-                    console.log('Supabase会话不存在');
-                    localStorage.removeItem('supabase.auth.token');
-                    localStorage.removeItem('supabase.auth.user');
-                    currentUser = null;
-                }
-                console.log('用户状态:', currentUser);
-                return session;
-
-            } catch (error) {
-                console.error('检查登录状态失败:', error);
-                return null;
+            if (savedToken && savedUser) {
+                currentUser = JSON.parse(savedUser);
             }
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (error) {
+            } else if (session) {
+                currentUser = session.user;
+                localStorage.setItem('supabase.auth.token', JSON.stringify({
+                    access_token: session.access_token,
+                    refresh_token: session.refresh_token,
+                    expires_at: session.expires_at
+                }));
+                localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
+            } else {
+                localStorage.removeItem('supabase.auth.token');
+                localStorage.removeItem('supabase.auth.user');
+                currentUser = null;
+            }
+            return session;
         }
 
         function showLoginPopup() {
@@ -573,18 +550,14 @@
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
 
-                console.log('尝试登录:', email);
-
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
 
                 if (error) {
-                    console.error('登录失败:', error);
                     alert('登录失败: ' + error.message);
                 } else {
-                    console.log('登录成功:', data);
                     if (data.session) {
                         localStorage.setItem('supabase.auth.token', JSON.stringify({
                             access_token: data.session.access_token,
@@ -630,7 +603,6 @@
                 alert('已登出');
                 location.reload();
             } catch (error) {
-                console.error('登出失败:', error);
                 alert('登出失败: ' + error.message);
             }
         }
@@ -709,26 +681,20 @@
             }
 
             try {
-                console.log('开始删除文章:', articleId);
-
                 const { error } = await supabase
                     .from('article')
                     .delete()
                     .eq('id', articleId);
 
                 if (error) {
-                    console.error('删除失败:', error);
                     alert('删除失败: ' + error.message);
                     return;
                 }
 
-                console.log('文章删除成功');
                 alert('文章删除成功！');
-
                 router.handleRoute();
 
             } catch (error) {
-                console.error('删除异常:', error);
                 alert('删除异常: ' + error.message);
             }
         }
@@ -749,9 +715,6 @@
             async handleRoute() {
                 let path = window.location.pathname;
                 let params = {};
-
-                console.log('路由跳转:', path);
-                console.log('当前用户状态:', currentUser);
 
                 if (path.endsWith('/')) {
                     path = path.slice(0, -1);
@@ -777,14 +740,12 @@
             },
 
             navigate(path) {
-                console.log('导航到:', path);
                 history.pushState(null, '', path);
                 this.handleRoute();
             }
         };
 
         async function showArticleList() {
-            console.log('显示文章列表');
             document.title = '文章列表 - HZY';
 
             const content = document.getElementById('content');
@@ -798,9 +759,6 @@
                     '<button class="btn btn-success" onclick="showLoginPopup()">' +
                     '<i class="fas fa-lock"></i> 管理员登录' +
                     '</button>'}
-                    <button class="btn btn-primary" onclick="testDatabase()" style="margin-left: 10px;">
-                        <i class="fas fa-database"></i> 测试数据库
-                    </button>
                 </div>
                 <div id="articles-container" class="loading">
                     <i class="fas fa-spinner"></i>
@@ -809,24 +767,16 @@
             `;
 
             try {
-                console.log('开始查询文章数据...');
-
-                const { data: articles, error, count } = await supabase
+                const { data: articles, error } = await supabase
                     .from('article')
                     .select('id, title, created_at, updated_at, md')
                     .order('created_at', { ascending: false });
 
-                console.log('查询结果:', { articles, error, count });
-
                 if (error) {
-                    console.error('查询失败:', error);
                     throw error;
                 }
 
-                console.log('找到文章数量:', articles?.length || 0);
-
                 if (!articles || articles.length === 0) {
-                    console.log('没有文章，显示空状态');
                     content.innerHTML = `
                         <div class="article-header">
                             <h1>文章列表</h1>
@@ -837,25 +787,15 @@
                             '<button class="btn btn-success" onclick="showLoginPopup()">' +
                             '<i class="fas fa-lock"></i> 管理员登录' +
                             '</button>'}
-                            <button class="btn btn-primary" onclick="testDatabase()" style="margin-left: 10px;">
-                                <i class="fas fa-database"></i> 测试数据库
-                            </button>
                         </div>
                         <div class="empty-state">
                             <i class="fas fa-newspaper"></i>
                             <h3>暂无文章</h3>
                             <p>${currentUser ? '点击上方按钮创建第一篇文章吧！' : '管理员登录后可以创建文章'}</p>
-                            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
-                                <p><strong>数据库连接状态：</strong></p>
-                                <p>✅ 连接成功</p>
-                                <p>📊 文章数量: ${articles?.length || 0}</p>
-                            </div>
                         </div>
                     `;
                     return;
                 }
-
-                console.log('开始渲染文章...');
 
                 const articlesHTML = articles.map(article => {
                     return `
@@ -887,18 +827,13 @@
                     `;
                 }).join('');
 
-                console.log('HTML生成完成，开始渲染');
-
                 document.getElementById('articles-container').outerHTML = `
                     <div id="articles-container">
                         ${articlesHTML}
                     </div>
                 `;
 
-                console.log('文章列表渲染完成');
-
             } catch (error) {
-                console.error('加载文章失败:', error);
                 content.innerHTML = `
                     <div class="article-header">
                         <h1>文章列表</h1>
@@ -909,25 +844,17 @@
                         '<button class="btn btn-success" onclick="showLoginPopup()">' +
                         '<i class="fas fa-lock"></i> 管理员登录' +
                         '</button>'}
-                        <button class="btn btn-primary" onclick="testDatabase()" style="margin-left: 10px;">
-                            <i class="fas fa-database"></i> 测试数据库
-                        </button>
                     </div>
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
                         <h3>加载失败</h3>
                         <p>${error.message}</p>
-                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
-                            <p><strong>错误详情：</strong></p>
-                            <pre style="font-size: 12px; overflow: auto;">${JSON.stringify(error, null, 2)}</pre>
-                        </div>
                     </div>
                 `;
             }
         }
 
         async function showArticleDetail(params) {
-            console.log('显示文章详情:', params.id);
             document.title = '文章详情 - HZY';
 
             const content = document.getElementById('content');
@@ -976,10 +903,8 @@
                     </div>
                 `;
 
-                // 渲染Markdown和LaTeX
                 renderMarkdownAndLaTeX(article.md || '', 'article-content-container');
             } catch (error) {
-                console.error('加载文章失败:', error);
                 content.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -1087,7 +1012,6 @@
                     </div>
                 `;
             } catch (error) {
-                console.error('加载文章失败:', error);
                 content.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -1124,8 +1048,6 @@
             const articleId = generateId();
 
             try {
-                console.log('开始保存文章:', { id: articleId, title });
-
                 const { error } = await supabase
                     .from('article')
                     .insert({
@@ -1136,14 +1058,12 @@
                     });
 
                 if (error) {
-                    console.error('保存失败:', error);
                     throw error;
                 }
 
                 alert('文章创建成功！');
                 router.navigate(`/article/${articleId}`);
             } catch (error) {
-                console.error('保存失败:', error);
                 alert('保存失败: ' + error.message);
             }
         }
@@ -1183,39 +1103,7 @@
                 alert('文章更新成功！');
                 router.navigate(`/article/${articleId}`);
             } catch (error) {
-                console.error('更新失败:', error);
                 alert('更新失败: ' + error.message);
-            }
-        }
-
-        async function testDatabase() {
-            try {
-                console.log('开始测试数据库...');
-
-                const { data, error } = await supabase
-                    .from('article')
-                    .select('count')
-                    .limit(1);
-
-                if (error) {
-                    console.error('数据库测试失败:', error);
-                    alert('数据库连接失败: ' + error.message);
-                } else {
-                    console.log('数据库测试成功:', data);
-
-                    const { count, error: countError } = await supabase
-                        .from('article')
-                        .select('*', { count: 'exact', head: true });
-
-                    if (countError) {
-                        alert('数据库连接成功！无法获取文章数量');
-                    } else {
-                        alert(`数据库连接成功！当前有 ${count} 篇文章`);
-                    }
-                }
-            } catch (error) {
-                console.error('测试异常:', error);
-                alert('测试异常: ' + error.message);
             }
         }
 
@@ -1276,12 +1164,10 @@
             </nav>';
         }
 
-        // 渲染Markdown和LaTeX的函数
         function renderMarkdownAndLaTeX(markdown, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
             
-            // 如果marked未加载，动态加载它
             if (typeof marked === 'undefined') {
                 loadScript('https://cdn.jsdelivr.net/npm/marked/marked.min.js', function() {
                     loadScript('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js', function() {
@@ -1296,11 +1182,9 @@
         }
 
         function renderContent(markdown, container) {
-            // 使用marked渲染Markdown
             const html = marked.parse(markdown);
             container.innerHTML = html;
             
-            // 使用KaTeX渲染LaTeX公式
             if (typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(container, {
                     delimiters: [
@@ -1314,7 +1198,6 @@
             }
         }
 
-        // 动态加载脚本的函数
         function loadScript(src, callback) {
             const script = document.createElement('script');
             script.src = src;
@@ -1323,7 +1206,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', async function () {
-            console.log('页面加载完成，开始初始化...');
             initSidebar();
             await checkAuth();
             await router.init();
@@ -1346,7 +1228,6 @@
             );
         });
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 
 </html>
