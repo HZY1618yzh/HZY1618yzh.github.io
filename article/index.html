@@ -11,7 +11,6 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/css/style.css">
     <style>
         * {
             margin: 0;
@@ -96,26 +95,6 @@
             height: 1px;
             background-color: #e9ecef;
             margin: 10px 15px;
-        }
-
-        .link-card {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            transition: transform 0.3s;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .link-card a {
-            position: relative;
-            z-index: 1;
-            color: black !important;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
         }
 
         .article-card {
@@ -249,6 +228,23 @@
         }
 
         .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: monospace;
+            min-height: 400px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-textarea:focus {
             outline: none;
             border-color: #3498db;
         }
@@ -482,50 +478,6 @@
         .delete-btn-cancel:hover {
             background-color: #7f8c8d;
         }
-        
-        /* Markdown 编辑器样式 */
-        .editor-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-        
-        .editor-tab {
-            padding: 8px 16px;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .editor-tab.active {
-            background: #3498db;
-            color: white;
-            border-color: #3498db;
-        }
-        
-        .editor-area {
-            display: none;
-        }
-        
-        .editor-area.active {
-            display: block;
-        }
-        
-        #markdown-editor {
-            width: 100%;
-            min-height: 400px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: vertical;
-        }
     </style>
 </head>
 
@@ -533,7 +485,6 @@
     <div id="nav">侧边栏</div>
     <main id="content" style="padding: 20px;"></main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.js"></script>
 
     <script>
         const SUPABASE_URL = 'https://hdhpftgjhvorrwtsdpgb.supabase.co';
@@ -542,10 +493,7 @@
         var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
-        let editorInstance = null;
-        let markdownEditorInstance = null;
         let articleToDelete = null;
-        let currentEditorMode = 'wysiwyg'; // 'wysiwyg' 或 'markdown'
 
         function generateId() {
             const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -555,7 +503,6 @@
             }
             return id;
         }
-
         async function checkAuth() {
             try {
                 console.log('开始检查登录状态...');
@@ -906,7 +853,7 @@
                                 <span> | 创建时间：${formatDate(article.created_at)}</span>
                                 ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                             </div>
-                            <div class="article-content-preview">${truncateContent(article.content || '无内容')}</div>
+                            <div class="article-content-preview">${truncateMarkdown(article.md || '无内容')}</div>
                             <div class="action-buttons">
                                 <button class="btn btn-primary" onclick="router.navigate('/article/${article.id}')">
                                     <i class="fas fa-eye"></i> 阅读
@@ -994,7 +941,7 @@
                         </div>
                     </div>
                     <div class="article-content">
-                        ${article.content}
+                        ${marked.parse(article.md || '')}
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="router.navigate('/article')">
@@ -1045,17 +992,8 @@
                         <input type="text" id="article-title" class="form-input" placeholder="请输入文章标题">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">内容</label>
-                        <div class="editor-tabs">
-                            <button class="editor-tab active" onclick="switchEditorMode('wysiwyg')">可视化编辑器</button>
-                            <button class="editor-tab" onclick="switchEditorMode('markdown')">Markdown编辑器</button>
-                        </div>
-                        <div id="wysiwyg-editor-container" class="editor-area active">
-                            <div id="wysiwyg-editor"></div>
-                        </div>
-                        <div id="markdown-editor-container" class="editor-area">
-                            <textarea id="markdown-editor" placeholder="请输入Markdown内容..."></textarea>
-                        </div>
+                        <label class="form-label">内容 (Markdown格式)</label>
+                        <textarea id="article-md" class="form-textarea" placeholder="请输入文章内容（支持Markdown和LaTeX）"></textarea>
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="saveArticle()">
@@ -1067,8 +1005,6 @@
                     </div>
                 </div>
             `;
-
-            initEditor();
         }
 
         async function showEditArticle(params) {
@@ -1107,17 +1043,8 @@
                             <input type="text" id="article-title" class="form-input" value="${escapeHtml(article.title)}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">内容</label>
-                            <div class="editor-tabs">
-                                <button class="editor-tab active" onclick="switchEditorMode('wysiwyg')">可视化编辑器</button>
-                                <button class="editor-tab" onclick="switchEditorMode('markdown')">Markdown编辑器</button>
-                            </div>
-                            <div id="wysiwyg-editor-container" class="editor-area active">
-                                <div id="wysiwyg-editor"></div>
-                            </div>
-                            <div id="markdown-editor-container" class="editor-area">
-                                <textarea id="markdown-editor" placeholder="请输入Markdown内容...">${escapeHtml(article.md || '')}</textarea>
-                            </div>
+                            <label class="form-label">内容 (Markdown格式)</label>
+                            <textarea id="article-md" class="form-textarea">${escapeHtml(article.md || '')}</textarea>
                         </div>
                         <div class="action-buttons">
                             <button class="btn btn-success" onclick="updateArticle('${article.id}')">
@@ -1135,8 +1062,6 @@
                         </div>
                     </div>
                 `;
-
-                initEditor(article.content, article.md);
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
@@ -1152,110 +1077,6 @@
             }
         }
 
-        function switchEditorMode(mode) {
-            currentEditorMode = mode;
-            
-            // 更新选项卡状态
-            document.querySelectorAll('.editor-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.editor-area').forEach(area => {
-                area.classList.remove('active');
-            });
-            
-            // 激活选中的选项卡
-            if (mode === 'wysiwyg') {
-                document.querySelector('.editor-tab:nth-child(1)').classList.add('active');
-                document.getElementById('wysiwyg-editor-container').classList.add('active');
-            } else {
-                document.querySelector('.editor-tab:nth-child(2)').classList.add('active');
-                document.getElementById('markdown-editor-container').classList.add('active');
-            }
-        }
-
-        function initEditor(initialContent = '', initialMd = '') {
-            // 初始化可视化编辑器
-            const editorConfig = {
-                placeholder: '开始写作吧...',
-                MENU_CONF: {
-                    codeSelectLang: {
-                        codeLangs: [
-                            { text: 'C', value: 'c' },
-                            { text: 'C++', value: 'cpp' },
-                            { text: 'Java', value: 'java' },
-                            { text: 'Python', value: 'python' },
-                            { text: 'JavaScript', value: 'javascript' },
-                            { text: 'HTML', value: 'html' },
-                            { text: 'CSS', value: 'css' },
-                            { text: 'Markdown', value: 'markdown' }
-                        ]
-                    }
-                }
-            };
-
-            if (editorInstance) {
-                editorInstance.destroy();
-            }
-
-            editorInstance = window.wangEditor.createEditor({
-                selector: '#wysiwyg-editor',
-                config: editorConfig,
-                mode: 'default'
-            });
-
-            const toolbarConfig = {
-                toolbarKeys: [
-                    'headerSelect',
-                    '|',
-                    'bold',
-                    'underline',
-                    'italic',
-                    'color',
-                    'bgColor',
-                    '|',
-                    'fontSize',
-                    'fontFamily',
-                    'lineHeight',
-                    '|',
-                    'bulletedList',
-                    'numberedList',
-                    'todo',
-                    '|',
-                    'emotion',
-                    'insertLink',
-                    'insertImage',
-                    'insertVideo',
-                    'insertTable',
-                    'codeBlock',
-                    'blockquote',
-                    '|',
-                    'undo',
-                    'redo',
-                    '|',
-                    'fullScreen'
-                ]
-            };
-
-            const toolbar = window.wangEditor.createToolbar({
-                editor: editorInstance,
-                selector: '#wysiwyg-editor',
-                config: toolbarConfig,
-                mode: 'default'
-            });
-
-            if (initialContent) {
-                editorInstance.setHtml(initialContent);
-            }
-
-            // 初始化Markdown编辑器
-            if (initialMd) {
-                const mdEditor = document.getElementById('markdown-editor');
-                if (mdEditor) {
-                    mdEditor.value = initialMd;
-                }
-            }
-        }
-
         async function saveArticle() {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1264,24 +1085,16 @@
             }
 
             const title = document.getElementById('article-title').value.trim();
-            const htmlContent = editorInstance.getHtml();
-            const mdContent = document.getElementById('markdown-editor').value.trim();
+            const md = document.getElementById('article-md').value.trim();
 
             if (!title) {
                 alert('请输入文章标题');
                 return;
             }
 
-            if (currentEditorMode === 'wysiwyg') {
-                if (!htmlContent || htmlContent === '<p><br></p>') {
-                    alert('请输入文章内容');
-                    return;
-                }
-            } else {
-                if (!mdContent) {
-                    alert('请输入文章内容');
-                    return;
-                }
+            if (!md) {
+                alert('请输入文章内容');
+                return;
             }
 
             const articleId = generateId();
@@ -1294,8 +1107,8 @@
                     .insert({
                         id: articleId,
                         title: title,
-                        content: htmlContent,
-                        md: mdContent,
+                        md: md,
+                        content: marked.parse(md),
                         created_at: new Date().toISOString()
                     });
 
@@ -1320,24 +1133,16 @@
             }
 
             const title = document.getElementById('article-title').value.trim();
-            const htmlContent = editorInstance.getHtml();
-            const mdContent = document.getElementById('markdown-editor').value.trim();
+            const md = document.getElementById('article-md').value.trim();
 
             if (!title) {
                 alert('请输入文章标题');
                 return;
             }
 
-            if (currentEditorMode === 'wysiwyg') {
-                if (!htmlContent || htmlContent === '<p><br></p>') {
-                    alert('请输入文章内容');
-                    return;
-                }
-            } else {
-                if (!mdContent) {
-                    alert('请输入文章内容');
-                    return;
-                }
+            if (!md) {
+                alert('请输入文章内容');
+                return;
             }
 
             try {
@@ -1345,8 +1150,8 @@
                     .from('article')
                     .update({
                         title: title,
-                        content: htmlContent,
-                        md: mdContent,
+                        md: md,
+                        content: marked.parse(md),
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', articleId);
@@ -1415,11 +1220,9 @@
             }
         }
 
-        function truncateContent(html, maxLength = 200) {
-            if (!html) return '';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const text = tempDiv.textContent || tempDiv.innerText || '';
+        function truncateMarkdown(markdown, maxLength = 200) {
+            if (!markdown) return '';
+            const text = markdown.replace(/[#*`_\-\[\]\(\)]/g, '').replace(/\s+/g, ' ');
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
@@ -1453,26 +1256,58 @@
 
         document.addEventListener('DOMContentLoaded', async function () {
             console.log('页面加载完成，开始初始化...');
-            initSidebar();
-            await checkAuth();
-            await router.init();
-            if (currentUser) {
-                showAdminUI();
-            }
-
-            const wait = (islod, chyt) => {
-                const interval = setInterval(() => {
-                    if (islod()) {
-                        document.title = chyt;
-                        clearInterval(interval);
+            
+            if (typeof marked === 'undefined') {
+                console.log('正在加载Marked.js...');
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+                script.onload = async function() {
+                    console.log('Marked.js加载完成');
+                    initSidebar();
+                    await checkAuth();
+                    await router.init();
+                    if (currentUser) {
+                        showAdminUI();
                     }
-                }, 100);
-            };
 
-            wait(
-                () => document.readyState === 'complete',
-                '文章-HZY'
-            );
+                    const wait = (islod, chyt) => {
+                        const interval = setInterval(() => {
+                            if (islod()) {
+                                document.title = chyt;
+                                clearInterval(interval);
+                            }
+                        }, 100);
+                    };
+
+                    wait(
+                        () => document.readyState === 'complete',
+                        '文章-HZY'
+                    );
+                };
+                document.head.appendChild(script);
+            } else {
+                console.log('Marked.js已加载');
+                initSidebar();
+                await checkAuth();
+                await router.init();
+                if (currentUser) {
+                    showAdminUI();
+                }
+
+                const wait = (islod, chyt) => {
+                    const interval = setInterval(() => {
+                        if (islod()) {
+                            document.title = chyt;
+                            clearInterval(interval);
+                        }
+                    }, 100);
+                };
+
+                wait(
+                    () => document.readyState === 'complete',
+                    '文章-HZY'
+                );
+            }
         });
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
