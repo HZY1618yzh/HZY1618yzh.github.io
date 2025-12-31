@@ -11,8 +11,9 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
-    <!-- 移除wangEditor的CSS，添加SimpleMDE的CSS -->
+    <!-- SimpleMDE和KaTeX样式 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
         * {
             margin: 0;
@@ -483,36 +484,36 @@
         .delete-btn-cancel:hover {
             background-color: #7f8c8d;
         }
-
+        
         /* Markdown编辑器容器样式 */
         .markdown-editor-container {
             border: 1px solid #ddd;
             border-radius: 6px;
             overflow: hidden;
         }
-
+        
         /* SimpleMDE自定义样式 */
         .editor-toolbar {
             border-bottom: 1px solid #ddd !important;
             background: #f8f9fa !important;
         }
-
+        
         .CodeMirror {
             border: none !important;
             height: 400px !important;
             font-family: 'Consolas', Monaco, 'Courier New', monospace !important;
             font-size: 14px !important;
         }
-
+        
         .editor-preview {
             background: white !important;
             padding: 20px !important;
         }
-
+        
         .editor-preview-side {
             border-left: 1px solid #ddd !important;
         }
-
+        
         /* 提示信息样式 */
         .editor-help {
             background: #f8f9fa;
@@ -523,14 +524,27 @@
             color: #666;
             border-left: 4px solid #3498db;
         }
-
+        
         .editor-help ul {
             margin: 10px 0;
             padding-left: 20px;
         }
-
+        
         .editor-help li {
             margin-bottom: 5px;
+        }
+        
+        /* KaTeX公式样式 */
+        .katex {
+            font-size: 1.1em !important;
+        }
+        .katex-display {
+            margin: 1em 0 !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            padding: 10px !important;
+            background: #f8f9fa !important;
+            border-radius: 4px !important;
         }
     </style>
 </head>
@@ -539,7 +553,10 @@
     <div id="nav">侧边栏</div>
     <main id="content" style="padding: 20px;"></main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 添加marked、KaTeX和SimpleMDE -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 
     <script>
@@ -560,37 +577,80 @@
             }
             return id;
         }
-        function htmlToMarkdown(html) {
-            if (!html) return '';
-            let markdown = html
-                .replace(/<p>(.*?)<\/p>/g, '$1\n\n')
-                .replace(/<h1>(.*?)<\/h1>/g, '# $1\n\n')
-                .replace(/<h2>(.*?)<\/h2>/g, '## $1\n\n')
-                .replace(/<h3>(.*?)<\/h3>/g, '### $1\n\n')
-                .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
-                .replace(/<b>(.*?)<\/b>/g, '**$1**')
-                .replace(/<em>(.*?)<\/em>/g, '*$1*')
-                .replace(/<i>(.*?)<\/i>/g, '*$1*')
-                .replace(/<code>(.*?)<\/code>/g, '`$1`')
-                .replace(/<pre><code>(.*?)<\/code><\/pre>/gs, '```\n$1\n```\n\n')
-                .replace(/<blockquote>(.*?)<\/blockquote>/g, '> $1\n\n')
-                .replace(/<li>(.*?)<\/li>/g, '- $1\n')
-                .replace(/<ul>|<\/ul>/g, '')
-                .replace(/<a href="(.*?)">(.*?)<\/a>/g, '[$2]($1)')
-                .replace(/<img src="(.*?)" alt="(.*?)">/g, '![$2]($1)')
-                .replace(/<br>/g, '\n')
-                .replace(/<[^>]*>/g, '')
-                .replace(/\n{3,}/g, '\n\n')
-                .trim();
-
-            return markdown;
-        }
-
+        
+        // 配置marked以支持LaTeX
         marked.setOptions({
             breaks: true,
             gfm: true,
             headerIds: false
         });
+
+        // 创建自定义的Markdown渲染器，支持LaTeX
+        const renderer = new marked.Renderer();
+
+        // 处理代码块
+        renderer.code = function(code, language) {
+            // 检查是否是LaTeX块（以$$开头和结尾）
+            if (code.startsWith('$$') && code.endsWith('$$') && code.length > 3) {
+                const latex = code.substring(2, code.length - 2);
+                try {
+                    return `<div class="katex-display">${katex.renderToString(latex, { displayMode: true, throwOnError: false })}</div>`;
+                } catch (e) {
+                    return `<div style="color: red; padding: 10px; background: #fee;">LaTeX错误: ${e.message}</div>`;
+                }
+            }
+            
+            // 普通代码块
+            const validLang = language || 'plaintext';
+            const escapedCode = escapeHtml(code);
+            return `<pre><code class="language-${validLang}">${escapedCode}</code></pre>`;
+        };
+
+        // 处理行内代码
+        renderer.codespan = function(code) {
+            // 检查是否是行内LaTeX公式（以$开头和结尾）
+            if (code.startsWith('$') && code.endsWith('$') && code.length > 1) {
+                const latex = code.substring(1, code.length - 1);
+                try {
+                    return katex.renderToString(latex, { displayMode: false, throwOnError: false });
+                } catch (e) {
+                    return `<code style="color: red;">LaTeX错误: ${e.message}</code>`;
+                }
+            }
+            return `<code>${escapeHtml(code)}</code>`;
+        };
+
+        // 应用自定义渲染器
+        marked.setOptions({ renderer });
+
+        // HTML转Markdown的函数（简化版）
+        function htmlToMarkdown(html) {
+            if (!html) return '';
+            
+            let markdown = html
+                // 清理HTML标签，保留文本内容
+                .replace(/<[^>]*>/g, ' ')
+                // 清理多余空格
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            return markdown;
+        }
+        
+        // 渲染LaTeX公式
+        function renderLatex(element) {
+            if (!element) return;
+            
+            renderMathInElement(element, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        }
 
         async function checkAuth() {
             try {
@@ -1029,7 +1089,7 @@
                             ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                         </div>
                     </div>
-                    <div class="article-content">
+                    <div class="article-content" id="article-content">
                         ${article.content}
                     </div>
                     <div class="action-buttons">
@@ -1046,6 +1106,12 @@
                         ` : ''}
                     </div>
                 `;
+                
+                // 渲染文章内容中的LaTeX公式
+                setTimeout(() => {
+                    renderLatex(document.getElementById('article-content'));
+                }, 100);
+                
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
@@ -1075,16 +1141,21 @@
                 <div class="article-header">
                     <h1>新建文章</h1>
                     <div class="editor-help">
-                        <p><strong>使用Markdown编辑器：</strong></p>
+                        <p><strong>Markdown编辑器使用指南：</strong></p>
                         <ul>
-                            <li>标题: # 一级标题, ## 二级标题</li>
-                            <li>列表: - 无序列表, 1. 有序列表</li>
-                            <li>代码: \`代码\` 或 \`\`\`语言\n代码\n\`\`\`</li>
-                            <li>LaTeX: $行内公式$ 或 $$块级公式$$</li>
-                            <li>粗体: **粗体**，斜体: *斜体*</li>
-                            <li>链接: [文本](链接)，图片: ![描述](图片链接)</li>
+                            <li><strong>标题</strong>: # 一级标题, ## 二级标题, ### 三级标题</li>
+                            <li><strong>LaTeX公式</strong>:
+                                <ul>
+                                    <li>行内公式: \`$E = mc^2$\`</li>
+                                    <li>块级公式: \`$$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$</li>
+                                </ul>
+                            </li>
+                            <li><strong>代码</strong>: \`代码\` 或 \`\`\`语言\n代码\n\`\`\`</li>
+                            <li><strong>列表</strong>: - 无序列表, 1. 有序列表</li>
+                            <li><strong>强调</strong>: **粗体**, *斜体*</li>
+                            <li><strong>链接</strong>: [文本](链接), **图片**: ![描述](图片链接)</li>
                         </ul>
-                        <p>支持实时预览，使用工具栏按钮或快捷键</p>
+                        <p>工具栏包含LaTeX公式按钮，支持实时预览</p>
                     </div>
                 </div>
                 <div class="editor-container">
@@ -1137,14 +1208,15 @@
                     .single();
 
                 if (error) throw error;
-                const markdownContent = htmlToMarkdown(article.content);
 
                 content.innerHTML = `
                     <div class="article-header">
                         <h1>编辑文章</h1>
                         <div class="editor-help">
-                            <p><strong>使用Markdown编辑器：</strong>编辑Markdown源码，保存为HTML</p>
-                            <p>支持LaTeX公式: $E=mc^2$ 或 $$\\sum_{i=1}^n i$$</p>
+                            <p><strong>提示：</strong>编辑Markdown源码，支持LaTeX公式</p>
+                            <p>• 行内公式: $E=mc^2$</p>
+                            <p>• 块级公式: $$\\sum_{i=1}^n i$$</p>
+                            <p>• 使用工具栏的LaTeX按钮插入公式模板</p>
                         </div>
                     </div>
                     <div class="editor-container">
@@ -1155,7 +1227,7 @@
                         <div class="form-group">
                             <label class="form-label">内容（Markdown格式）</label>
                             <div class="markdown-editor-container">
-                                <textarea id="markdown-editor">${escapeHtml(markdownContent)}</textarea>
+                                <textarea id="markdown-editor">${escapeHtml(article.content)}</textarea>
                             </div>
                         </div>
                         <div class="action-buttons">
@@ -1175,7 +1247,7 @@
                     </div>
                 `;
 
-                initEditor(markdownContent);
+                initEditor(article.content);
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
@@ -1191,22 +1263,58 @@
             }
         }
 
+        // 初始化Markdown编辑器（带LaTeX支持）
         function initEditor(initialContent = '') {
+            // 销毁之前的编辑器实例
             if (editorInstance) {
                 editorInstance.toTextArea();
                 editorInstance = null;
             }
+            
+            // 自定义LaTeX按钮
+            const latexButton = {
+                name: "latex",
+                action: function(editor) {
+                    const cm = editor.codemirror;
+                    const selection = cm.getSelection();
+                    const text = selection || "E = mc^2";
+                    cm.replaceSelection("$" + text + "$");
+                    if (!selection) {
+                        cm.setCursor(cm.getCursor().line, cm.getCursor().ch - text.length - 1);
+                    }
+                },
+                className: "fa fa-sigma",
+                title: "插入LaTeX公式"
+            };
+            
+            const blockLatexButton = {
+                name: "block-latex",
+                action: function(editor) {
+                    const cm = editor.codemirror;
+                    const selection = cm.getSelection();
+                    const text = selection || "\\sum_{i=1}^n i = \\frac{n(n+1)}{2}";
+                    cm.replaceSelection("$$\n" + text + "\n$$");
+                    if (!selection) {
+                        cm.setCursor(cm.getCursor().line - 1, text.length + 1);
+                    }
+                },
+                className: "fa fa-square-root-alt",
+                title: "插入块级LaTeX公式"
+            };
+            
+            // 创建SimpleMDE编辑器
             editorInstance = new EasyMDE({
                 element: document.getElementById('markdown-editor'),
                 autosave: {
                     enabled: false,
                 },
-                placeholder: "输入Markdown内容...",
+                placeholder: "输入Markdown内容...支持LaTeX公式：$E=mc^2$",
                 spellChecker: false,
                 status: true,
                 toolbar: [
                     "heading", "bold", "italic", "strikethrough", "|",
                     "code", "quote", "unordered-list", "ordered-list", "|",
+                    latexButton, blockLatexButton, "|",
                     "link", "image", "table", "horizontal-rule", "|",
                     "preview", "side-by-side", "fullscreen", "|",
                     "guide"
@@ -1215,13 +1323,25 @@
                     singleLineBreaks: false,
                     codeSyntaxHighlighting: true,
                 },
-                previewRender: function (plainText) {
+                previewRender: function(plainText) {
+                    // 使用配置了LaTeX支持的marked渲染预览
                     return marked.parse(plainText);
-                }
+                },
+                previewClass: "editor-preview"
             });
-
+            
             if (initialContent) {
                 editorInstance.value(initialContent);
+            }
+            
+            // 配置预览中的LaTeX渲染
+            const previewElement = editorInstance.codemirror.getWrapperElement().querySelector('.editor-preview');
+            if (previewElement) {
+                editorInstance.codemirror.on("update", function() {
+                    setTimeout(() => {
+                        renderLatex(previewElement);
+                    }, 100);
+                });
             }
         }
 
@@ -1245,8 +1365,9 @@
                 return;
             }
 
+            // 将Markdown转换为HTML（使用支持LaTeX的配置）
             const htmlContent = marked.parse(markdownContent);
-
+            
             const articleId = generateId();
 
             try {
@@ -1294,6 +1415,7 @@
                 return;
             }
 
+            // 将Markdown转换为HTML（使用支持LaTeX的配置）
             const htmlContent = marked.parse(markdownContent);
 
             try {
@@ -1430,11 +1552,6 @@
             );
         });
     </script>
-    <script defer
-        src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
-        integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
-        data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
-        crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
-
 </html>
