@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
     <!-- 引入KaTeX样式 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
     <style>
         * {
             margin: 0;
@@ -498,10 +498,6 @@
     <div id="nav">侧边栏</div>
     <main id="content" style="padding: 20px;"></main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- 引入marked和KaTeX -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <script>
         const SUPABASE_URL = 'https://hdhpftgjhvorrwtsdpgb.supabase.co';
@@ -997,26 +993,6 @@
             }
         }
 
-        function renderMarkdownAndLaTeX(markdown, containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            // 使用marked渲染Markdown
-            const html = marked.parse(markdown);
-            container.innerHTML = html;
-            
-            // 使用KaTeX渲染LaTeX公式
-            renderMathInElement(container, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false},
-                    {left: '\\(', right: '\\)', display: false},
-                    {left: '\\[', right: '\\]', display: true}
-                ],
-                throwOnError: false
-            });
-        }
-
         function showNewArticle() {
             if (!currentUser) {
                 alert('请先登录！');
@@ -1268,7 +1244,6 @@
 
         function truncateMarkdown(markdown, maxLength = 200) {
             if (!markdown) return '';
-            // 移除Markdown语法标签，只保留纯文本
             const text = markdown.replace(/[#*`_\-\[\]\(\)]/g, '').replace(/\s+/g, ' ');
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
@@ -1299,6 +1274,52 @@
                     </li>\
                 </ul>\
             </nav>';
+        }
+
+        // 渲染Markdown和LaTeX的函数
+        function renderMarkdownAndLaTeX(markdown, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // 如果marked未加载，动态加载它
+            if (typeof marked === 'undefined') {
+                loadScript('https://cdn.jsdelivr.net/npm/marked/marked.min.js', function() {
+                    loadScript('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js', function() {
+                        loadScript('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js', function() {
+                            renderContent(markdown, container);
+                        });
+                    });
+                });
+            } else {
+                renderContent(markdown, container);
+            }
+        }
+
+        function renderContent(markdown, container) {
+            // 使用marked渲染Markdown
+            const html = marked.parse(markdown);
+            container.innerHTML = html;
+            
+            // 使用KaTeX渲染LaTeX公式
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(container, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // 动态加载脚本的函数
+        function loadScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = callback;
+            document.head.appendChild(script);
         }
 
         document.addEventListener('DOMContentLoaded', async function () {
