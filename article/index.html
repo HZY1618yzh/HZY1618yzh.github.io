@@ -11,6 +11,8 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <!-- 引入KaTeX样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
         * {
             margin: 0;
@@ -292,8 +294,6 @@
             line-height: 1.8;
             font-size: 1.1rem;
             color: #34495e;
-            white-space: pre-wrap;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .article-content h1,
@@ -336,6 +336,17 @@
             margin: 20px 0;
             color: #7f8c8d;
             font-style: italic;
+        }
+
+        /* KaTeX样式调整 */
+        .katex {
+            font-size: 1.1em !important;
+        }
+
+        .katex-display {
+            margin: 1em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         .action-buttons {
@@ -487,6 +498,10 @@
     <div id="nav">侧边栏</div>
     <main id="content" style="padding: 20px;"></main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 引入marked和KaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <script>
         const SUPABASE_URL = 'https://hdhpftgjhvorrwtsdpgb.supabase.co';
@@ -855,7 +870,7 @@
                                 <span> | 创建时间：${formatDate(article.created_at)}</span>
                                 ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                             </div>
-                            <div class="article-content-preview">${truncateContent(article.md || '无内容')}</div>
+                            <div class="article-content-preview">${truncateMarkdown(article.md || '无内容')}</div>
                             <div class="action-buttons">
                                 <button class="btn btn-primary" onclick="router.navigate('/article/${article.id}')">
                                     <i class="fas fa-eye"></i> 阅读
@@ -945,8 +960,7 @@
                             ${article.updated_at ? `<span> | 更新时间：${formatDate(article.updated_at)}</span>` : ''}
                         </div>
                     </div>
-                    <div class="article-content">
-                        ${escapeHtml(article.md || '')}
+                    <div id="article-content-container" class="article-content">
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="router.navigate('/article')">
@@ -965,6 +979,9 @@
                         ` : ''}
                     </div>
                 `;
+
+                // 渲染Markdown和LaTeX
+                renderMarkdownAndLaTeX(article.md || '', 'article-content-container');
             } catch (error) {
                 console.error('加载文章失败:', error);
                 content.innerHTML = `
@@ -978,6 +995,26 @@
                     </div>
                 `;
             }
+        }
+
+        function renderMarkdownAndLaTeX(markdown, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // 使用marked渲染Markdown
+            const html = marked.parse(markdown);
+            container.innerHTML = html;
+            
+            // 使用KaTeX渲染LaTeX公式
+            renderMathInElement(container, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
         }
 
         function showNewArticle() {
@@ -1229,8 +1266,10 @@
             }
         }
 
-        function truncateContent(text, maxLength = 200) {
-            if (!text) return '';
+        function truncateMarkdown(markdown, maxLength = 200) {
+            if (!markdown) return '';
+            // 移除Markdown语法标签，只保留纯文本
+            const text = markdown.replace(/[#*`_\-\[\]\(\)]/g, '').replace(/\s+/g, ' ');
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
