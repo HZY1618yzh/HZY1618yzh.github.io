@@ -546,6 +546,13 @@
             background: #f8f9fa !important;
             border-radius: 4px !important;
         }
+        
+        .katex-error {
+            color: red !important;
+            border: 1px solid red !important;
+            padding: 5px !important;
+            background: #fee !important;
+        }
     </style>
 </head>
 
@@ -556,7 +563,6 @@
     <!-- 添加marked、KaTeX和SimpleMDE -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 
     <script>
@@ -578,55 +584,102 @@
             return id;
         }
         
-        // 配置marked以支持LaTeX
-        marked.setOptions({
-            breaks: true,
-            gfm: true,
-            headerIds: false
-        });
-
-        // 创建自定义的Markdown渲染器，支持LaTeX
-        const renderer = new marked.Renderer();
-
-        // 处理代码块
-        renderer.code = function(code, language) {
-            // 检查是否是LaTeX块（以$$开头和结尾）
-            if (code.startsWith('$$') && code.endsWith('$$') && code.length > 3) {
-                const latex = code.substring(2, code.length - 2);
-                try {
-                    return `<div class="katex-display">${katex.renderToString(latex, { displayMode: true, throwOnError: false })}</div>`;
-                } catch (e) {
-                    return `<div style="color: red; padding: 10px; background: #fee;">LaTeX错误: ${e.message}</div>`;
+        // 核心函数：将Markdown中的LaTeX转换为HTML
+        function convertMarkdownWithLatex(markdown) {
+            if (!markdown) return '';
+            
+            let html = '';
+            const lines = markdown.split('\n');
+            let inCodeBlock = false;
+            let codeBlockContent = '';
+            let codeBlockLang = '';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                // 处理代码块
+                if (line.startsWith('```')) {
+                    if (!inCodeBlock) {
+                        // 开始代码块
+                        inCodeBlock = true;
+                        codeBlockLang = line.substring(3).trim();
+                        codeBlockContent = '';
+                    } else {
+                        // 结束代码块
+                        inCodeBlock = false;
+                        html += `<pre><code class="language-${codeBlockLang}">${escapeHtml(codeBlockContent)}</code></pre>\n`;
+                    }
+                    continue;
+                }
+                
+                if (inCodeBlock) {
+                    codeBlockContent += line + '\n';
+                    continue;
+                }
+                
+                // 处理块级LaTeX公式 $$
+                if (line.trim().startsWith('$$') && line.trim().endsWith('$$')) {
+                    const latex = line.trim().substring(2, line.trim().length - 2);
+                    try {
+                        html += `<div class="katex-display">${katex.renderToString(latex, { displayMode: true, throwOnError: false })}</div>\n`;
+                    } catch (e) {
+                        html += `<div class="katex-error">LaTeX错误: ${e.message}</div>\n`;
+                    }
+                    continue;
+                }
+                
+                // 处理普通Markdown行（包含行内LaTeX）
+                let processedLine = line;
+                
+                // 将行内LaTeX $...$ 转换为KaTeX HTML
+                processedLine = processedLine.replace(/\$(.*?)\$/g, (match, latex) => {
+                    try {
+                        return katex.renderToString(latex.trim(), { displayMode: false, throwOnError: false });
+                    } catch (e) {
+                        return `<span class="katex-error">LaTeX错误: ${e.message}</span>`;
+                    }
+                });
+                
+                // 将块级LaTeX $$...$$ 转换为KaTeX HTML
+                processedLine = processedLine.replace(/\$\$(.*?)\$\$/g, (match, latex) => {
+                    try {
+                        return `<div class="katex-display">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`;
+                    } catch (e) {
+                        return `<div class="katex-error">LaTeX错误: ${e.message}</div>`;
+                    }
+                });
+                
+                // 简单的Markdown处理
+                if (line.startsWith('# ')) {
+                    html += `<h1>${line.substring(2)}</h1>\n`;
+                } else if (line.startsWith('## ')) {
+                    html += `<h2>${line.substring(3)}</h2>\n`;
+                } else if (line.startsWith('### ')) {
+                    html += `<h3>${line.substring(4)}</h3>\n`;
+                } else if (line.startsWith('- ')) {
+                    html += `<li>${line.substring(2)}</li>\n`;
+                } else if (line.trim() === '') {
+                    html += '<p><br></p>\n';
+                } else {
+                    // 处理行内格式
+                    let text = processedLine;
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    text = text.replace(/`(.*?)`/g, '<code>$1</code>');
+                    text = text.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+                    text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+                    html += `<p>${text}</p>\n`;
                 }
             }
             
-            // 普通代码块
-            const validLang = language || 'plaintext';
-            const escapedCode = escapeHtml(code);
-            return `<pre><code class="language-${validLang}">${escapedCode}</code></pre>`;
-        };
-
-        // 处理行内代码
-        renderer.codespan = function(code) {
-            // 检查是否是行内LaTeX公式（以$开头和结尾）
-            if (code.startsWith('$') && code.endsWith('$') && code.length > 1) {
-                const latex = code.substring(1, code.length - 1);
-                try {
-                    return katex.renderToString(latex, { displayMode: false, throwOnError: false });
-                } catch (e) {
-                    return `<code style="color: red;">LaTeX错误: ${e.message}</code>`;
-                }
-            }
-            return `<code>${escapeHtml(code)}</code>`;
-        };
-
-        // 应用自定义渲染器
-        marked.setOptions({ renderer });
-
-        // HTML转Markdown的函数（简化版）
+            return html;
+        }
+        
+        // HTML转Markdown（简化版，用于编辑现有文章）
         function htmlToMarkdown(html) {
             if (!html) return '';
             
+            // 简单的HTML转Markdown
             let markdown = html
                 // 清理HTML标签，保留文本内容
                 .replace(/<[^>]*>/g, ' ')
@@ -637,18 +690,29 @@
             return markdown;
         }
         
-        // 渲染LaTeX公式
-        function renderLatex(element) {
+        // 渲染文章内容中的LaTeX
+        function renderLatexInElement(element) {
             if (!element) return;
             
-            renderMathInElement(element, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false},
-                    {left: '\\(', right: '\\)', display: false},
-                    {left: '\\[', right: '\\]', display: true}
-                ],
-                throwOnError: false
+            // 使用KaTeX手动渲染公式
+            const text = element.innerHTML;
+            
+            // 渲染行内公式
+            element.innerHTML = text.replace(/\$(.*?)\$/g, (match, latex) => {
+                try {
+                    return katex.renderToString(latex.trim(), { displayMode: false, throwOnError: false });
+                } catch (e) {
+                    return `<span class="katex-error">LaTeX错误: ${e.message}</span>`;
+                }
+            });
+            
+            // 渲染块级公式
+            element.innerHTML = element.innerHTML.replace(/\$\$(.*?)\$\$/g, (match, latex) => {
+                try {
+                    return `<div class="katex-display">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`;
+                } catch (e) {
+                    return `<div class="katex-error">LaTeX错误: ${e.message}</div>`;
+                }
             });
         }
 
@@ -1107,9 +1171,12 @@
                     </div>
                 `;
                 
-                // 渲染文章内容中的LaTeX公式
+                // 如果内容中有LaTeX公式，渲染它们
                 setTimeout(() => {
-                    renderLatex(document.getElementById('article-content'));
+                    const contentElement = document.getElementById('article-content');
+                    if (contentElement && contentElement.textContent.includes('$')) {
+                        renderLatexInElement(contentElement);
+                    }
                 }, 100);
                 
             } catch (error) {
@@ -1146,8 +1213,8 @@
                             <li><strong>标题</strong>: # 一级标题, ## 二级标题, ### 三级标题</li>
                             <li><strong>LaTeX公式</strong>:
                                 <ul>
-                                    <li>行内公式: \`$E = mc^2$\`</li>
-                                    <li>块级公式: \`$$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$</li>
+                                    <li>行内公式: $E = mc^2$</li>
+                                    <li>块级公式: $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$</li>
                                 </ul>
                             </li>
                             <li><strong>代码</strong>: \`代码\` 或 \`\`\`语言\n代码\n\`\`\`</li>
@@ -1263,7 +1330,7 @@
             }
         }
 
-        // 初始化Markdown编辑器（带LaTeX支持）
+        // 初始化Markdown编辑器
         function initEditor(initialContent = '') {
             // 销毁之前的编辑器实例
             if (editorInstance) {
@@ -1284,7 +1351,7 @@
                     }
                 },
                 className: "fa fa-sigma",
-                title: "插入LaTeX公式"
+                title: "插入行内LaTeX公式"
             };
             
             const blockLatexButton = {
@@ -1308,7 +1375,7 @@
                 autosave: {
                     enabled: false,
                 },
-                placeholder: "输入Markdown内容...支持LaTeX公式：$E=mc^2$",
+                placeholder: "输入Markdown内容...支持LaTeX公式：$E=mc^2$ 或 $$\\sum_{i=1}^n i$$",
                 spellChecker: false,
                 status: true,
                 toolbar: [
@@ -1324,24 +1391,14 @@
                     codeSyntaxHighlighting: true,
                 },
                 previewRender: function(plainText) {
-                    // 使用配置了LaTeX支持的marked渲染预览
-                    return marked.parse(plainText);
+                    // 使用自定义函数渲染预览，支持LaTeX
+                    return convertMarkdownWithLatex(plainText);
                 },
                 previewClass: "editor-preview"
             });
             
             if (initialContent) {
                 editorInstance.value(initialContent);
-            }
-            
-            // 配置预览中的LaTeX渲染
-            const previewElement = editorInstance.codemirror.getWrapperElement().querySelector('.editor-preview');
-            if (previewElement) {
-                editorInstance.codemirror.on("update", function() {
-                    setTimeout(() => {
-                        renderLatex(previewElement);
-                    }, 100);
-                });
             }
         }
 
@@ -1365,8 +1422,10 @@
                 return;
             }
 
-            // 将Markdown转换为HTML（使用支持LaTeX的配置）
-            const htmlContent = marked.parse(markdownContent);
+            // 关键：将Markdown转换为HTML，并转换LaTeX为KaTeX HTML
+            const htmlContent = convertMarkdownWithLatex(markdownContent);
+            
+            console.log('保存的HTML内容:', htmlContent);
             
             const articleId = generateId();
 
@@ -1378,7 +1437,7 @@
                     .insert({
                         id: articleId,
                         title: title,
-                        content: htmlContent,
+                        content: htmlContent, // 这里保存的是包含KaTeX HTML的内容
                         created_at: new Date().toISOString()
                     });
 
@@ -1415,15 +1474,17 @@
                 return;
             }
 
-            // 将Markdown转换为HTML（使用支持LaTeX的配置）
-            const htmlContent = marked.parse(markdownContent);
+            // 关键：将Markdown转换为HTML，并转换LaTeX为KaTeX HTML
+            const htmlContent = convertMarkdownWithLatex(markdownContent);
+            
+            console.log('更新的HTML内容:', htmlContent);
 
             try {
                 const { error } = await supabase
                     .from('article')
                     .update({
                         title: title,
-                        content: htmlContent,
+                        content: htmlContent, // 这里保存的是包含KaTeX HTML的内容
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', articleId);
@@ -1552,6 +1613,5 @@
             );
         });
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
