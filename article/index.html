@@ -485,33 +485,83 @@
             background-color: #7f8c8d;
         }
         
-        /* Markdown编辑器容器样式 */
+        /* Markdown编辑器容器样式 - 修复穿模问题 */
         .markdown-editor-container {
             border: 1px solid #ddd;
             border-radius: 6px;
             overflow: hidden;
+            position: relative;
+            min-height: 400px;
         }
         
-        /* SimpleMDE自定义样式 */
+        /* SimpleMDE自定义样式 - 修复穿模 */
         .editor-toolbar {
             border-bottom: 1px solid #ddd !important;
             background: #f8f9fa !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
         }
         
         .CodeMirror {
             border: none !important;
-            height: 400px !important;
+            min-height: 400px !important;
+            height: auto !important;
             font-family: 'Consolas', Monaco, 'Courier New', monospace !important;
             font-size: 14px !important;
+            z-index: 1 !important;
+        }
+        
+        .CodeMirror-scroll {
+            min-height: 400px !important;
         }
         
         .editor-preview {
             background: white !important;
             padding: 20px !important;
+            overflow-y: auto !important;
+            max-height: 600px !important;
+            position: relative !important;
+            z-index: 2 !important;
         }
         
         .editor-preview-side {
             border-left: 1px solid #ddd !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+        
+        /* 修复EasyMDE预览容器 */
+        .EasyMDEContainer {
+            position: relative !important;
+            min-height: 400px !important;
+        }
+        
+        .EasyMDEContainer .CodeMirror {
+            position: absolute !important;
+            top: 39px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: auto !important;
+        }
+        
+        .EasyMDEContainer .editor-preview {
+            position: absolute !important;
+            top: 39px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: auto !important;
+        }
+        
+        .EasyMDEContainer.sided--no-sided .editor-preview-side {
+            position: absolute !important;
+            top: 39px !important;
+            bottom: 0 !important;
+            left: 50% !important;
+            right: 0 !important;
+            height: auto !important;
         }
         
         /* 提示信息样式 */
@@ -534,24 +584,70 @@
             margin-bottom: 5px;
         }
         
-        /* KaTeX公式样式 */
+        /* KaTeX公式样式 - 修复多行公式 */
         .katex {
             font-size: 1.1em !important;
+            line-height: 1.2 !important;
         }
+        
         .katex-display {
             margin: 1em 0 !important;
             overflow-x: auto !important;
             overflow-y: hidden !important;
-            padding: 10px !important;
+            padding: 15px !important;
             background: #f8f9fa !important;
-            border-radius: 4px !important;
+            border-radius: 8px !important;
+            position: relative !important;
+            display: block !important;
+        }
+        
+        .katex-display > .katex {
+            white-space: normal !important;
+            text-align: center !important;
+            display: block !important;
+            padding: 10px 0 !important;
+        }
+        
+        .katex-display .katex-html {
+            display: inline-block !important;
+            text-align: center !important;
+        }
+        
+        /* 多行LaTeX公式容器 */
+        .multiline-latex {
+            display: block !important;
+            margin: 1em 0 !important;
+            padding: 15px !important;
+            background: #f8f9fa !important;
+            border-radius: 8px !important;
+            overflow-x: auto !important;
         }
         
         .katex-error {
             color: red !important;
             border: 1px solid red !important;
-            padding: 5px !important;
+            padding: 10px !important;
             background: #fee !important;
+            border-radius: 4px !important;
+            margin: 5px 0 !important;
+            font-family: monospace !important;
+            font-size: 0.9em !important;
+        }
+        
+        /* 文章内容中的LaTeX样式 */
+        .article-content .katex-display {
+            margin: 20px 0 !important;
+            padding: 20px !important;
+        }
+        
+        .article-content .katex {
+            font-size: 1.15em !important;
+        }
+        
+        /* 预览中的LaTeX样式 */
+        .editor-preview .katex-display {
+            margin: 15px 0 !important;
+            padding: 15px !important;
         }
     </style>
 </head>
@@ -584,30 +680,111 @@
             return id;
         }
         
-        // 核心函数：将Markdown中的LaTeX转换为HTML
+        // 核心函数：将Markdown中的LaTeX转换为HTML（支持多行公式）
         function convertMarkdownWithLatex(markdown) {
             if (!markdown) return '';
             
-            let html = '';
-            const lines = markdown.split('\n');
-            let inCodeBlock = false;
-            let codeBlockContent = '';
-            let codeBlockLang = '';
+            // 第一步：处理多行LaTeX公式块
+            let processedText = '';
+            let inLatexBlock = false;
+            let latexBlockContent = '';
+            let lines = markdown.split('\n');
             
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
                 
+                // 检查是否开始多行LaTeX块
+                if (line.trim() === '$$') {
+                    if (!inLatexBlock) {
+                        // 开始LaTeX块
+                        inLatexBlock = true;
+                        latexBlockContent = '';
+                        // 添加占位符，后面会替换
+                        processedText += `\n[LATEX_BLOCK_START]\n`;
+                    } else {
+                        // 结束LaTeX块
+                        inLatexBlock = false;
+                        // 添加结束标记
+                        processedText += `\n[LATEX_BLOCK:${latexBlockContent}]\n`;
+                    }
+                    continue;
+                }
+                
+                if (inLatexBlock) {
+                    latexBlockContent += line + '\n';
+                    continue;
+                }
+                
+                processedText += line + '\n';
+            }
+            
+            // 第二步：处理单行LaTeX公式（行内和单行块级）
+            let result = processedText;
+            
+            // 处理单行块级LaTeX $$...$$
+            result = result.replace(/\$\$(.*?)\$\$/g, (match, latex) => {
+                try {
+                    return `<div class="katex-display">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`;
+                } catch (e) {
+                    return `<div class="katex-error">LaTeX错误: ${escapeHtml(e.message)}<br>公式: ${escapeHtml(latex)}</div>`;
+                }
+            });
+            
+            // 处理行内LaTeX $...$
+            result = result.replace(/\$(.*?)\$/g, (match, latex) => {
+                // 避免匹配到LATEX_BLOCK标记
+                if (match.includes('LATEX_BLOCK')) return match;
+                try {
+                    return katex.renderToString(latex.trim(), { displayMode: false, throwOnError: false });
+                } catch (e) {
+                    return `<span class="katex-error">LaTeX错误: ${escapeHtml(e.message)}</span>`;
+                }
+            });
+            
+            // 第三步：处理多行LaTeX块
+            result = result.replace(/\[LATEX_BLOCK_START\]/g, '');
+            result = result.replace(/\[LATEX_BLOCK:(.*?)\]/g, (match, latex) => {
+                try {
+                    return `<div class="katex-display">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`;
+                } catch (e) {
+                    return `<div class="katex-error">多行LaTeX错误: ${escapeHtml(e.message)}<br>公式:<pre>${escapeHtml(latex)}</pre></div>`;
+                }
+            });
+            
+            // 第四步：处理其他Markdown格式
+            result = result
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^- (.*$)/gm, '<li>$1</li>')
+                .replace(/^\d\. (.*$)/gm, '<li>$1</li>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%;">')
+                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+            
+            // 第五步：处理代码块
+            let finalResult = '';
+            let inCodeBlock = false;
+            let codeBlockContent = '';
+            let codeBlockLang = '';
+            const resultLines = result.split('\n');
+            
+            for (let i = 0; i < resultLines.length; i++) {
+                const line = resultLines[i];
+                
                 // 处理代码块
-                if (line.startsWith('```')) {
+                if (line.trim().startsWith('```')) {
                     if (!inCodeBlock) {
                         // 开始代码块
                         inCodeBlock = true;
-                        codeBlockLang = line.substring(3).trim();
+                        codeBlockLang = line.trim().substring(3).trim();
                         codeBlockContent = '';
                     } else {
                         // 结束代码块
                         inCodeBlock = false;
-                        html += `<pre><code class="language-${codeBlockLang}">${escapeHtml(codeBlockContent)}</code></pre>\n`;
+                        finalResult += `<pre><code class="language-${codeBlockLang}">${escapeHtml(codeBlockContent)}</code></pre>\n`;
                     }
                     continue;
                 }
@@ -617,101 +794,46 @@
                     continue;
                 }
                 
-                // 处理块级LaTeX公式 $$
-                if (line.trim().startsWith('$$') && line.trim().endsWith('$$')) {
-                    const latex = line.trim().substring(2, line.trim().length - 2);
-                    try {
-                        html += `<div class="katex-display">${katex.renderToString(latex, { displayMode: true, throwOnError: false })}</div>\n`;
-                    } catch (e) {
-                        html += `<div class="katex-error">LaTeX错误: ${e.message}</div>\n`;
-                    }
-                    continue;
-                }
-                
-                // 处理普通Markdown行（包含行内LaTeX）
-                let processedLine = line;
-                
-                // 将行内LaTeX $...$ 转换为KaTeX HTML
-                processedLine = processedLine.replace(/\$(.*?)\$/g, (match, latex) => {
-                    try {
-                        return katex.renderToString(latex.trim(), { displayMode: false, throwOnError: false });
-                    } catch (e) {
-                        return `<span class="katex-error">LaTeX错误: ${e.message}</span>`;
-                    }
-                });
-                
-                // 将块级LaTeX $$...$$ 转换为KaTeX HTML
-                processedLine = processedLine.replace(/\$\$(.*?)\$\$/g, (match, latex) => {
-                    try {
-                        return `<div class="katex-display">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`;
-                    } catch (e) {
-                        return `<div class="katex-error">LaTeX错误: ${e.message}</div>`;
-                    }
-                });
-                
-                // 简单的Markdown处理
-                if (line.startsWith('# ')) {
-                    html += `<h1>${line.substring(2)}</h1>\n`;
-                } else if (line.startsWith('## ')) {
-                    html += `<h2>${line.substring(3)}</h2>\n`;
-                } else if (line.startsWith('### ')) {
-                    html += `<h3>${line.substring(4)}</h3>\n`;
-                } else if (line.startsWith('- ')) {
-                    html += `<li>${line.substring(2)}</li>\n`;
-                } else if (line.trim() === '') {
-                    html += '<p><br></p>\n';
+                // 处理空行
+                if (line.trim() === '') {
+                    finalResult += '<p><br></p>\n';
+                } else if (!line.startsWith('<') && !line.includes('katex') && !line.includes('LATEX')) {
+                    // 普通文本段落
+                    finalResult += `<p>${line}</p>\n`;
                 } else {
-                    // 处理行内格式
-                    let text = processedLine;
-                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                    text = text.replace(/`(.*?)`/g, '<code>$1</code>');
-                    text = text.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
-                    text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
-                    html += `<p>${text}</p>\n`;
+                    // 已经是HTML标签或LaTeX
+                    finalResult += line + '\n';
                 }
             }
             
-            return html;
-        }
-        
-        // HTML转Markdown（简化版，用于编辑现有文章）
-        function htmlToMarkdown(html) {
-            if (!html) return '';
-            
-            // 简单的HTML转Markdown
-            let markdown = html
-                // 清理HTML标签，保留文本内容
-                .replace(/<[^>]*>/g, ' ')
-                // 清理多余空格
-                .replace(/\s+/g, ' ')
+            // 清理多余的空行和标签
+            finalResult = finalResult
+                .replace(/<p><\/p>/g, '')
+                .replace(/\n{3,}/g, '\n\n')
                 .trim();
             
-            return markdown;
+            return finalResult;
         }
         
-        // 渲染文章内容中的LaTeX
+        // 渲染文章内容中的LaTeX（支持重新渲染）
         function renderLatexInElement(element) {
             if (!element) return;
             
-            // 使用KaTeX手动渲染公式
-            const text = element.innerHTML;
+            // 保存原始HTML
+            const originalHTML = element.innerHTML;
             
-            // 渲染行内公式
-            element.innerHTML = text.replace(/\$(.*?)\$/g, (match, latex) => {
+            // 查找并渲染LaTeX公式
+            element.innerHTML = originalHTML.replace(/\$(.*?)\$/g, (match, latex) => {
                 try {
                     return katex.renderToString(latex.trim(), { displayMode: false, throwOnError: false });
                 } catch (e) {
-                    return `<span class="katex-error">LaTeX错误: ${e.message}</span>`;
+                    return `<span class="katex-error">${escapeHtml(e.message)}</span>`;
                 }
-            });
-            
-            // 渲染块级公式
-            element.innerHTML = element.innerHTML.replace(/\$\$(.*?)\$\$/g, (match, latex) => {
+            }).replace(/\$\$(.*?)\$\$/g, (match, latex) => {
                 try {
                     return `<div class="katex-display">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`;
                 } catch (e) {
-                    return `<div class="katex-error">LaTeX错误: ${e.message}</div>`;
+                    return `<div class="katex-error">${escapeHtml(e.message)}</div>`;
                 }
             });
         }
@@ -1174,7 +1296,7 @@
                 // 如果内容中有LaTeX公式，渲染它们
                 setTimeout(() => {
                     const contentElement = document.getElementById('article-content');
-                    if (contentElement && contentElement.textContent.includes('$')) {
+                    if (contentElement && (contentElement.textContent.includes('$') || contentElement.innerHTML.includes('katex'))) {
                         renderLatexInElement(contentElement);
                     }
                 }, 100);
@@ -1214,7 +1336,16 @@
                             <li><strong>LaTeX公式</strong>:
                                 <ul>
                                     <li>行内公式: $E = mc^2$</li>
-                                    <li>块级公式: $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$</li>
+                                    <li>单行块级公式: $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$</li>
+                                    <li>多行公式:
+                                        <pre>
+$$
+\\begin{aligned}
+f(x) &= \\int_{-\\infty}^{\\infty} \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi \\\\
+&= \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!}(x-a)^n
+\\end{aligned}
+$$</pre>
+                                    </li>
                                 </ul>
                             </li>
                             <li><strong>代码</strong>: \`代码\` 或 \`\`\`语言\n代码\n\`\`\`</li>
@@ -1282,7 +1413,8 @@
                         <div class="editor-help">
                             <p><strong>提示：</strong>编辑Markdown源码，支持LaTeX公式</p>
                             <p>• 行内公式: $E=mc^2$</p>
-                            <p>• 块级公式: $$\\sum_{i=1}^n i$$</p>
+                            <p>• 单行块级: $$\\sum_{i=1}^n i$$</p>
+                            <p>• 多行公式: 使用独立的$$...$$块</p>
                             <p>• 使用工具栏的LaTeX按钮插入公式模板</p>
                         </div>
                     </div>
@@ -1369,19 +1501,35 @@
                 title: "插入块级LaTeX公式"
             };
             
+            const multilineLatexButton = {
+                name: "multiline-latex",
+                action: function(editor) {
+                    const cm = editor.codemirror;
+                    const template = `$$
+\\begin{aligned}
+f(x) &= \\int_{-\\infty}^{\\infty} \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi \\\\
+&= \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!}(x-a)^n
+\\end{aligned}
+$$`;
+                    cm.replaceSelection(template);
+                },
+                className: "fa fa-align-left",
+                title: "插入多行LaTeX公式"
+            };
+            
             // 创建SimpleMDE编辑器
             editorInstance = new EasyMDE({
                 element: document.getElementById('markdown-editor'),
                 autosave: {
                     enabled: false,
                 },
-                placeholder: "输入Markdown内容...支持LaTeX公式：$E=mc^2$ 或 $$\\sum_{i=1}^n i$$",
+                placeholder: "输入Markdown内容...支持LaTeX公式",
                 spellChecker: false,
-                status: true,
+                status: false, // 关闭底部状态栏，减少穿模
                 toolbar: [
                     "heading", "bold", "italic", "strikethrough", "|",
                     "code", "quote", "unordered-list", "ordered-list", "|",
-                    latexButton, blockLatexButton, "|",
+                    latexButton, blockLatexButton, multilineLatexButton, "|",
                     "link", "image", "table", "horizontal-rule", "|",
                     "preview", "side-by-side", "fullscreen", "|",
                     "guide"
@@ -1394,12 +1542,24 @@
                     // 使用自定义函数渲染预览，支持LaTeX
                     return convertMarkdownWithLatex(plainText);
                 },
-                previewClass: "editor-preview"
+                previewClass: "editor-preview",
+                sideBySideFullscreen: false // 修复全屏模式
             });
             
             if (initialContent) {
                 editorInstance.value(initialContent);
             }
+            
+            // 监听内容变化，修复预览
+            editorInstance.codemirror.on("change", function() {
+                setTimeout(() => {
+                    const preview = document.querySelector('.editor-preview');
+                    if (preview) {
+                        preview.style.overflowY = 'auto';
+                        preview.style.maxHeight = '600px';
+                    }
+                }, 100);
+            });
         }
 
         async function saveArticle() {
@@ -1437,7 +1597,7 @@
                     .insert({
                         id: articleId,
                         title: title,
-                        content: htmlContent, // 这里保存的是包含KaTeX HTML的内容
+                        content: htmlContent,
                         created_at: new Date().toISOString()
                     });
 
@@ -1484,7 +1644,7 @@
                     .from('article')
                     .update({
                         title: title,
-                        content: htmlContent, // 这里保存的是包含KaTeX HTML的内容
+                        content: htmlContent,
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', articleId);
