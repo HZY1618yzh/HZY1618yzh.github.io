@@ -150,6 +150,101 @@
             align-items: center;
             text-decoration: none;
         }
+
+        .beijing-time-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .beijing-time-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: #e0e0e0;
+        }
+        
+        .beijing-time-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .beijing-time-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .beijing-time-title i {
+            color: #e0e0e0;
+        }
+        
+        .beijing-time-utc {
+            font-size: 0.9em;
+            color: black;
+            background: #f0f2f5;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        .beijing-time-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: black;
+            text-align: center;
+            margin: 0.5rem 0;
+            font-family: 'Courier New', monospace;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .beijing-time-date {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .beijing-date {
+            color: #555;
+            font-size: 1em;
+        }
+        
+        .beijing-weekday {
+            color: black;
+            background: #e0e0e0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .beijing-time-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .beijing-time-display {
+                font-size: 1.8em;
+            }
+            
+            .beijing-time-date {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 
@@ -182,6 +277,16 @@
     <main style="padding: 20px;">
         <h1>欢迎来到HZY的个人主页！</h1>
         <div class="link-card">
+            <h2>个人简介</h2>
+            <p>我是HZY，一名热爱编程和算法竞赛的学习者。这个网站展示我的项目和作品。</p>
+        </div>
+        <a href="https://blog.csdn.net/D56795?spm=1000.2115.3001.5343">
+            <div class="link-card">
+                <h2>我的博客</h2>
+                <p>我经常分享编程技巧和开发经验，欢迎阅读我的技术博客文章。</p>
+            </div>
+        </a>
+        <div class="link-card">
             <h2>宣传/广告</h2>
             <div class="pro"><span id="jinrishici-sentence">正在加载今日诗词....</span>
                 <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
@@ -192,18 +297,65 @@
                 <div class="center" id="pro"><button id="seemorepro">查看更多</button></div>
             </div>
         </div>
-        <div class="link-card">
-            <h2>个人简介</h2>
-            <p>我是HZY，一名热爱编程和算法竞赛的学习者。这个网站展示我的项目和作品。</p>
-        </div>
-        <a href="https://blog.csdn.net/D56795?spm=1000.2115.3001.5343">
-            <div class="link-card">
-                <h2>我的博客</h2>
-                <p>我经常分享编程技巧和开发经验，欢迎阅读我的技术博客文章。</p>
+        <div class="beijing-time-card" id="beijing-time-card">
+            <div class="beijing-time-header">
+                <div class="beijing-time-title">
+                    <i class="fas fa-clock"></i>
+                    <span>北京时间</span>
+                </div>
+                <div class="beijing-time-utc">UTC+8</div>
             </div>
-        </a>
+            <div class="beijing-time-display" id="beijing-time-display">00:00:00</div>
+            <div class="beijing-time-date">
+                <div class="beijing-date" id="beijing-date">2023-01-01</div>
+                <div class="beijing-weekday" id="beijing-weekday">星期一</div>
+            </div>
+        </div>
     </main>
     <script>
+        function getBeijingTime() {
+            const now = new Date();
+            const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+            const beijingTime = new Date(utc + 3600000 * 8);
+            return beijingTime;
+        }
+
+        function formatTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[date.getDay()];
+            
+            return {
+                dateStr: `${year}-${month}-${day}`,
+                timeStr: `${hours}:${minutes}:${seconds}`,
+                weekday: weekday
+            };
+        }
+
+        function updateBeijingTime() {
+            const beijingTime = getBeijingTime();
+            const formatted = formatTime(beijingTime);
+            
+            const timeDisplay = document.getElementById('beijing-time-display');
+            const dateDisplay = document.getElementById('beijing-date');
+            const weekdayDisplay = document.getElementById('beijing-weekday');
+            
+            if (timeDisplay) {
+                timeDisplay.textContent = formatted.timeStr;
+            }
+            
+            if (dateDisplay && weekdayDisplay) {
+                dateDisplay.textContent = formatted.dateStr;
+                weekdayDisplay.textContent = formatted.weekday;
+            }
+        }
+        updateBeijingTime();
+        setInterval(updateBeijingTime, 1000);
         document.addEventListener('DOMContentLoaded', function () {
             const cards = document.querySelectorAll('.link-card');
             const navItems = document.querySelectorAll('.nav-item');
