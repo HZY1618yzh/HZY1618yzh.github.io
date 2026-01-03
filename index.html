@@ -23,80 +23,6 @@
             color: inherit;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f6f7f9;
-            margin-left: 60px;
-            padding: 20px;
-            color: #333;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 100vh;
-            background-color: #fff;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            overflow-x: hidden;
-            transition: width 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar:hover {
-            width: 200px;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            padding: 20px 0;
-        }
-
-        .nav-item {
-            position: relative;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            transition: background-color 0.2s ease;
-            min-height: 24px;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background-color: #f0f2f5;
-        }
-
-        .nav-icon {
-            min-width: 24px;
-            color: #495057;
-            font-size: 18px;
-            margin-right: 20px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .nav-text {
-            color: #343a40;
-            font-size: 15px;
-            font-weight: 500;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease 0.1s;
-        }
-
-        .sidebar:hover .nav-text {
-            opacity: 1;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background-color: #e9ecef;
-            margin: 10px 15px;
-        }
-
         .link-card {
             background: rgba(255, 255, 255, 0.8);
             border-radius: 15px;
@@ -249,31 +175,7 @@
 </head>
 
 <body>
-    <nav class="sidebar">
-        <ul class="sidebar-nav">
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/'">
-                <i class="nav-icon fas fa-home"></i>
-                <span class="nav-text">首页</span>
-            </li>
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/game'">
-                <i class="nav-icon fas fa-gamepad"></i>
-                <span class="nav-text">游戏</span>
-            </li>
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/tools'">
-                <i class="nav-icon fas fa-wrench"></i>
-                <span class="nav-text">实用工具</span>
-            </li>
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/article'">
-                <i class="nav-icon fas fa-newspaper"></i>
-                <span class="nav-text">文章</span>
-            </li>
-            <li class="nav-divider"></li>
-            <li class="nav-item" onclick="window.location='https://github.com/HZY1618yzh/home'">
-                <i class="nav-icon fab fa-github"></i>
-                <span class="nav-text">GitHub</span>
-            </li>
-        </ul>
-    </nav>
+    <div id="nav"></div>
     <main style="padding: 20px;">
         <h1>欢迎来到HZY的个人主页！</h1>
         <div class="link-card">
@@ -312,6 +214,8 @@
             </div>
         </div>
     </main>
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/script/sidebar.js"></script>
     <script>
         function getBeijingTime() {
             const now = new Date();
@@ -382,7 +286,7 @@
         }
         wait(
             () => document.readyState === 'complete',
-            '主页-HZY'
+            '主页-HZY',initSideBar()
         );
     </script>
 </body>
