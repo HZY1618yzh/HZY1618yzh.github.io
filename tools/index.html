@@ -88,27 +88,8 @@
         </div>
     </main>
     <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
-    <script src="/script/sidebar.js"></script>
+    <script src="/js/sidebar.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
-                initSidebar();
-            }, 100);
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const cards = document.querySelectorAll('.link-card');
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.setAttribute('tabindex', '0');
-                item.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        this.click();
-                    }
-                });
-            });
-        });
         function wait(islod, chyt) {
             const interval = setInterval(() => {
                 if (islod()) {

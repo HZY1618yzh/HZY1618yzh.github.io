@@ -25,3 +25,8 @@ function initSidebar() {
                 </ul>\
             </nav>';
 }
+document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
+        initSidebar();
+    }, 100);
+});
