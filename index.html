@@ -217,6 +217,16 @@
     <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
     <script src="/script/sidebar.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initSideBar === 'function') {
+            initSideBar();
+        } else {
+            setTimeout(function() {
+                if (typeof initSideBar === 'function') initSideBar();
+            }, 500);
+        }
+    </script>
+    <script>
         function getBeijingTime() {
             const now = new Date();
             const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -271,7 +281,6 @@
                     }
                 });
             });
-            initSideBar();console.log("运行");
         });
         document.getElementById('seemorepro').addEventListener('click', function (e) {
             e.stopPropagation();
