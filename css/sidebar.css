@@ -1,0 +1,65 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 100vh;
+    background-color: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden;
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar:hover {
+    width: 200px;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 20px 0;
+}
+
+.nav-item {
+    position: relative;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    min-height: 24px;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background-color: #f0f2f5;
+}
+
+.nav-icon {
+    min-width: 24px;
+    color: #495057;
+    font-size: 18px;
+    margin-right: 20px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-text {
+    color: #343a40;
+    font-size: 15px;
+    font-weight: 500;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.1s;
+}
+
+.sidebar:hover .nav-text {
+    opacity: 1;
+}
+
+.nav-divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 10px 15px;
+}
