@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
@@ -22,79 +23,6 @@
             color: inherit;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f6f7f9;
-            margin-left: 60px;
-            padding: 20px;
-            color: #333;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 100vh;
-            background-color: #fff;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            overflow-x: hidden;
-            transition: width 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar:hover {
-            width: 200px;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            padding: 20px 0;
-        }
-
-        .nav-item {
-            position: relative;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            transition: background-color 0.2s ease;
-            min-height: 24px;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background-color: #f0f2f5;
-        }
-
-        .nav-icon {
-            min-width: 24px;
-            color: #495057;
-            font-size: 18px;
-            margin-right: 20px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .nav-text {
-            color: #343a40;
-            font-size: 15px;
-            font-weight: 500;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease 0.1s;
-        }
-
-        .sidebar:hover .nav-text {
-            opacity: 1;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background-color: #e9ecef;
-            margin: 10px 15px;
-        }
         .main-content {
             padding: 20px;
             max-width: 1200px;
@@ -190,7 +118,7 @@
             color: #d32f2f;
             border: 1px solid #ffcdd2;
         }
-        
+
         .status-success {
             background: #e8f5e9;
             color: #2e7d32;
@@ -200,7 +128,7 @@
 </head>
 
 <body>
-    <div id="nav">侧边栏</div>
+    <div id="nav"></div>
     <main style="padding: 20px;">
         <div class="url-input-section">
             <h2 style="margin-bottom: 20px; color: #333;">网站代理访问</h2>
@@ -226,6 +154,15 @@
             <p>4. 本工具仅用于教育目的，请遵守相关法律法规</p>
         </div>
     </main>
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/script/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                initSidebar();
+            }, 100);
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const cards = document.querySelectorAll('.link-card');
@@ -247,7 +184,7 @@
                 });
             });
         });
-        
+
         function wait(islod, chyt) {
             const interval = setInterval(() => {
                 if (islod()) {
@@ -256,53 +193,23 @@
                 }
             }, 100);
         }
-        
+
         wait(
             () => document.readyState === 'complete',
             '洛谷访问-HZY'
         );
-        
-        // 初始化侧边栏
-        document.getElementById("nav").innerHTML = '<nav class="sidebar">\
-            <ul class="sidebar-nav">\
-                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/\'">\
-                    <i class="nav-icon fas fa-home"></i>\
-                    <span class="nav-text">首页</span>\
-                </li>\
-                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/game\'">\
-                    <i class="nav-icon fas fa-gamepad"></i>\
-                    <span class="nav-text">游戏</span>\
-                </li>\
-                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/tools\'">\
-                    <i class="nav-icon fas fa-wrench"></i>\
-                    <span class="nav-text">实用工具</span>\
-                </li>\
-                <li class="nav-item" onclick="window.location=\'https://hzy.us.kg/article\'">\
-                    <i class="nav-icon fas fa-newspaper"></i>\
-                    <span class="nav-text">文章</span>\
-                </li>\
-                <li class="nav-divider"></li>\
-                <li class="nav-item" onclick="window.location=\'https://github.com/HZY1618yzh/home\'">\
-                    <i class="nav-icon fab fa-github"></i>\
-                    <span class="nav-text">GitHub</span>\
-                </li>\
-            </ul>\
-        </nav>';
-        
-        // 页面加载时检查URL参数
-        window.addEventListener('load', function() {
+
+        window.addEventListener('load', function () {
             const urlParams = new URLSearchParams(window.location.search);
             const urlFromParam = urlParams.get('a');
-            
+
             if (urlFromParam) {
-                // 解码URL参数并设置到输入框
                 const decodedUrl = decodeURIComponent(urlFromParam);
                 document.getElementById('urlInput').value = decodedUrl;
-                // 加载网站
                 setTimeout(() => loadWebsite(decodedUrl), 500);
             }
         });
-        
+
         function loadWebsite(customUrl) {
             const urlInput = document.getElementById('urlInput');
             const contentFrame = document.getElementById('contentFrame');
@@ -315,7 +222,6 @@
                 return;
             }
 
-            // 确保URL有协议前缀
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 url = 'https://' + url;
             }
@@ -324,19 +230,15 @@
             contentFrame.style.display = 'none';
 
             try {
-                // 解析URL
                 const urlObj = new URL(url);
                 const hostAndPath = urlObj.hostname + urlObj.pathname + urlObj.search;
-                
-                // 更新URL参数 - 使用encodeURIComponent确保特殊字符被正确编码
+
                 const newUrl = new URL(window.location.href);
                 newUrl.searchParams.set('a', encodeURIComponent(url));
                 window.history.replaceState({}, '', newUrl);
 
-                // 设置iframe源
                 contentFrame.src = url;
-                
-                // 重置iframe事件监听器
+
                 contentFrame.onload = function () {
                     showStatus('网站加载完成', 'success');
                     contentFrame.style.display = 'block';
@@ -355,7 +257,6 @@
             }
         }
 
-        // 显示状态消息
         function showStatus(message, type) {
             const statusMessage = document.getElementById('statusMessage');
             statusMessage.textContent = message;
@@ -377,14 +278,18 @@
                     break;
             }
         }
-        
-        // 允许通过回车键触发访问
-        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+
+        document.getElementById('urlInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 loadWebsite();
             }
         });
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+    <script defer
+        src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+        integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+        data-cf-beacon='{"version":"2024.11.0","token":"ad12a392e58a407ab7d9fa323257445e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
