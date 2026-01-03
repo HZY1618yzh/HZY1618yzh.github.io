@@ -218,14 +218,9 @@
     <script src="/script/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (typeof initSideBar === 'function') {
+            setTimeout(function () {
                 initSidebar();
-            } else {
-                console.log("cow");
-                setTimeout(function () {
-                    initSidebar();
-                }, 100);
-            }
+            }, 100);
         });
     </script>
     <script>
