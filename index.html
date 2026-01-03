@@ -271,6 +271,7 @@
                     }
                 });
             });
+            initSideBar()
         });
         document.getElementById('seemorepro').addEventListener('click', function (e) {
             e.stopPropagation();
@@ -286,7 +287,7 @@
         }
         wait(
             () => document.readyState === 'complete',
-            '主页-HZY',initSideBar()
+            '主页-HZY'
         );
     </script>
 </body>
