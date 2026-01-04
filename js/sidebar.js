@@ -13,7 +13,7 @@ function initSidebar() {
                         <i class="nav-icon fas fa-wrench"></i>\
                         <span class="nav-text">实用工具</span>\
                     </li>\
-                    <li class="nav-item" onclick="window.location(\'/article\')">\
+                    <li class="nav-item" onclick="window.location=\'/article\'">\
                         <i class="nav-icon fas fa-newspaper"></i>\
                         <span class="nav-text">文章</span>\
                     </li>\
