@@ -26,21 +26,32 @@ body {
 .sidebar-nav {
     list-style: none;
     padding: 20px 0;
+    margin: 0;
 }
 
 .nav-item {
     position: relative;
-    padding: 15px;
-    display: flex;
-    align-items: center;
+    display: block;
     white-space: nowrap;
     transition: background-color 0.2s ease;
     min-height: 24px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    box-sizing: border-box;
     cursor: pointer;
 }
 
-.nav-item:hover,
-.nav-item .nav-link:hover {
+.nav-link:hover {
+    text-decoration: none;
+    color: inherit;
     background-color: #f0f2f5;
 }
 
@@ -71,18 +82,4 @@ body {
     height: 1px;
     background-color: #e9ecef;
     margin: 10px 15px;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-    width: 100%;
-    height: 100%;
-}
-
-.nav-link:hover {
-    text-decoration: none;
-    color: inherit;
 }
