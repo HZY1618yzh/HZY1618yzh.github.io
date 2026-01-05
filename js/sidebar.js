@@ -27,8 +27,6 @@ function initSidebar() {
 }
 document.addEventListener('DOMContentLoaded', function () {
     initSidebar();
-});
-document.addEventListener('DOMContentLoaded', function () {
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.setAttribute('tabindex', '0');
