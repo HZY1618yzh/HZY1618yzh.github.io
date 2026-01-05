@@ -26,9 +26,7 @@ function initSidebar() {
             </nav>';
 }
 document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(function () {
-        initSidebar();
-    }, 100);
+    initSidebar();
 });
 document.addEventListener('DOMContentLoaded', function () {
     const navItems = document.querySelectorAll('.nav-item');
