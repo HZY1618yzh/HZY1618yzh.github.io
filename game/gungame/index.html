@@ -183,7 +183,7 @@
             <canvas id="gameCanvas" class="game-canvas" width="800" height="600"></canvas>
             <div class="game-ui">
                 <div>得分: <span id="score">0</span></div>
-                <div>时间: <span id="timer">60</span>秒</div>
+                <div>时间: <span id="timer">10</span>秒</div>
                 <div>目标: <span id="targets">0</span>/<span id="totalTargets">10</span></div>
             </div>
             <div class="game-controls">
@@ -194,7 +194,7 @@
                 <h1 class="game-title">打枪游戏</h1>
                 <p class="game-instructions">
                     点击屏幕上的红色靶子进行射击！<br>
-                    在60秒内尽可能击中更多目标。<br>
+                    在10秒内尽可能击中更多目标。<br>
                     每个靶子得10分，全部击中额外奖励100分！
                 </p>
                 <button id="startGameBtn" class="btn btn-start">开始游戏</button>
@@ -229,7 +229,7 @@
 
             // 游戏变量
             let score = 0;
-            let timeLeft = 60;
+            let timeLeft = 10;
             let targetsHit = 0;
             let totalTargets = 10;
             let gameActive = false;
@@ -239,7 +239,7 @@
             // 初始化游戏
             function initGame() {
                 score = 0;
-                timeLeft = 60;
+                timeLeft = 10;
                 targetsHit = 0;
                 totalTargets = 10;
                 targets = [];
