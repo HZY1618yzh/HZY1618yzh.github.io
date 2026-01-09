@@ -5,22 +5,19 @@
     <meta charset="UTF-8">
     <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>洛谷访问-HZY</title>
+    <title>工具|洛谷访问</title>
     <script>
-        document.title = 'Loading... 洛谷访问-HZY';
+        document.title = 'Loading... 工具|洛谷访问';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
         }
 
         .main-content {
@@ -154,8 +151,6 @@
             <p>4. 本工具仅用于教育目的，请遵守相关法律法规</p>
         </div>
     </main>
-        <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
-    <script src="/js/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const cards = document.querySelectorAll('.link-card');
@@ -180,7 +175,7 @@
 
         wait(
             () => document.readyState === 'complete',
-            '洛谷访问-HZY'
+            '工具|洛谷访问'
         );
 
         window.addEventListener('load', function () {
@@ -226,7 +221,7 @@
                 contentFrame.onload = function () {
                     showStatus('网站加载完成', 'success');
                     contentFrame.style.display = 'block';
-                    document.title = `${urlObj.hostname} - 洛谷访问-HZY`;
+                    document.title = `${urlObj.hostname} - 工具|洛谷访问`;
                 };
 
                 contentFrame.onerror = function () {

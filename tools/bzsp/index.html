@@ -5,22 +5,19 @@
     <meta charset="UTF-8">
     <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>视频加载-HZY</title>
+    <title>工具|视频加载</title>
     <script>
-        document.title = 'Loding... 视频加载-HZY';
+        document.title = 'Loding... 工具|视频加载';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
         }
 
         .link-card {
@@ -50,25 +47,14 @@
     <main style="padding: 20px;">
         <div id="sp">请输入视频信息（哔哩哔哩）</div>
     </main>
-    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
-    <script src="/js/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const cards = document.querySelectorAll('.link-card');
-            const navItems = document.querySelectorAll('.nav-item');
             cards.forEach(card => {
                 card.addEventListener('click', function () {
                     const link = this.querySelector('a');
                     if (link) {
                         window.location.href = link.href;
-                    }
-                });
-            });
-            navItems.forEach(item => {
-                item.setAttribute('tabindex', '0');
-                item.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        this.click();
                     }
                 });
             });
@@ -83,7 +69,7 @@
         }
         wait(
             () => document.readyState === 'complete',
-            '视频加载-HZY'
+            '工具|视频加载'
         );
 
         document.getElementById('sp').innerHTML = '<iframe id="sp" style="width: 700px;height: 400px;" src="https://www.bilibili.com/blackboard/live/live-activity-player.html' + window.location.search + '" frameborder="no"    framespacing="0" scrolling="no" allow="autoplay; encrypted-media" allowfullscreen="true">加载视频中...</iframe>';

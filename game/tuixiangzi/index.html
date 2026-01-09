@@ -5,92 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游戏|推箱子</title>
+    <script>
+        document.title = 'Loding... 游戏|推箱子';
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f6f7f9;
-            margin-left: 60px;
-            padding: 20px;
-            color: #333;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 100vh;
-            background-color: #fff;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            overflow-x: hidden;
-            transition: width 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar:hover {
-            width: 200px;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            padding: 20px 0;
-        }
-
-        .nav-item {
-            position: relative;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            transition: background-color 0.2s ease;
-            min-height: 24px;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background-color: #f0f2f5;
-        }
-
-        .nav-icon {
-            min-width: 24px;
-            color: #495057;
-            font-size: 18px;
-            margin-right: 20px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .nav-text {
-            color: #343a40;
-            font-size: 15px;
-            font-weight: 500;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease 0.1s;
-        }
-
-        .sidebar:hover .nav-text {
-            opacity: 1;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background-color: #e9ecef;
-            margin: 10px 15px;
         }
 
         .link-card {
@@ -125,6 +51,7 @@
             border: 2px solid #ff5252;
             box-shadow: 0 4px 20px rgba(255, 82, 82, 0.4);
         }
+
         .special-card::before {
             content: '';
             position: absolute;
@@ -140,6 +67,7 @@
             animation: shine 3s infinite linear;
             z-index: 0;
         }
+
         .special-card a {
             position: relative;
             z-index: 1;
@@ -158,14 +86,17 @@
             height: 24px;
             margin-right: 10px;
         }
+
         @keyframes shine {
             from {
                 transform: rotate(0deg);
             }
+
             to {
                 transform: rotate(360deg);
             }
         }
+
         .version-table {
             width: 100%;
             border-collapse: collapse;
@@ -221,46 +152,21 @@
             margin-bottom: 30px;
             color: #4a5568;
         }
-
     </style>
 </head>
 
 <body>
-    <nav class="sidebar">
-        <ul class="sidebar-nav">
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/'">
-                <i class="nav-icon fas fa-home"></i>
-                <span class="nav-text">首页</span>
-            </li>
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/game'">
-                <i class="nav-icon fas fa-gamepad"></i>
-                <span class="nav-text">游戏</span>
-            </li>
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/tools'">
-                <i class="nav-icon fas fa-wrench"></i>
-                <span class="nav-text">实用工具</span>
-            </li>
-            <li class="nav-item" onclick="window.location='https://hzy.us.kg/article'">
-                <i class="nav-icon fas fa-newspaper"></i>
-                <span class="nav-text">文章</span>
-            </li>
-            <li class="nav-divider"></li>
-            <li class="nav-item" onclick="window.location='https://github.com/HZY1618yzh/home'">
-                <i class="nav-icon fab fa-github"></i>
-                <span class="nav-text">GitHub</span>
-            </li>
-        </ul>
-    </nav>
-
+    <div id="nav"></div>
     <main style="padding: 20px;">
         <h1>推箱子游戏</h1>
         <div class="link-card special-card">
-            <a href="https://download.hzy.us.kg/%E6%8E%A8%E7%AE%B1%E5%AD%901.4.2%E7%89%88%E4%B8%8B%E8%BD%BD.exe" download>
+            <a href="https://download.hzy.us.kg/%E6%8E%A8%E7%AE%B1%E5%AD%901.4.2%E7%89%88%E4%B8%8B%E8%BD%BD.exe"
+                download>
                 <i class="fas fa-download" style="margin-right: 10px;"></i>
                 立即下载最新版本（github慢速版）
             </a>
         </div>
-         <div class="link-card">
+        <div class="link-card">
             <h2><i class="fas fa-info-circle"></i> 游戏介绍</h2>
             <p>推箱子是一款经典的益智游戏，玩家需要控制角色推动箱子到指定位置。</p>
             <p>游戏特点：</p>
@@ -273,7 +179,7 @@
         <div class="link-card">
             <h2><i class="fas fa-history"></i> 版本历史</h2>
             <p>以下是推箱子游戏的版本更新记录：</p>
-            
+
             <table class="version-table">
                 <thead>
                     <tr>
@@ -314,27 +220,32 @@
                         <td>重写输出逻辑，没有闪屏。增加关卡</td>
                     </tr>
                     <tr>
-                        <td><span class="status-badge status-not-supported"><a href="https://vip.123pan.cn/1828128238/22388431" download>下载地址（123网盘快速版）</a></span></td>
+                        <td><span class="status-badge status-not-supported"><a
+                                    href="https://vip.123pan.cn/1828128238/22388431" download>下载地址（123网盘快速版）</a></span>
+                        </td>
                         <td>1.4.2</td>
                         <td>重写读入逻辑</td>
                     </tr>
                 </tbody>
             </table>
-            
+
             <p style="margin-top: 20px; text-align: center; font-style: italic;">未完待续...</p>
         </div>
     </main>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.setAttribute('tabindex', '0');
-                item.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        this.click();
+            function wait(islod, chyt) {
+                const interval = setInterval(() => {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
                     }
-                });
-            });
+                }, 100);
+            }
+            wait(
+                () => document.readyState === 'complete',
+                '游戏|推箱子'
+            );
         });
     </script>
 </body>
