@@ -3,21 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>主页-HZY</title>
-    <script>
-        document.title = 'Loding... 主页-HZY';
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.title = 'Loding... 主页-HZY';</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
-    <script src="/js/sidebar.js"></script>
-    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
         }
 
         .link-card {
@@ -151,6 +152,96 @@
             font-weight: bold;
         }
 
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: monospace;
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .ad-item {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
         @media (max-width: 768px) {
             .beijing-time-header {
                 flex-direction: column;
@@ -175,114 +266,92 @@
     <div id="nav"></div>
     <main style="padding: 20px;">
         <h1>欢迎来到HZY的个人主页！</h1>
+
         <div class="link-card">
             <h2>个人简介</h2>
             <p>我是HZY，一名热爱编程和算法竞赛的学习者。这个网站展示我的项目和作品。</p>
         </div>
+
         <a href="https://blog.csdn.net/D56795?spm=1000.2115.3001.5343">
             <div class="link-card">
                 <h2>我的博客</h2>
                 <p>我经常分享编程技巧和开发经验，欢迎阅读我的技术博客文章。</p>
             </div>
         </a>
+
         <div class="link-card">
             <h2>宣传/广告</h2>
-            <div class="pro"><span id="jinrishici-sentence">正在加载今日诗词....</span>
-                <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+            <div id="ads-container">
+                <div class="center" style="color: #666; padding: 2rem;">
+                    <i class="fas fa-ad" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>正在加载广告...</p>
+                </div>
             </div>
-            <div class="pro"><a href="https://www.luogu.com.cn/discuss/525529">不可以总司令</a></div>
-            <div class="pro">稻花香里说丰年，听取 WA 声一片 ——辛弃疾 《西江月·夜行黄沙道中》</div>
-            <div>
-                <div class="center" id="pro"><button id="seemorepro">查看更多</button></div>
+            <div class="center" id="pro">
             </div>
         </div>
-        <div class="beijing-time-card" id="beijing-time-card">
-            <div class="beijing-time-header">
-                <div class="beijing-time-title">
-                    <i class="fas fa-clock"></i>
-                    <span>北京时间</span>
+
+        <div class="beijing-time-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <div style="font-size: 1.2em; font-weight: bold;">
+                    <i class="fas fa-clock"></i> 北京时间
                 </div>
-                <div class="beijing-time-utc">UTC+8</div>
+                <div style="background: #f0f2f5; padding: 4px 10px; border-radius: 12px;">
+                    UTC+8
+                </div>
             </div>
-            <div class="beijing-time-display" id="beijing-time-display">00:00:00</div>
-            <div class="beijing-time-date">
-                <div class="beijing-date" id="beijing-date">2023-01-01</div>
-                <div class="beijing-weekday" id="beijing-weekday">星期一</div>
+            <div style="font-size: 2em; font-weight: bold; text-align: center;" id="beijing-time">00:00:00</div>
+            <div
+                style="display: flex; justify-content: space-between; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #eee;">
+                <div id="beijing-date">2023-01-01</div>
+                <div id="beijing-weekday">星期一</div>
             </div>
         </div>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/pro.js"></script>
+
     <script>
-        function getBeijingTime() {
-                const now = new Date();
-                const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-                const beijingTime = new Date(utc + 3600000 * 8);
-                return beijingTime;
+        document.addEventListener('DOMContentLoaded', async function () {
+            function updateBeijingTime() {
+                var now = new Date();
+                var utc = now.getTime() + now.getTimezoneOffset() * 60000;
+                var beijingTime = new Date(utc + 3600000 * 8);
+
+                var year = beijingTime.getFullYear();
+                var month = (beijingTime.getMonth() + 1).toString().padStart(2, '0');
+                var day = beijingTime.getDate().toString().padStart(2, '0');
+                var hours = beijingTime.getHours().toString().padStart(2, '0');
+                var minutes = beijingTime.getMinutes().toString().padStart(2, '0');
+                var seconds = beijingTime.getSeconds().toString().padStart(2, '0');
+
+                var weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                var weekday = weekdays[beijingTime.getDay()];
+
+                var timeEl = document.getElementById('beijing-time');
+                var dateEl = document.getElementById('beijing-date');
+                var weekdayEl = document.getElementById('beijing-weekday');
+
+                if (timeEl) timeEl.textContent = hours + ':' + minutes + ':' + seconds;
+                if (dateEl) dateEl.textContent = year + '-' + month + '-' + day;
+                if (weekdayEl) weekdayEl.textContent = weekday;
             }
-
-        function formatTime(date) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-                const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-                const weekday = weekdays[date.getDay()];
-
-                return {
-                    dateStr: `${year}-${month}-${day}`,
-                    timeStr: `${hours}:${minutes}:${seconds}`,
-                    weekday: weekday
-                };
-            }
-
-        function updateBeijingTime() {
-                const beijingTime = getBeijingTime();
-                const formatted = formatTime(beijingTime);
-
-                const timeDisplay = document.getElementById('beijing-time-display');
-                const dateDisplay = document.getElementById('beijing-date');
-                const weekdayDisplay = document.getElementById('beijing-weekday');
-
-                if (timeDisplay) {
-                    timeDisplay.textContent = formatted.timeStr;
-                }
-
-                if (dateDisplay && weekdayDisplay) {
-                    dateDisplay.textContent = formatted.dateStr;
-                    weekdayDisplay.textContent = formatted.weekday;
-                }
-            }
-        updateBeijingTime();
-        setInterval(updateBeijingTime, 1000);
-        document.addEventListener('DOMContentLoaded', function () {
-            const cards = document.querySelectorAll('.link-card');
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.setAttribute('tabindex', '0');
-                item.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        this.click();
+            updateBeijingTime();
+            setInterval(updateBeijingTime, 1000);
+            function wait(islod, chyt) {
+                var interval = setInterval(function () {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
                     }
-                });
-            });
+                }, 100);
+            }
+            wait(
+                function () { return document.readyState === 'complete'; },
+                '主页-HZY'
+            );
         });
-        document.getElementById('seemorepro').addEventListener('click', function (e) {
-            e.stopPropagation();
-            document.getElementById('pro').innerHTML = '<div class="pro">绿水青山就是金山银山 ——习近平</div><div class="center"><p>没有更多了</p></div>';
-        });
-        function wait(islod, chyt) {
-            const interval = setInterval(() => {
-                if (islod()) {
-                    document.title = chyt;
-                    clearInterval(interval);
-                }
-            }, 100);
-        }
-        wait(
-            () => document.readyState === 'complete',
-            '主页-HZY'
-        );
     </script>
 </body>
 
