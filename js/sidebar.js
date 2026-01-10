@@ -22,7 +22,7 @@ function initSidebar() {
                         <i class="nav-icon fab fa-github"></i>\
                         <span class="nav-text">GitHub</span>\
                     </li>\
-                    <li class="nav-item" onclick="window.location=\'https://ifdian.net/a/hzy1618yzh\'">\
+                    <li class="nav-item" onclick="window.location=\'https://ifdian.net/a/hzy1618yzh/plan\'">\
                         <i class="fas fa-hand-holding-usd"></i>\
                         <span class="nav-text">爱发电</span>\
                     </li>\
