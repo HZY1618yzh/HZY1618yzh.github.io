@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>冬日绘版-HZY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.title = 'Loding... 冬日绘版-HZY';</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-card a {
+            position: relative;
+            z-index: 1;
+            color: black !important;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        /* 画布样式 */
+        .canvas-container {
+            position: relative;
+            margin: 20px auto;
+            border: 2px solid #333;
+            border-radius: 5px;
+            overflow: hidden;
+            background: #fff;
+            width: 800px;
+            height: 600px;
+        }
+
+        #pixelCanvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .tools-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tool-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .tool-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            vertical-align: middle;
+        }
+
+        .status-bar {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-text {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav"></div>
+    <main style="padding: 20px;">
+        <div class="link-card">
+            <h2 class="center">欢迎来到 冬日绘版-HZY</h2>
+            <p class="center">1亿×1亿像素画板</p>
+        </div>
+
+        <div class="tools-panel">
+            <h3>工具</h3>
+            <button class="tool-btn active" id="brushBtn">画笔</button>
+            <button class="tool-btn" id="eraserBtn">橡皮擦</button>
+            <input type="color" id="colorPicker" class="color-picker" value="#000000">
+            <span>取色器选择颜色</span>
+
+            <div class="help-text">
+                <p>• 空格 + 左键拖动：移动画布</p>
+                <p>• 空格 + 滚轮：缩放画布</p>
+                <p>• 左键：绘制/删除</p>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="pixelCanvas" width="800" height="600"></canvas>
+        </div>
+
+        <div class="status-bar">
+            <p>坐标: <span id="coordDisplay">(0, 0)</span></p>
+            <p>工具: <span id="toolDisplay">画笔</span></p>
+            <p>颜色: <span id="colorDisplay">#000000</span></p>
+            <p>状态: <span id="statusDisplay">就绪</span></p>
+            <p>控制: <span id="controlDisplay">绘画</span></p>
+        </div>
+
+        <div class="link-card">
+            <h3>说明</h3>
+            <p>• 左键拖动进行连续绘制</p>
+            <p>• 使用取色器（颜色选择器）选择颜色，默认黑色</p>
+            <p>• 橡皮擦会从数据库中删除像素记录</p>
+            <p>• 空格 + 左键拖动：移动画布</p>
+            <p>• 空格 + 滚轮：缩放画布</p>
+            <p>• 每30秒自动从服务器获取更新</p>
+            <p>• 画布大小：1亿×1亿像素</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        var SUPABASE_URL = 'https://idfnubsvhqdmsiycjgof.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZm51YnN2aHFkbXNpeWNqZ29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5NjE0NjUsImV4cCI6MjA4MzUzNzQ2NX0.a6X9e_rnOv33JMN7g7OIm5TlGIXQLWlO5hR0BjOuVYU';
+
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        var CANVAS_WIDTH = 800;
+        var CANVAS_HEIGHT = 600;
+        var BASE_PIXEL_SIZE = 4;
+        var WORLD_SIZE = 100000000;
+
+        var currentTool = 'brush';
+        var currentColor = '#000000';
+        var offsetX = 50000000;
+        var offsetY = 50000000; 
+        var zoom = 1.0;
+        var updateInterval;
+        var pixelCache = {}; 
+        var isInitialLoad = true;
+        var isDragging = false;
+        var isSpacePressed = false;
+        var lastMouseX = 0;
+        var lastMouseY = 0;
+        var isDrawing = false;
+        var lastDrawX = -1;
+        var lastDrawY = -1;
+
+        var canvas = document.getElementById('pixelCanvas');
+        var ctx = canvas.getContext('2d');
+        var brushBtn = document.getElementById('brushBtn');
+        var eraserBtn = document.getElementById('eraserBtn');
+        var colorPicker = document.getElementById('colorPicker');
+        var coordDisplay = document.getElementById('coordDisplay');
+        var toolDisplay = document.getElementById('toolDisplay');
+        var colorDisplay = document.getElementById('colorDisplay');
+        var statusDisplay = document.getElementById('statusDisplay');
+        var controlDisplay = document.getElementById('controlDisplay');
+
+        function getPixelSize() {
+            return Math.max(1, Math.floor(BASE_PIXEL_SIZE * zoom));
+        }
+
+        function getGridDimensions() {
+            var pixelSize = getPixelSize();
+            return {
+                width: Math.floor(CANVAS_WIDTH / pixelSize),
+                height: Math.floor(CANVAS_HEIGHT / pixelSize)
+            };
+        }
+
+        function init() {
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', handleTouchEnd);
+
+            brushBtn.addEventListener('click', function () {
+                setTool('brush');
+            });
+
+            eraserBtn.addEventListener('click', function () {
+                setTool('eraser');
+            });
+            
+            colorPicker.addEventListener('change', function (e) {
+                currentColor = e.target.value;
+                colorDisplay.textContent = currentColor;
+            });
+
+            loadCanvasData();
+
+            updateInterval = setInterval(loadCanvasData, 30000);
+
+            updateControlDisplay();
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+
+            brushBtn.classList.remove('active');
+            eraserBtn.classList.remove('active');
+
+            if (tool === 'brush') {
+                brushBtn.classList.add('active');
+                canvas.style.cursor = 'crosshair';
+                toolDisplay.textContent = '画笔';
+            } else if (tool === 'eraser') {
+                eraserBtn.classList.add('active');
+                canvas.style.cursor = 'crosshair';
+                toolDisplay.textContent = '橡皮擦';
+            }
+        }
+
+        function updateControlDisplay() {
+            controlDisplay.textContent = isSpacePressed ? '控制' : '绘画';
+        }
+
+        function handleKeyDown(e) {
+            if (e.code === 'Space') {
+                isSpacePressed = true;
+                canvas.style.cursor = isDragging ? 'grabbing' : 'grab';
+                updateControlDisplay();
+                e.preventDefault(); 
+            }
+        }
+
+        function handleKeyUp(e) {
+            if (e.code === 'Space') {
+                isSpacePressed = false;
+                canvas.style.cursor = 'crosshair';
+                updateControlDisplay();
+            }
+        }
+
+        function handleMouseDown(e) {
+            e.preventDefault();
+            var pos = getCanvasPosition(e);
+
+            if (isSpacePressed && e.button === 0) {
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                canvas.style.cursor = 'grabbing';
+                return;
+            }
+
+            if (e.button === 0 && !isSpacePressed) { 
+                isDrawing = true;
+                drawPixel(pos.worldX, pos.worldY);
+                lastDrawX = pos.worldX;
+                lastDrawY = pos.worldY;
+            }
+        }
+
+        function handleMouseMove(e) {
+            e.preventDefault();
+            var pos = getCanvasPosition(e);
+
+            coordDisplay.textContent = '(' + pos.worldX + ', ' + pos.worldY + ')';
+
+            if (isDragging && isSpacePressed) {
+                var deltaX = e.clientX - lastMouseX;
+                var deltaY = e.clientY - lastMouseY;
+
+                var pixelSize = getPixelSize();
+                offsetX -= Math.round(deltaX / pixelSize);
+                offsetY -= Math.round(deltaY / pixelSize);
+
+                offsetX = Math.max(0, Math.min(offsetX, WORLD_SIZE - 1));
+                offsetY = Math.max(0, Math.min(offsetY, WORLD_SIZE - 1));
+
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+
+                loadCanvasData();
+            }
+
+            if (isDrawing && !isSpacePressed && e.buttons === 1) {
+                if (lastDrawX !== pos.worldX || lastDrawY !== pos.worldY){
+                    drawLine(lastDrawX, lastDrawY, pos.worldX, pos.worldY);
+                    lastDrawX = pos.worldX;
+                    lastDrawY = pos.worldY;
+                }
+            }
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            var dx = Math.abs(x2 - x1);
+            var dy = Math.abs(y2 - y1);
+            var sx = (x1 < x2) ? 1 : -1;
+            var sy = (y1 < y2) ? 1 : -1;
+            var err = dx - dy;
+
+            while (true) {
+                drawPixel(x1, y1);
+
+                if (x1 === x2 && y1 === y2) break;
+                var e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x1 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y1 += sy;
+                }
+            }
+        }
+
+        function handleMouseUp(e) {
+            if (isDragging) {
+                isDragging = false;
+                canvas.style.cursor = isSpacePressed ? 'grab' : 'crosshair';
+            }
+
+            if (isDrawing) {
+                isDrawing = false;
+                lastDrawX = -1;
+                lastDrawY = -1;
+            }
+        }
+
+        function handleWheel(e) {
+            if (!isSpacePressed) return; 
+
+            e.preventDefault();
+
+            var rect = canvas.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            var pos = getCanvasPositionFromXY(x, y);
+
+            var oldWorldX = pos.worldX;
+            var oldWorldY = pos.worldY;
+
+            var delta = e.deltaY > 0 ? 0.9 : 1.1;
+            zoom = Math.max(0.1, Math.min(10, zoom * delta));
+
+            var grid = getGridDimensions();
+            var newWorldX = offsetX - Math.floor(grid.width / 2) + Math.floor(x / getPixelSize());
+            var newWorldY = offsetY - Math.floor(grid.height / 2) + Math.floor(y / getPixelSize());
+
+            offsetX += (oldWorldX - newWorldX);
+            offsetY += (oldWorldY - newWorldY);
+
+            loadCanvasData();
+        }
+
+        function getCanvasPositionFromXY(canvasX, canvasY) {
+            var pixelSize = getPixelSize();
+            var grid = getGridDimensions();
+
+            var gridX = Math.floor(canvasX / pixelSize);
+            var gridY = Math.floor(canvasY / pixelSize);
+
+            var worldX = offsetX - Math.floor(grid.width / 2) + gridX;
+            var worldY = offsetY - Math.floor(grid.height / 2) + gridY;
+
+            worldX = Math.max(0, Math.min(worldX, WORLD_SIZE - 1));
+            worldY = Math.max(0, Math.min(worldY, WORLD_SIZE - 1));
+
+            return {
+                gridX: gridX,
+                gridY: gridY,
+                worldX: worldX,
+                worldY: worldY
+            };
+        }
+
+        function getCanvasPosition(e) {
+            var rect = canvas.getBoundingClientRect();
+            var clientX, clientY;
+
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            return getCanvasPositionFromXY(clientX - rect.left, clientY - rect.top);
+        }
+
+        function drawPixel(worldX, worldY) {
+            if (worldX < 0 || worldX >= WORLD_SIZE || worldY < 0 || worldY >= WORLD_SIZE) return;
+
+            var pixelSize = getPixelSize();
+            var grid = getGridDimensions();
+
+            var gridX = worldX - (offsetX - Math.floor(grid.width / 2));
+            var gridY = worldY - (offsetY - Math.floor(grid.height / 2));
+
+            var shouldDraw = gridX >= 0 && gridX < grid.width && gridY >= 0 && gridY < grid.height;
+
+            var color;
+            var colorNum;
+
+            if (currentTool === 'eraser') {
+                color = '#FFFFFF'; 
+                colorNum = null;
+            } else {
+                color = currentColor;
+                colorNum = parseInt(color.replace('#', ''), 16);
+            }
+
+            if (shouldDraw) {
+                ctx.fillStyle = color;
+                ctx.fillRect(gridX * pixelSize, gridY * pixelSize, pixelSize, pixelSize);
+
+                statusDisplay.textContent = '绘制中...';
+            }
+
+            var key = worldX + ',' + worldY;
+            if (currentTool === 'eraser') {
+                delete pixelCache[key]; 
+            } else {
+                pixelCache[key] = color;
+            }
+
+            savePixelToDatabase(worldX, worldY, colorNum);
+        }
+
+        function savePixelToDatabase(worldX, worldY, colorNum) {
+            var id = worldX * 100000000 + worldY;
+
+            if (colorNum === null) {
+                supabase
+                    .from('draw')
+                    .delete()
+                    .eq('id', id)
+                    .then(function (response) {
+                        if (response.error) {
+                            console.error('删除像素失败:', response.error);
+                            statusDisplay.textContent = '删除失败';
+                        } else {
+                            statusDisplay.textContent = '已删除';
+                            setTimeout(function () {
+                                statusDisplay.textContent = '就绪';
+                            }, 1000);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('删除错误:', error);
+                        statusDisplay.textContent = '错误';
+                    });
+            } else {
+                supabase
+                    .from('draw')
+                    .upsert({
+                        id: id,
+                        col: colorNum
+                    })
+                    .then(function (response) {
+                        if (response.error) {
+                            console.error('保存像素失败:', response.error);
+                            statusDisplay.textContent = '保存失败';
+                        } else {
+                            statusDisplay.textContent = '已保存';
+                            setTimeout(function () {
+                                statusDisplay.textContent = '就绪';
+                            }, 1000);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('保存错误:', error);
+                        statusDisplay.textContent = '错误';
+                    });
+            }
+        }
+
+        function loadCanvasData() {
+            if (isInitialLoad) {
+                statusDisplay.textContent = '加载中...';
+            }
+
+            var pixelSize = getPixelSize();
+            var grid = getGridDimensions();
+
+            var startX = offsetX - Math.floor(grid.width / 2);
+            var endX = startX + grid.width;
+            var startY = offsetY - Math.floor(grid.height / 2);
+            var endY = startY + grid.height;
+
+            startX = Math.max(0, startX);
+            endX = Math.min(endX, WORLD_SIZE);
+            startY = Math.max(0, startY);
+            endY = Math.min(endY, WORLD_SIZE);
+
+            var minId = startX * 100000000 + startY;
+            var maxId = endX * 100000000 + endY;
+
+            clearCanvas();
+
+            pixelCache = {};
+
+            supabase
+                .from('draw')
+                .select('id, col')
+                .gte('id', minId)
+                .lt('id', maxId)
+                .then(function (response) {
+                    if (response.data) {
+                        response.data.forEach(function (pixel) {
+                            var id = pixel.id;
+                            var worldY = id % 100000000;
+                            var worldX = (id - worldY) / 100000000;
+
+                            var gridX = worldX - startX;
+                            var gridY = worldY - startY;
+
+                            if (gridX >= 0 && gridX < grid.width && gridY >= 0 && gridY < grid.height) {
+                                var color = '#' + pixel.col.toString(16).padStart(6, '0');
+                                ctx.fillStyle = color;
+                                ctx.fillRect(gridX * pixelSize, gridY * pixelSize, pixelSize, pixelSize);
+
+                                var key = worldX + ',' + worldY;
+                                pixelCache[key] = color;
+                            }
+                        });
+
+                        if (isInitialLoad) {
+                            statusDisplay.textContent = '加载完成';
+                            isInitialLoad = false;
+                            setTimeout(function () {
+                                statusDisplay.textContent = '就绪';
+                            }, 1000);
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    console.error('加载像素失败:', error);
+                    statusDisplay.textContent = '加载失败';
+                });
+        }
+
+        function handleTouchStart(e) {
+            if (e.touches.length === 1) {
+                var touch = e.touches[0];
+                var rect = canvas.getBoundingClientRect();
+                var x = touch.clientX - rect.left;
+                var y = touch.clientY - rect.top;
+                var pos = getCanvasPositionFromXY(x, y);
+                isDrawing = true;
+                drawPixel(pos.worldX, pos.worldY);
+                lastDrawX = pos.worldX;
+                lastDrawY = pos.worldY;
+            }
+        }
+
+        function handleTouchMove(e) {
+            if (e.touches.length === 1 && isDrawing) {
+                var touch = e.touches[0];
+                var rect = canvas.getBoundingClientRect();
+                var x = touch.clientX - rect.left;
+                var y = touch.clientY - rect.top;
+                var pos = getCanvasPositionFromXY(x, y);
+                coordDisplay.textContent = '(' + pos.worldX + ', ' + pos.worldY + ')';
+
+                if (lastDrawX !== pos.worldX || lastDrawY !== pos.worldY) {
+                    drawLine(lastDrawX, lastDrawY, pos.worldX, pos.worldY);
+                    lastDrawX = pos.worldX;
+                    lastDrawY = pos.worldY;
+                }
+            }
+        }
+
+        function handleTouchEnd() {
+            isDrawing = false;
+            lastDrawX = -1;
+            lastDrawY = -1;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            function wait(islod, chyt) {
+                var interval = setInterval(function () {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+
+            init();
+
+            wait(
+                function () { return document.readyState === 'complete'; },
+                '冬日绘版-HZY'
+            );
+        });
+    </script>
+</body>
+
+</html>
