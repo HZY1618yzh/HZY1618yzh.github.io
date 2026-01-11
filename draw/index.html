@@ -156,7 +156,7 @@
     <main style="padding: 20px;">
         <div class="link-card">
             <h2 class="center">欢迎来到 冬日绘版-HZY</h2>
-            <p class="center">1亿×1亿像素画板</p>
+            <p class="center">10万×10万像素画板</p>
             <p class="center pixel-info">每个像素点代表实际1个像素，无需缩放</p>
         </div>
 
@@ -202,7 +202,7 @@
             <p>• 橡皮擦会从数据库中删除像素记录</p>
             <p>• 右键拖动或空格+左键拖动：移动画布</p>
             <p>• 每30秒自动从服务器获取更新</p>
-            <p>• 画布大小：1亿×1亿像素</p>
+            <p>• 画布大小：10万×10万像素</p>
             <p>• 固定缩放：1:1（每个像素点对应实际1个像素）</p>
             <p>• 画布移动：按住右键或空格键+左键拖动</p>
         </div>
@@ -219,7 +219,7 @@
         var CANVAS_WIDTH = 800;
         var CANVAS_HEIGHT = 600;
         var PIXEL_SIZE = 1; // 固定像素大小
-        var WORLD_SIZE = 100000000;
+        var WORLD_SIZE = 100000;
         
         // 计算可见区域大小（像素数）
         var VISIBLE_WIDTH = Math.floor(CANVAS_WIDTH / PIXEL_SIZE); // 800像素
@@ -228,8 +228,8 @@
         // 状态变量 - 简化，移除缩放相关
         var currentTool = 'brush';
         var currentColor = '#000000';
-        var offsetX = 50000000; // 初始居中
-        var offsetY = 50000000;
+        var offsetX = 0; // 初始居中
+        var offsetY = 0;
         var updateInterval;
         var pixelCache = {};
         var isInitialLoad = true;
@@ -570,7 +570,7 @@
         }
 
         function savePixelToDatabase(worldX, worldY, colorNum) {
-            var id = worldX * 100000000 + worldY;
+            var id = worldX * 100000 + worldY;
             
             if (colorNum === null) {
                 // 删除像素
@@ -646,8 +646,8 @@
             });
             
             // 从数据库加载新数据
-            var minId = area.startX * 100000000 + area.startY;
-            var maxId = area.endX * 100000000 + area.endY;
+            var minId = area.startX * 100000 + area.startY;
+            var maxId = area.endX * 100000 + area.endY;
             
             supabase
                 .from('draw')
@@ -658,8 +658,8 @@
                     if (response.data) {
                         response.data.forEach(function(pixel) {
                             var id = pixel.id;
-                            var worldY = id % 100000000;
-                            var worldX = (id - worldY) / 100000000;
+                            var worldY = id % 100000;
+                            var worldX = (id - worldY) / 100000;
                             
                             // 绘制像素
                             var canvasPos = worldToCanvas(worldX, worldY);
@@ -842,7 +842,6 @@
                 function() { return document.readyState === 'complete'; },
                 function() {
                     document.title = '冬日绘版-HZY';
-                    console.log('冬日绘版已加载完成 - 简化版（无缩放）');
                 }
             );
         });
