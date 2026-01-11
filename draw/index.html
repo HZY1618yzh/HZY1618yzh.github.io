@@ -475,8 +475,6 @@
             if (shouldDraw) {
                 ctx.fillStyle = color;
                 ctx.fillRect(gridX * pixelSize, gridY * pixelSize, pixelSize, pixelSize);
-
-                statusDisplay.textContent = '绘制中...';
             }
 
             var key = worldX + ',' + worldY;
@@ -491,50 +489,50 @@
 
         function savePixelToDatabase(worldX, worldY, colorNum) {
             var id = worldX * 100000000 + worldY;
-
-            if (colorNum === null) {
-                supabase
-                    .from('draw')
-                    .delete()
-                    .eq('id', id)
-                    .then(function (response) {
-                        if (response.error) {
-                            console.error('删除像素失败:', response.error);
-                            statusDisplay.textContent = '删除失败';
-                        } else {
-                            statusDisplay.textContent = '已删除';
-                            setTimeout(function () {
-                                statusDisplay.textContent = '就绪';
-                            }, 1000);
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error('删除错误:', error);
-                        statusDisplay.textContent = '错误';
-                    });
-            } else {
-                supabase
-                    .from('draw')
-                    .upsert({
-                        id: id,
-                        col: colorNum
-                    })
-                    .then(function (response) {
-                        if (response.error) {
-                            console.error('保存像素失败:', response.error);
-                            statusDisplay.textContent = '保存失败';
-                        } else {
-                            statusDisplay.textContent = '已保存';
-                            setTimeout(function () {
-                                statusDisplay.textContent = '就绪';
-                            }, 1000);
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error('保存错误:', error);
-                        statusDisplay.textContent = '错误';
-                    });
-            }
+            
+            supabase
+                .from('draw')
+                .upsert({
+                    id: id,
+                    col: colorNum
+                }, {
+                    onConflict: 'id',
+                    ignoreDuplicates: false
+                })
+                .then(function (response) {
+                    if (response.error) {
+                        console.error('保存像素失败:', response.error);
+                        
+                        supabase
+                            .from('draw')
+                            .update({ col: colorNum })
+                            .eq('id', id)
+                            .then(function (updateResponse) {
+                                if (updateResponse.error) {
+                                    console.error('更新像素失败:', updateResponse.error);
+                                    statusDisplay.textContent = '保存失败';
+                                } else {
+                                    statusDisplay.textContent = '已保存';
+                                    setTimeout(function () {
+                                        statusDisplay.textContent = '就绪';
+                                    }, 1000);
+                                }
+                            })
+                            .catch(function (error) {
+                                console.error('更新错误:', error);
+                                statusDisplay.textContent = '错误';
+                            });
+                    } else {
+                        statusDisplay.textContent = '已保存';
+                        setTimeout(function () {
+                            statusDisplay.textContent = '就绪';
+                        }, 1000);
+                    }
+                })
+                .catch(function (error) {
+                    console.error('保存错误:', error);
+                    statusDisplay.textContent = '错误';
+                });
         }
 
         function loadCanvasData() {
