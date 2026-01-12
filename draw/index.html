@@ -19,7 +19,7 @@
         <div class="link-card">
             <h2 class="center">冬日绘版-HZY</h2>
             <p class="center">1000×1000像素画板</p>
-            <p class="center pixel-info">全缓存版 - 无闪屏，实时保存</p>
+            <p class="center pixel-info">全缓存版 - 无闪屏，停笔保存</p>
         </div>
         <div class="tools-panel">
             <h3>工具</h3>
@@ -36,7 +36,7 @@
                 <p>• 左键拖动：绘制/擦除</p>
                 <p>• 空格+左键：移动画布</p>
                 <p>• 双指触摸：移动画布</p>
-                <p>• 实时保存 | 所有像素都缓存</p>
+                <p>• 停笔保存 | 所有像素都缓存</p>
             </div>
         </div>
         <div class="canvas-container" id="canvasContainer">
@@ -58,8 +58,7 @@
             <p>3. 空格+左键拖动移动画布</p>
             <p>4. 双指触摸移动画布</p>
             <p>5. 使用颜色选择器选择颜色</p>
-            <p>6. 禁止连笔</p>
-            <p style="color:#4CAF50">优化：全像素缓存，零闪屏，实时保存</p>
+            <p style="color:#4CAF50">优化：全像素缓存，零闪屏，停笔立即保存</p>
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -317,7 +316,8 @@
                 isDrawing=false;
                 lastDrawX=-1;
                 lastDrawY=-1;
-                scheduleSave();
+                // 停笔立即保存
+                immediateSave();
             }
         }
         
@@ -397,7 +397,8 @@
                 isDrawing=false;
                 lastDrawX=-1;
                 lastDrawY=-1;
-                scheduleSave();
+                // 停笔立即保存
+                immediateSave();
             }
         }
         
@@ -441,19 +442,20 @@
             }
         }
         
-        function scheduleSave(){
-            if(saveDebounceTimer){
-                clearTimeout(saveDebounceTimer);
+        function immediateSave(){
+            if(modifiedPixels.size===0)return;
+            if(isSaving){
+                // 如果正在保存，设置一个短延迟重试
+                setTimeout(immediateSave,200);
+                return;
             }
-            saveDebounceTimer=setTimeout(()=>{
-                if(modifiedPixels.size>0&&!isSaving){
-                    saveModifiedPixels();
-                }
-            },5000);
+            saveModifiedPixels();
         }
         
         function saveModifiedPixels(){
             if(isSaving)return;
+            if(modifiedPixels.size===0)return;
+            
             isSaving=true;
             saveStatus.style.display='block';
             saveStatusDisplay.textContent='保存中...';
