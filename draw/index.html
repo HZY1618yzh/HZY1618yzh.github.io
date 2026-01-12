@@ -109,12 +109,11 @@
         var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         function getVisibleArea(){
-            var startX = Math.max(0,offsetX-Math.floor(CANVAS_WIDTH/2));
-            var endX = Math.min(WORLD_SIZE,startX+CANVAS_WIDTH);
-            var startY = Math.max(0,offsetY-Math.floor(CANVAS_HEIGHT/2));
-            var endY = Math.min(WORLD_SIZE,startY+CANVAS_HEIGHT);
-            if(endX-startX<CANVAS_WIDTH){startX=Math.max(0,endX-CANVAS_WIDTH)}
-            if(endY-startY<CANVAS_HEIGHT){startY=Math.max(0,endY-CANVAS_HEIGHT)}
+            var startX = Math.max(0, Math.min(offsetX - Math.floor(CANVAS_WIDTH / 2), WORLD_SIZE - CANVAS_WIDTH));
+            var endX = Math.min(WORLD_SIZE, startX + CANVAS_WIDTH);
+            var startY = Math.max(0, Math.min(offsetY - Math.floor(CANVAS_HEIGHT / 2), WORLD_SIZE - CANVAS_HEIGHT));
+            var endY = Math.min(WORLD_SIZE, startY + CANVAS_HEIGHT);
+            if (endX - startX < CANVAS_WIDTH) endX = Math.min(WORLD_SIZE, startX + CANVAS_WIDTH);
             return{startX:startX,endX:endX,startY:startY,endY:endY}
         }
         

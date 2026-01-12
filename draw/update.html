@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>图片上传 - 冬日绘版-HZY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.title = 'Loading... 图片上传 - 冬日绘版-HZY';</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}a{text-decoration:none;color:inherit}.link-card{background:rgba(255,255,255,0.8);border-radius:15px;padding:1.5rem;margin:1.5rem 0;transition:transform 0.3s;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.link-card a{position:relative;z-index:1;color:black!important;font-weight:bold;display:flex;align-items:center;text-decoration:none}.link-card:hover{transform:translateY(-5px);box-shadow:0 6px 20px rgba(0,0,0,0.15)}.center{text-align:center}.tools-panel{background:white;border-radius:10px;padding:15px;margin:20px auto;max-width:600px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.upload-btn{padding:12px 25px;margin:10px 5px;border:none;border-radius:5px;background:#4CAF50;color:white;cursor:pointer;transition:all 0.3s;font-weight:bold}.upload-btn:hover{background:#45a049}.upload-btn:disabled{background:#cccccc;cursor:not-allowed}.input-field{padding:10px;margin:10px 0;border:1px solid #ddd;border-radius:5px;width:100%;max-width:300px}.label-text{display:block;margin:5px 0;font-weight:bold;color:#333}.status-bar{background:white;padding:15px;border-radius:10px;margin:20px auto;max-width:800px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-family:monospace}.preview-container{margin:20px auto;max-width:400px;text-align:center}.preview-image{max-width:100%;border:2px solid #ddd;border-radius:5px;margin-top:10px}.progress-bar{width:100%;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden;margin:15px 0}.progress-fill{height:100%;background:#4CAF50;transition:width 0.3s;text-align:center;color:white;font-size:12px;line-height:20px}.color-option{display:inline-block;width:25px;height:25px;border-radius:3px;margin:2px;cursor:pointer;border:1px solid #333}.help-text{color:#666;font-size:0.9em;margin-top:10px}.error-message{color:#f44336;padding:10px;background:#ffebee;border-radius:5px;margin:10px 0}.success-message{color:#4CAF50;padding:10px;background:#e8f5e9;border-radius:5px;margin:10px 0}
+    </style>
+</head>
+<body>
+    <div id="nav"></div>
+    <main style="padding:20px">
+        <div class="link-card">
+            <h2 class="center">图片上传 - 冬日绘版-HZY</h2>
+            <p class="center">将图片上传到指定坐标位置</p>
+            <p class="center">支持PNG、JPG、GIF格式 | 自动转换为像素画</p>
+        </div>
+        
+        <div class="tools-panel">
+            <h3>上传设置</h3>
+            
+            <label class="label-text">1. 选择图片文件</label>
+            <input type="file" id="imageFile" accept="image/png,image/jpeg,image/gif" class="input-field">
+            
+            <div class="preview-container">
+                <div id="imagePreview"></div>
+            </div>
+            
+            <label class="label-text">2. 设置起始坐标 (左上角)</label>
+            <div style="display:flex;gap:15px;margin:10px 0">
+                <div>
+                    <label>X坐标 (0-999)</label>
+                    <input type="number" id="posX" min="0" max="999" value="0" class="input-field">
+                </div>
+                <div>
+                    <label>Y坐标 (0-999)</label>
+                    <input type="number" id="posY" min="0" max="999" value="0" class="input-field">
+                </div>
+            </div>
+            
+            <label class="label-text">3. 上传选项</label>
+            <div style="margin:10px 0">
+                <label>
+                    <input type="checkbox" id="overwriteMode" checked>
+                    覆盖现有像素
+                </label>
+                <div style="margin:5px 0">
+                    <label>
+                        <input type="checkbox" id="dithering" checked>
+                        启用颜色抖动（减少色阶）
+                    </label>
+                </div>
+            </div>
+            
+            <div class="progress-bar" style="display:none" id="progressContainer">
+                <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display:none"></div>
+            <div id="successMessage" class="success-message" style="display:none"></div>
+            
+            <button class="upload-btn" id="uploadBtn">
+                <i class="fas fa-upload"></i> 上传图片到画板
+            </button>
+            <button class="upload-btn" style="background:#2196F3" id="previewBtn">
+                <i class="fas fa-eye"></i> 预览效果
+            </button>
+            
+            <div class="help-text">
+                <p>• 图片尺寸不应超过 500×500 像素</p>
+                <p>• 建议使用高对比度图片</p>
+                <p>• 上传过程可能需要几秒钟时间</p>
+                <p>• 上传后请返回主画板查看</p>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <p>图片信息: <span id="imageInfo">未选择图片</span></p>
+            <p>目标位置: X=<span id="targetX">0</span>, Y=<span id="targetY">0</span></p>
+            <p>预计像素: <span id="pixelCount">0</span> 个</p>
+            <p>状态: <span id="statusDisplay">准备就绪</span></p>
+            <p>上传进度: <span id="progressText">-</span></p>
+        </div>
+        
+        <div class="link-card">
+            <h3>使用说明</h3>
+            <p>1. 点击"选择文件"按钮选择要上传的图片</p>
+            <p>2. 设置图片左上角要放置的坐标位置</p>
+            <p>3. 点击"预览效果"查看图片转换后的效果</p>
+            <p>4. 点击"上传图片到画板"开始上传</p>
+            <p>5. 上传完成后，返回主画板查看结果</p>
+            <p style="color:#4CAF50">注意：上传会修改画板像素，请谨慎操作</p>
+        </div>
+        
+        <div class="link-card">
+            <h3>返回主画板</h3>
+            <p>
+                <a href="index.html" style="color:#2196F3;font-weight:bold">
+                    <i class="fas fa-arrow-left"></i> 返回冬日绘版主页面
+                </a>
+            </p>
+        </div>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase配置（与主画板相同）
+        var SUPABASE_URL = 'https://idfnubsvhqdmsiycjgof.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZm51YnN2aHFkbXNpeWNqZ29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5NjE0NjUsImV4cCI6MjA4MzUzNzQ2NX0.a6X9e_rnOv33JMN7g7OIm5TlGIXQLWlO5hR0BjOuVYU';
+        var WORLD_SIZE = 1000;
+        
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        var currentImage = null;
+        var imageCanvas = null;
+        var imageCtx = null;
+        var isUploading = false;
+        
+        // DOM元素
+        var imageFile = document.getElementById('imageFile');
+        var posX = document.getElementById('posX');
+        var posY = document.getElementById('posY');
+        var uploadBtn = document.getElementById('uploadBtn');
+        var previewBtn = document.getElementById('previewBtn');
+        var overwriteMode = document.getElementById('overwriteMode');
+        var dithering = document.getElementById('dithering');
+        var imagePreview = document.getElementById('imagePreview');
+        var imageInfo = document.getElementById('imageInfo');
+        var targetX = document.getElementById('targetX');
+        var targetY = document.getElementById('targetY');
+        var pixelCount = document.getElementById('pixelCount');
+        var statusDisplay = document.getElementById('statusDisplay');
+        var progressText = document.getElementById('progressText');
+        var progressContainer = document.getElementById('progressContainer');
+        var progressFill = document.getElementById('progressFill');
+        var errorMessage = document.getElementById('errorMessage');
+        var successMessage = document.getElementById('successMessage');
+        
+        function init() {
+            // 初始化事件监听
+            imageFile.addEventListener('change', handleImageSelect);
+            posX.addEventListener('change', updatePositionInfo);
+            posY.addEventListener('change', updatePositionInfo);
+            uploadBtn.addEventListener('click', handleUpload);
+            previewBtn.addEventListener('click', handlePreview);
+            
+            // 创建预览Canvas
+            imageCanvas = document.createElement('canvas');
+            imageCtx = imageCanvas.getContext('2d');
+            
+            updatePositionInfo();
+        }
+        
+        function handleImageSelect(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showError('请选择图片文件（PNG、JPG、GIF）');
+                return;
+            }
+            
+            // 检查文件大小（限制5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                showError('图片文件大小不能超过5MB');
+                return;
+            }
+            
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var img = new Image();
+                img.onload = function() {
+                    currentImage = img;
+                    
+                    // 限制图片尺寸
+                    var maxSize = 500;
+                    if (img.width > maxSize || img.height > maxSize) {
+                        showError('图片尺寸过大，请使用500×500像素以内的图片');
+                        currentImage = null;
+                        return;
+                    }
+                    
+                    // 显示图片信息
+                    imageInfo.textContent = img.width + '×' + img.height + '像素 - ' + 
+                                          Math.round(file.size / 1024) + 'KB';
+                    
+                    // 显示预览
+                    showImagePreview(img);
+                    
+                    // 更新像素计数
+                    updatePixelCount();
+                    
+                    // 清除错误信息
+                    hideError();
+                };
+                img.onerror = function() {
+                    showError('图片加载失败，请选择其他图片');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function showImagePreview(img) {
+            imagePreview.innerHTML = '';
+            
+            // 创建预览容器
+            var previewCanvas = document.createElement('canvas');
+            var previewCtx = previewCanvas.getContext('2d');
+            
+            // 设置预览尺寸
+            var maxPreviewSize = 300;
+            var scale = Math.min(maxPreviewSize / img.width, maxPreviewSize / img.height);
+            var previewWidth = Math.round(img.width * scale);
+            var previewHeight = Math.round(img.height * scale);
+            
+            previewCanvas.width = previewWidth;
+            previewCanvas.height = previewHeight;
+            previewCanvas.style.border = '2px solid #4CAF50';
+            previewCanvas.style.borderRadius = '5px';
+            
+            // 绘制预览
+            previewCtx.drawImage(img, 0, 0, previewWidth, previewHeight);
+            
+            // 添加网格线（小尺寸时显示）
+            if (previewWidth > 50 && previewHeight > 50) {
+                previewCtx.strokeStyle = 'rgba(0,0,0,0.1)';
+                previewCtx.lineWidth = 0.5;
+                
+                // 绘制垂直网格线
+                for (var x = 0; x <= previewWidth; x += 10) {
+                    previewCtx.beginPath();
+                    previewCtx.moveTo(x, 0);
+                    previewCtx.lineTo(x, previewHeight);
+                    previewCtx.stroke();
+                }
+                
+                // 绘制水平网格线
+                for (var y = 0; y <= previewHeight; y += 10) {
+                    previewCtx.beginPath();
+                    previewCtx.moveTo(0, y);
+                    previewCtx.lineTo(previewWidth, y);
+                    previewCtx.stroke();
+                }
+            }
+            
+            imagePreview.appendChild(previewCanvas);
+        }
+        
+        function updatePositionInfo() {
+            var x = parseInt(posX.value) || 0;
+            var y = parseInt(posY.value) || 0;
+            
+            // 限制坐标范围
+            x = Math.max(0, Math.min(999, x));
+            y = Math.max(0, Math.min(999, y));
+            
+            posX.value = x;
+            posY.value = y;
+            
+            targetX.textContent = x;
+            targetY.textContent = y;
+            
+            updatePixelCount();
+        }
+        
+        function updatePixelCount() {
+            if (!currentImage) {
+                pixelCount.textContent = '0';
+                return;
+            }
+            
+            var x = parseInt(posX.value) || 0;
+            var y = parseInt(posY.value) || 0;
+            
+            // 计算实际能放置的像素数量
+            var availableWidth = Math.min(currentImage.width, WORLD_SIZE - x);
+            var availableHeight = Math.min(currentImage.height, WORLD_SIZE - y);
+            
+            var count = availableWidth * availableHeight;
+            pixelCount.textContent = count.toLocaleString();
+            
+            // 如果图片超出边界，显示警告
+            if (availableWidth < currentImage.width || availableHeight < currentImage.height) {
+                showError('警告：图片部分内容将超出画板边界');
+            } else {
+                hideError();
+            }
+        }
+        
+        function handlePreview() {
+            if (!currentImage) {
+                showError('请先选择图片');
+                return;
+            }
+            
+            // 在新窗口中打开预览
+            var previewWindow = window.open('', '_blank');
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>图片上传预览</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                        canvas { border: 2px solid #333; margin: 10px; }
+                        .info { margin: 10px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <h2>图片上传预览</h2>
+                    <div class="info">原始尺寸: ${currentImage.width}×${currentImage.height}像素</div>
+                    <div class="info">放置位置: X=${posX.value}, Y=${posY.value}</div>
+                    <canvas id="previewCanvas"></canvas>
+                    <div class="info">上图显示了转换后的像素效果</div>
+                    <button onclick="window.close()" style="padding:10px 20px;margin:20px;background:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer">关闭</button>
+                </body>
+                </html>
+            `);
+            
+            // 绘制预览
+            setTimeout(function() {
+                var canvas = previewWindow.document.getElementById('previewCanvas');
+                var ctx = canvas.getContext('2d');
+                
+                // 设置Canvas尺寸
+                var previewScale = 2; // 放大显示
+                canvas.width = currentImage.width * previewScale;
+                canvas.height = currentImage.height * previewScale;
+                
+                // 处理图像并绘制
+                processAndDrawImage(ctx, currentImage, previewScale, true);
+            }, 100);
+        }
+        
+        function processAndDrawImage(ctx, img, scale, isPreview) {
+            // 创建临时Canvas处理图像
+            var tempCanvas = document.createElement('canvas');
+            var tempCtx = tempCanvas.getContext('2d');
+            
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            
+            // 绘制原始图像
+            tempCtx.drawImage(img, 0, 0);
+            
+            // 获取图像数据
+            var imageData = tempCtx.getImageData(0, 0, img.width, img.height);
+            var data = imageData.data;
+            
+            // 处理每个像素
+            for (var i = 0; i < data.length; i += 4) {
+                var r = data[i];
+                var g = data[i + 1];
+                var b = data[i + 2];
+                var a = data[i + 3] / 255;
+                
+                // 处理透明度
+                if (a < 0.1) {
+                    // 完全透明，跳过
+                    data[i] = 255;     // R
+                    data[i + 1] = 255; // G
+                    data[i + 2] = 255; // B
+                    data[i + 3] = 0;   // A
+                    continue;
+                }
+                
+                // 应用透明度
+                if (a < 1) {
+                    // 混合白色背景
+                    r = Math.round(r * a + 255 * (1 - a));
+                    g = Math.round(g * a + 255 * (1 - a));
+                    b = Math.round(b * a + 255 * (1 - a));
+                }
+                
+                // 颜色抖动（如果需要）
+                if (dithering.checked && !isPreview) {
+                    // Floyd-Steinberg抖动算法的简化版本
+                    var newR = Math.round(r / 51) * 51; // 减少到5个色阶
+                    var newG = Math.round(g / 51) * 51;
+                    var newB = Math.round(b / 51) * 51;
+                    
+                    var errR = r - newR;
+                    var errG = g - newG;
+                    var errB = b - newB;
+                    
+                    r = newR;
+                    g = newG;
+                    b = newB;
+                    
+                    // 传播误差（简化，只传播到右侧像素）
+                    if (i + 4 < data.length) {
+                        data[i + 4] += errR * 7/16;
+                        data[i + 5] += errG * 7/16;
+                        data[i + 6] += errB * 7/16;
+                    }
+                }
+                
+                data[i] = r;
+                data[i + 1] = g;
+                data[i + 2] = b;
+                data[i + 3] = 255;
+            }
+            
+            tempCtx.putImageData(imageData, 0, 0);
+            
+            // 绘制到目标Canvas
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(tempCanvas, 0, 0, img.width * scale, img.height * scale);
+            
+            // 添加网格线
+            if (scale > 2) {
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.lineWidth = 0.5;
+                
+                // 绘制网格
+                for (var x = 0; x <= img.width; x++) {
+                    ctx.beginPath();
+                    ctx.moveTo(x * scale, 0);
+                    ctx.lineTo(x * scale, img.height * scale);
+                    ctx.stroke();
+                }
+                
+                for (var y = 0; y <= img.height; y++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y * scale);
+                    ctx.lineTo(img.width * scale, y * scale);
+                    ctx.stroke();
+                }
+            }
+            
+            return imageData;
+        }
+        
+        async function handleUpload() {
+            if (!currentImage) {
+                showError('请先选择图片');
+                return;
+            }
+            
+            if (isUploading) {
+                showError('正在上传中，请稍候...');
+                return;
+            }
+            
+            var startX = parseInt(posX.value) || 0;
+            var startY = parseInt(posY.value) || 0;
+            
+            // 检查坐标范围
+            if (startX < 0 || startX >= WORLD_SIZE || startY < 0 || startY >= WORLD_SIZE) {
+                showError('起始坐标超出范围 (0-999)');
+                return;
+            }
+            
+            // 计算实际能放置的尺寸
+            var availableWidth = Math.min(currentImage.width, WORLD_SIZE - startX);
+            var availableHeight = Math.min(currentImage.height, WORLD_SIZE - startY);
+            
+            if (availableWidth <= 0 || availableHeight <= 0) {
+                showError('图片无法放置在指定位置（超出画板边界）');
+                return;
+            }
+            
+            if (!confirm(`确认上传图片到位置 (${startX}, ${startY})？\n\n将修改 ${availableWidth * availableHeight} 个像素`)) {
+                return;
+            }
+            
+            isUploading = true;
+            uploadBtn.disabled = true;
+            previewBtn.disabled = true;
+            statusDisplay.textContent = '正在处理图片...';
+            
+            // 显示进度条
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressFill.textContent = '0%';
+            progressText.textContent = '准备上传...';
+            
+            // 处理图像
+            var imageData = processAndDrawImage(imageCtx, currentImage, 1, false);
+            
+            // 准备上传数据
+            var pixels = [];
+            var totalPixels = availableWidth * availableHeight;
+            var uploadedCount = 0;
+            var batchSize = 1000; // 每批上传1000个像素
+            
+            statusDisplay.textContent = '正在上传像素...';
+            
+            // 分批上传
+            for (var y = 0; y < availableHeight; y++) {
+                for (var x = 0; x < availableWidth; x++) {
+                    var pixelIndex = (y * currentImage.width + x) * 4;
+                    var r = imageData.data[pixelIndex];
+                    var g = imageData.data[pixelIndex + 1];
+                    var b = imageData.data[pixelIndex + 2];
+                    
+                    // 跳过白色像素（如果不覆盖模式）
+                    if (!overwriteMode.checked && r === 255 && g === 255 && b === 255) {
+                        uploadedCount++;
+                        continue;
+                    }
+                    
+                    var worldX = startX + x;
+                    var worldY = startY + y;
+                    var pixelIndex = worldX * WORLD_SIZE + worldY;
+                    
+                    // 将RGB转换为16进制颜色
+                    var colorNum = (r << 16) | (g << 8) | b;
+                    
+                    // 白色像素视为擦除
+                    if (r === 255 && g === 255 && b === 255) {
+                        colorNum = null;
+                    }
+                    
+                    pixels.push({
+                        id: pixelIndex,
+                        col: colorNum
+                    });
+                    
+                    uploadedCount++;
+                    
+                    // 每处理100个像素更新一次进度
+                    if (pixels.length >= batchSize || uploadedCount === totalPixels) {
+                        await uploadPixelBatch(pixels);
+                        pixels = [];
+                        
+                        // 更新进度显示
+                        var progress = Math.round((uploadedCount / totalPixels) * 100);
+                        progressFill.style.width = progress + '%';
+                        progressFill.textContent = progress + '%';
+                        progressText.textContent = `${uploadedCount.toLocaleString()}/${totalPixels.toLocaleString()} (${progress}%)`;
+                        
+                        statusDisplay.textContent = `上传中... ${progress}%`;
+                    }
+                }
+            }
+            
+            // 完成上传
+            isUploading = false;
+            uploadBtn.disabled = false;
+            previewBtn.disabled = false;
+            statusDisplay.textContent = '上传完成！';
+            progressText.textContent = '上传完成';
+            
+            showSuccess(`图片已成功上传到位置 (${startX}, ${startY})`);
+            
+            // 3秒后隐藏进度条
+            setTimeout(function() {
+                progressContainer.style.display = 'none';
+                statusDisplay.textContent = '准备就绪';
+            }, 3000);
+        }
+        
+        async function uploadPixelBatch(pixels) {
+            if (pixels.length === 0) return;
+            
+            try {
+                // 分离需要更新和删除的像素
+                var updates = [];
+                var deletes = [];
+                
+                pixels.forEach(pixel => {
+                    if (pixel.col === null) {
+                        deletes.push(pixel.id);
+                    } else {
+                        updates.push(pixel);
+                    }
+                });
+                
+                // 执行批量操作
+                var promises = [];
+                
+                if (updates.length > 0) {
+                    promises.push(
+                        supabase.from('draw').upsert(updates, { onConflict: 'id' })
+                    );
+                }
+                
+                if (deletes.length > 0) {
+                    promises.push(
+                        supabase.from('draw').delete().in('id', deletes)
+                    );
+                }
+                
+                await Promise.all(promises);
+                
+            } catch (error) {
+                console.error('上传失败:', error);
+                throw error;
+            }
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+        
+        window.onload = function() {
+            init();
+            document.title = '图片上传 - 冬日绘版-HZY';
+        };
+    </script>
+</body>
+</html>
