@@ -58,6 +58,7 @@
             <p>3. 空格+左键拖动移动画布</p>
             <p>4. 双指触摸移动画布</p>
             <p>5. 使用颜色选择器选择颜色</p>
+            <p>6. 禁止连笔</p>
             <p style="color:#4CAF50">优化：全像素缓存，零闪屏，实时保存</p>
         </div>
     </main>
@@ -448,7 +449,7 @@
                 if(modifiedPixels.size>0&&!isSaving){
                     saveModifiedPixels();
                 }
-            },500);
+            },5000);
         }
         
         function saveModifiedPixels(){
