@@ -10,7 +10,7 @@
     <script src="/js/sidebar.js"></script>
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}a{text-decoration:none;color:inherit}.link-card{background:rgba(255,255,255,0.8);border-radius:15px;padding:1.5rem;margin:1.5rem 0;transition:transform 0.3s;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.link-card a{position:relative;z-index:1;color:black!important;font-weight:bold;display:flex;align-items:center;text-decoration:none}.link-card:hover{transform:translateY(-5px);box-shadow:0 6px 20px rgba(0,0,0,0.15)}.center{text-align:center}.canvas-container{position:relative;margin:20px auto;border:2px solid #333;border-radius:5px;overflow:hidden;background:#fff;width:600px;height:400px;touch-action:none}#pixelCanvas{display:block;cursor:crosshair}.tools-panel{background:white;border-radius:10px;padding:15px;margin:20px auto;max-width:600px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.tool-btn{padding:10px 20px;margin:5px;border:none;border-radius:5px;background:#f0f0f0;cursor:pointer;transition:all 0.3s}.tool-btn.active{background:#4CAF50;color:white}.tool-btn:hover{background:#e0e0e0}.color-picker{width:40px;height:40px;border:2px solid #333;border-radius:5px;cursor:pointer;margin:5px;vertical-align:middle}.status-bar{background:white;padding:10px;border-radius:10px;margin:20px auto;max-width:800px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-family:monospace}.help-text{color:#666;font-size:0.9em;margin-top:10px}.view-controls{display:flex;justify-content:center;gap:10px;margin-top:10px}.view-btn{padding:5px 15px;border:1px solid #ddd;border-radius:5px;background:white;cursor:pointer;transition:all 0.3s}.view-btn:hover{background:#f0f0f0}.pixel-info{margin-top:5px;font-size:0.9em;color:#666}.loader{position:absolute;top:10px;right:10px;padding:5px 10px;background:rgba(0,0,0,0.7);color:white;border-radius:5px;font-size:12px;display:none}.save-status{position:absolute;bottom:10px;right:10px;padding:5px 10px;background:rgba(76,175,80,0.9);color:white;border-radius:5px;font-size:12px;display:none}
+        *{margin:0;padding:0;box-sizing:border-box}a{text-decoration:none;color:inherit}.link-card{background:rgba(255,255,255,0.8);border-radius:15px;padding:1.5rem;margin:1.5rem 0;transition:transform 0.3s;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.link-card a{position:relative;z-index:1;color:black!important;font-weight:bold;display:flex;align-items:center;text-decoration:none}.link-card:hover{transform:translateY(-5px);box-shadow:0 6px 20px rgba(0,0,0,0.15)}.center{text-align:center}.canvas-container{position:relative;margin:20px auto;border:2px solid #333;border-radius:5px;overflow:hidden;background:#fff;width:600px;height:400px;touch-action:none}#pixelCanvas{display:block;cursor:crosshair}.tools-panel{background:white;border-radius:10px;padding:15px;margin:20px auto;max-width:600px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.tool-btn{padding:10px 20px;margin:5px;border:none;border-radius:5px;background:#f0f0f0;cursor:pointer;transition:all 0.3s}.tool-btn.active{background:#4CAF50;color:white}.tool-btn:hover{background:#e0e0e0}.color-picker{width:40px;height:40px;border:2px solid #333;border-radius:5px;cursor:pointer;margin:5px;vertical-align:middle}.status-bar{background:white;padding:10px;border-radius:10px;margin:20px auto;max-width:800px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-family:monospace}.help-text{color:#666;font-size:0.9em;margin-top:10px}.view-controls{display:flex;justify-content:center;gap:10px;margin-top:10px}.view-btn{padding:5px 15px;border:1px solid #ddd;border-radius:5px;background:white;cursor:pointer;transition:all 0.3s}.view-btn:hover{background:#f0f0f0}.pixel-info{margin-top:5px;font-size:0.9em;color:#666}.loader{position:absolute;top:10px;right:10px;padding:5px 10px;background:rgba(0,0,0,0.7);color:white;border-radius:5px;font-size:12px;display:none}.save-status{position:absolute;bottom:10px;right:10px;padding:5px 10px;background:rgba(76,175,80,0.9);color:white;border-radius:5px;font-size:12px;display:none}.saving-indicator{color:#4CAF50;font-weight:bold}
     </style>
 </head>
 <body>
@@ -19,7 +19,7 @@
         <div class="link-card">
             <h2 class="center">冬日绘版-HZY</h2>
             <p class="center">1000×1000像素画板</p>
-            <p class="center pixel-info">全缓存版 - 无闪屏，30秒自动保存</p>
+            <p class="center pixel-info">全缓存版 - 无闪屏，实时保存</p>
         </div>
         <div class="tools-panel">
             <h3>工具</h3>
@@ -31,13 +31,12 @@
                 <button class="view-btn" id="centerBtn">回到中心</button>
                 <button class="view-btn" id="saveViewBtn">保存位置</button>
                 <button class="view-btn" id="loadViewBtn">加载位置</button>
-                <button class="view-btn" id="forceSaveBtn">立即保存</button>
             </div>
             <div class="help-text">
                 <p>• 左键拖动：绘制/擦除</p>
                 <p>• 空格+左键：移动画布</p>
                 <p>• 双指触摸：移动画布</p>
-                <p>• 30秒自动保存 | 所有像素都缓存</p>
+                <p>• 实时保存 | 所有像素都缓存</p>
             </div>
         </div>
         <div class="canvas-container" id="canvasContainer">
@@ -50,7 +49,7 @@
             <p>工具: <span id="toolDisplay">画笔</span></p>
             <p>颜色: <span id="colorDisplay">#000000</span></p>
             <p>状态: <span id="statusDisplay">就绪</span> | 修改: <span id="modifiedDisplay">0</span></p>
-            <p>下次保存: <span id="saveCountdown">30秒</span></p>
+            <p>保存状态: <span id="saveStatusDisplay" class="saving-indicator">已保存</span></p>
         </div>
         <div class="link-card">
             <h3>操作说明</h3>
@@ -59,7 +58,7 @@
             <p>3. 空格+左键拖动移动画布</p>
             <p>4. 双指触摸移动画布</p>
             <p>5. 使用颜色选择器选择颜色</p>
-            <p style="color:#4CAF50">优化：全像素缓存，零闪屏，30秒自动保存</p>
+            <p style="color:#4CAF50">优化：全像素缓存，零闪屏，实时保存</p>
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -70,15 +69,12 @@
         var CANVAS_HEIGHT = 400;
         var PIXEL_SIZE = 1;
         var WORLD_SIZE = 1000;
-        var VISIBLE_WIDTH = CANVAS_WIDTH;
-        var VISIBLE_HEIGHT = CANVAS_HEIGHT;
         var currentTool = 'brush';
         var currentColor = '#000000';
         var offsetX = 500;
         var offsetY = 500;
         var isDragging = false;
         var isSpacePressed = false;
-        var isRightMouseDown = false;
         var lastMouseX = 0;
         var lastMouseY = 0;
         var isDrawing = false;
@@ -87,23 +83,16 @@
         var isLoading = false;
         var isTouching = false;
         var isPinching = false;
-        var initialPinchDistance = 0;
-        var initialOffsetX = 0;
-        var initialOffsetY = 0;
         var lastTouchX = 0;
         var lastTouchY = 0;
         var touchStartTime = 0;
         var pixelCache = new Array(WORLD_SIZE * WORLD_SIZE);
         var modifiedPixels = new Set();
-        var saveTimer = null;
-        var autoSaveTimer = null;
-        var saveInterval = 30000;
-        var lastSaveTime = Date.now();
-        var modifiedCount = 0;
         var isSaving = false;
         var renderTimer = null;
         var needsRender = false;
         var lastRenderArea = null;
+        var saveDebounceTimer = null;
         var canvas = document.getElementById('pixelCanvas');
         var ctx = canvas.getContext('2d');
         var loader = document.getElementById('loader');
@@ -116,8 +105,9 @@
         var colorDisplay = document.getElementById('colorDisplay');
         var statusDisplay = document.getElementById('statusDisplay');
         var modifiedDisplay = document.getElementById('modifiedDisplay');
-        var saveCountdown = document.getElementById('saveCountdown');
+        var saveStatusDisplay = document.getElementById('saveStatusDisplay');
         var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
         function getVisibleArea(){
             var startX = Math.max(0,offsetX-Math.floor(CANVAS_WIDTH/2));
             var endX = Math.min(WORLD_SIZE,startX+CANVAS_WIDTH);
@@ -127,29 +117,29 @@
             if(endY-startY<CANVAS_HEIGHT){startY=Math.max(0,endY-CANVAS_HEIGHT)}
             return{startX:startX,endX:endX,startY:startY,endY:endY}
         }
+        
         function worldToCanvas(worldX,worldY){
             var area=getVisibleArea();
             var canvasX=(worldX-area.startX)*PIXEL_SIZE;
             var canvasY=(worldY-area.startY)*PIXEL_SIZE;
             return{x:Math.round(canvasX),y:Math.round(canvasY)}
         }
+        
         function canvasToWorld(canvasX,canvasY){
             var area=getVisibleArea();
             var worldX=area.startX+Math.floor(canvasX/PIXEL_SIZE);
             var worldY=area.startY+Math.floor(canvasY/PIXEL_SIZE);
             return{worldX:Math.max(0,Math.min(worldX,WORLD_SIZE-1)),worldY:Math.max(0,Math.min(worldY,WORLD_SIZE-1))}
         }
+        
         function getPixelIndex(worldX,worldY){return worldX*WORLD_SIZE+worldY}
+        
         function updateModifiedDisplay(){
             modifiedDisplay.textContent=modifiedPixels.size;
-            updateSaveCountdown()
         }
-        function updateSaveCountdown(){
-            var remaining=Math.ceil((saveInterval-(Date.now()-lastSaveTime))/1000);
-            if(remaining<0)remaining=0;
-            saveCountdown.textContent=remaining+'秒'
-        }
+        
         function getDistance(x1,y1,x2,y2){return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2))}
+        
         function init(){
             document.addEventListener('keydown',handleKeyDown);
             document.addEventListener('keyup',handleKeyUp);
@@ -182,14 +172,14 @@
             document.getElementById('centerBtn').onclick=centerView;
             document.getElementById('saveViewBtn').onclick=saveView;
             document.getElementById('loadViewBtn').onclick=loadView;
-            document.getElementById('forceSaveBtn').onclick=forceSave;
             loadAllPixels();
-            startAutoSave()
         }
+        
         function clearCanvas(){
             ctx.fillStyle='#FFFFFF';
             ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
         }
+        
         function loadAllPixels(){
             isLoading=true;
             loader.style.display='block';
@@ -221,12 +211,14 @@
             }
             loadBatch(0)
         }
+        
         function scheduleRender(){
             if(!renderTimer){
                 renderTimer=requestAnimationFrame(renderVisibleArea);
                 needsRender=true
             }
         }
+        
         function renderVisibleArea(){
             renderTimer=null;
             var area=getVisibleArea();
@@ -247,6 +239,7 @@
                 }
             }
         }
+        
         function handleKeyDown(e){
             if(e.code==='Space'){
                 isSpacePressed=true;
@@ -254,12 +247,14 @@
                 e.preventDefault()
             }
         }
+        
         function handleKeyUp(e){
             if(e.code==='Space'){
                 isSpacePressed=false;
                 canvas.style.cursor='crosshair'
             }
         }
+        
         function handleMouseDown(e){
             e.preventDefault();
             var rect=canvas.getBoundingClientRect();
@@ -281,6 +276,7 @@
                 lastDrawY=pos.worldY
             }
         }
+        
         function handleMouseMove(e){
             e.preventDefault();
             var rect=canvas.getBoundingClientRect();
@@ -310,6 +306,7 @@
                 }
             }
         }
+        
         function handleMouseUp(e){
             if(isDragging){
                 isDragging=false;
@@ -318,9 +315,11 @@
             if(isDrawing){
                 isDrawing=false;
                 lastDrawX=-1;
-                lastDrawY=-1
+                lastDrawY=-1;
+                scheduleSave();
             }
         }
+        
         function handleTouchStart(e){
             e.preventDefault();
             var rect=canvas.getBoundingClientRect();
@@ -331,8 +330,6 @@
                 lastTouchX=touch.clientX;
                 lastTouchY=touch.clientY;
                 touchStartTime=Date.now();
-                initialOffsetX=offsetX;
-                initialOffsetY=offsetY;
                 var x=touch.clientX-rect.left;
                 var y=touch.clientY-rect.top;
                 var pos=canvasToWorld(x,y);
@@ -345,13 +342,11 @@
                 isDrawing=false;
                 var touch1=touches[0];
                 var touch2=touches[1];
-                initialPinchDistance=getDistance(touch1.clientX,touch1.clientY,touch2.clientX,touch2.clientY);
-                initialOffsetX=offsetX;
-                initialOffsetY=offsetY;
                 lastTouchX=(touch1.clientX+touch2.clientX)/2;
                 lastTouchY=(touch1.clientY+touch2.clientY)/2
             }
         }
+        
         function handleTouchMove(e){
             e.preventDefault();
             var rect=canvas.getBoundingClientRect();
@@ -362,7 +357,7 @@
                 var y=touch.clientY-rect.top;
                 var pos=canvasToWorld(x,y);
                 coordDisplay.textContent='('+pos.worldX+', '+pos.worldY+')';
-                if(isDrawing&&lastDrawX!==pos.worldX||lastDrawY!==pos.worldY){
+                if(isDrawing&&(lastDrawX!==pos.worldX||lastDrawY!==pos.worldY)){
                     drawLine(lastDrawX,lastDrawY,pos.worldX,pos.worldY);
                     lastDrawX=pos.worldX;
                     lastDrawY=pos.worldY
@@ -372,7 +367,6 @@
             }else if(touches.length===2&&isPinching){
                 var touch1=touches[0];
                 var touch2=touches[1];
-                var currentDistance=getDistance(touch1.clientX,touch1.clientY,touch2.clientX,touch2.clientY);
                 var centerX=(touch1.clientX+touch2.clientX)/2;
                 var centerY=(touch1.clientY+touch2.clientY)/2;
                 var deltaX=centerX-lastTouchX;
@@ -388,6 +382,7 @@
                 scheduleRender()
             }
         }
+        
         function handleTouchEnd(e){
             e.preventDefault();
             if(isTouching&&Date.now()-touchStartTime<200){
@@ -397,10 +392,14 @@
             }
             isTouching=false;
             isPinching=false;
-            isDrawing=false;
-            lastDrawX=-1;
-            lastDrawY=-1
+            if(isDrawing){
+                isDrawing=false;
+                lastDrawX=-1;
+                lastDrawY=-1;
+                scheduleSave();
+            }
         }
+        
         function drawLine(x1,y1,x2,y2){
             var dx=Math.abs(x2-x1);
             var dy=Math.abs(y2-y1);
@@ -417,6 +416,7 @@
                 if(e2<dx){err+=dx;currentY+=sy}
             }
         }
+        
         function drawPixel(worldX,worldY){
             if(worldX<0||worldX>=WORLD_SIZE||worldY<0||worldY>=WORLD_SIZE)return;
             var colorNum;
@@ -439,27 +439,24 @@
                 }
             }
         }
-        function startAutoSave(){
-            autoSaveTimer=setInterval(()=>{
-                if(modifiedPixels.size>0&&!isSaving){
-                    saveModifiedPixels()
-                }
-                updateSaveCountdown()
-            },1000)
-        }
-        function forceSave(){
-            if(modifiedPixels.size>0&&!isSaving){
-                saveModifiedPixels()
-            }else if(modifiedPixels.size===0){
-                statusDisplay.textContent='没有需要保存的修改';
-                setTimeout(()=>statusDisplay.textContent='就绪',1000)
+        
+        function scheduleSave(){
+            if(saveDebounceTimer){
+                clearTimeout(saveDebounceTimer);
             }
+            saveDebounceTimer=setTimeout(()=>{
+                if(modifiedPixels.size>0&&!isSaving){
+                    saveModifiedPixels();
+                }
+            },500);
         }
+        
         function saveModifiedPixels(){
             if(isSaving)return;
             isSaving=true;
             saveStatus.style.display='block';
-            statusDisplay.textContent='保存中...';
+            saveStatusDisplay.textContent='保存中...';
+            saveStatusDisplay.style.color='#ff9800';
             var pixelsToSave=Array.from(modifiedPixels);
             var updates=[];
             var deletes=[];
@@ -489,10 +486,11 @@
                 if(success){
                     modifiedPixels.clear();
                     updateModifiedDisplay();
-                    lastSaveTime=Date.now();
-                    statusDisplay.textContent='已保存 '+pixelsToSave.length+' 个像素'
+                    saveStatusDisplay.textContent='已保存';
+                    saveStatusDisplay.style.color='#4CAF50';
                 }else{
-                    statusDisplay.textContent='保存失败'
+                    saveStatusDisplay.textContent='保存失败';
+                    saveStatusDisplay.style.color='#f44336';
                 }
                 isSaving=false;
                 saveStatus.style.display='none';
@@ -503,6 +501,7 @@
                 },2000)
             })
         }
+        
         function centerView(){
             offsetX=500;
             offsetY=500;
@@ -510,6 +509,7 @@
             statusDisplay.textContent='已回到中心';
             setTimeout(()=>statusDisplay.textContent='就绪',1000)
         }
+        
         function saveView(){
             try{
                 localStorage.setItem('paintView',JSON.stringify({offsetX:offsetX,offsetY:offsetY,currentColor:currentColor,currentTool:currentTool}));
@@ -519,6 +519,7 @@
                 statusDisplay.textContent='保存失败'
             }
         }
+        
         function loadView(){
             try{
                 var saved=localStorage.getItem('paintView');
@@ -545,6 +546,7 @@
                 statusDisplay.textContent='加载失败'
             }
         }
+        
         window.onload=function(){
             init();
             document.title='冬日绘版-HZY'
