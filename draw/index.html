@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <title>冬日绘版-HZY</title>
@@ -10,210 +9,42 @@
     <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
     <script src="/js/sidebar.js"></script>
     <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
-
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .link-card {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            transition: transform 0.3s;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .link-card a {
-            position: relative;
-            z-index: 1;
-            color: black !important;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-
-        .link-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        /* 画布样式 */
-        .canvas-container {
-            position: relative;
-            margin: 20px auto;
-            border: 2px solid #333;
-            border-radius: 5px;
-            overflow: hidden;
-            background: #fff;
-            width: 600px;
-            height: 400px;
-        }
-
-        #pixelCanvas {
-            display: block;
-            cursor: crosshair;
-        }
-
-        .tools-panel {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .tool-btn {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            background: #f0f0f0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .tool-btn.active {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .tool-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .color-picker {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #333;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-            vertical-align: middle;
-        }
-
-        .status-bar {
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 20px auto;
-            max-width: 800px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            font-family: monospace;
-        }
-
-        .help-text {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        .view-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .view-btn {
-            padding: 5px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .view-btn:hover {
-            background: #f0f0f0;
-        }
-
-        .pixel-info {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        /* 加载指示器 */
-        .loader {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-radius: 5px;
-            font-size: 12px;
-            display: none;
-        }
-
-        /* 保存状态 */
-        .save-status {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background: rgba(76, 175, 80, 0.9);
-            color: white;
-            border-radius: 5px;
-            font-size: 12px;
-            display: none;
-        }
+        *{margin:0;padding:0;box-sizing:border-box}a{text-decoration:none;color:inherit}.link-card{background:rgba(255,255,255,0.8);border-radius:15px;padding:1.5rem;margin:1.5rem 0;transition:transform 0.3s;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.link-card a{position:relative;z-index:1;color:black!important;font-weight:bold;display:flex;align-items:center;text-decoration:none}.link-card:hover{transform:translateY(-5px);box-shadow:0 6px 20px rgba(0,0,0,0.15)}.center{text-align:center}.canvas-container{position:relative;margin:20px auto;border:2px solid #333;border-radius:5px;overflow:hidden;background:#fff;width:600px;height:400px;touch-action:none}#pixelCanvas{display:block;cursor:crosshair}.tools-panel{background:white;border-radius:10px;padding:15px;margin:20px auto;max-width:600px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}.tool-btn{padding:10px 20px;margin:5px;border:none;border-radius:5px;background:#f0f0f0;cursor:pointer;transition:all 0.3s}.tool-btn.active{background:#4CAF50;color:white}.tool-btn:hover{background:#e0e0e0}.color-picker{width:40px;height:40px;border:2px solid #333;border-radius:5px;cursor:pointer;margin:5px;vertical-align:middle}.status-bar{background:white;padding:10px;border-radius:10px;margin:20px auto;max-width:800px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-family:monospace}.help-text{color:#666;font-size:0.9em;margin-top:10px}.view-controls{display:flex;justify-content:center;gap:10px;margin-top:10px}.view-btn{padding:5px 15px;border:1px solid #ddd;border-radius:5px;background:white;cursor:pointer;transition:all 0.3s}.view-btn:hover{background:#f0f0f0}.pixel-info{margin-top:5px;font-size:0.9em;color:#666}.loader{position:absolute;top:10px;right:10px;padding:5px 10px;background:rgba(0,0,0,0.7);color:white;border-radius:5px;font-size:12px;display:none}.save-status{position:absolute;bottom:10px;right:10px;padding:5px 10px;background:rgba(76,175,80,0.9);color:white;border-radius:5px;font-size:12px;display:none}
     </style>
 </head>
-
 <body>
     <div id="nav"></div>
-    <main style="padding: 20px;">
+    <main style="padding:20px">
         <div class="link-card">
             <h2 class="center">冬日绘版-HZY</h2>
             <p class="center">1000×1000像素画板</p>
             <p class="center pixel-info">全缓存版 - 无闪屏，30秒自动保存</p>
         </div>
-
         <div class="tools-panel">
             <h3>工具</h3>
             <button class="tool-btn active" id="brushBtn">画笔</button>
             <button class="tool-btn" id="eraserBtn">橡皮擦</button>
             <input type="color" id="colorPicker" class="color-picker" value="#000000">
             <span>颜色选择</span>
-
             <div class="view-controls">
                 <button class="view-btn" id="centerBtn">回到中心</button>
                 <button class="view-btn" id="saveViewBtn">保存位置</button>
                 <button class="view-btn" id="loadViewBtn">加载位置</button>
                 <button class="view-btn" id="forceSaveBtn">立即保存</button>
             </div>
-
             <div class="help-text">
                 <p>• 左键拖动：绘制/擦除</p>
-                <p>• 右键拖动：移动画布</p>
                 <p>• 空格+左键：移动画布</p>
+                <p>• 双指触摸：移动画布</p>
                 <p>• 30秒自动保存 | 所有像素都缓存</p>
             </div>
         </div>
-
         <div class="canvas-container" id="canvasContainer">
             <canvas id="pixelCanvas" width="600" height="400"></canvas>
             <div class="loader" id="loader">加载中...</div>
             <div class="save-status" id="saveStatus">保存中...</div>
         </div>
-
         <div class="status-bar">
             <p>坐标: <span id="coordDisplay">(500, 500)</span></p>
             <p>工具: <span id="toolDisplay">画笔</span></p>
@@ -221,37 +52,29 @@
             <p>状态: <span id="statusDisplay">就绪</span> | 修改: <span id="modifiedDisplay">0</span></p>
             <p>下次保存: <span id="saveCountdown">30秒</span></p>
         </div>
-
         <div class="link-card">
             <h3>操作说明</h3>
             <p>1. 点击"画笔"或"橡皮擦"切换工具</p>
             <p>2. 在画布上左键点击或拖动绘制</p>
-            <p>3. 右键拖动或空格+左键拖动移动画布</p>
-            <p>4. 使用颜色选择器选择颜色</p>
-            <p style="color: #4CAF50;">优化：全像素缓存，零闪屏，30秒自动保存</p>
+            <p>3. 空格+左键拖动移动画布</p>
+            <p>4. 双指触摸移动画布</p>
+            <p>5. 使用颜色选择器选择颜色</p>
+            <p style="color:#4CAF50">优化：全像素缓存，零闪屏，30秒自动保存</p>
         </div>
     </main>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
-        // 配置
         var SUPABASE_URL = 'https://idfnubsvhqdmsiycjgof.supabase.co';
         var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZm51YnN2aHFkbXNpeWNqZ29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5NjE0NjUsImV4cCI6MjA4MzUzNzQ2NX0.a6X9e_rnOv33JMN7g7OIm5TlGIXQLWlO5hR0BjOuVYU';
-
-        // 画板参数 - 1000x1000
         var CANVAS_WIDTH = 600;
         var CANVAS_HEIGHT = 400;
         var PIXEL_SIZE = 1;
-        var WORLD_SIZE = 1000; // 1000x1000像素
-        
+        var WORLD_SIZE = 1000;
         var VISIBLE_WIDTH = CANVAS_WIDTH;
         var VISIBLE_HEIGHT = CANVAS_HEIGHT;
-
-        // 状态变量
         var currentTool = 'brush';
         var currentColor = '#000000';
-        var offsetX = 500; // 中心位置
+        var offsetX = 500;
         var offsetY = 500;
         var isDragging = false;
         var isSpacePressed = false;
@@ -262,23 +85,25 @@
         var lastDrawX = -1;
         var lastDrawY = -1;
         var isLoading = false;
-
-        // 全像素缓存系统
-        var pixelCache = new Array(WORLD_SIZE * WORLD_SIZE); // 所有像素的缓存
-        var modifiedPixels = new Set(); // 已修改但未保存的像素
+        var isTouching = false;
+        var isPinching = false;
+        var initialPinchDistance = 0;
+        var initialOffsetX = 0;
+        var initialOffsetY = 0;
+        var lastTouchX = 0;
+        var lastTouchY = 0;
+        var touchStartTime = 0;
+        var pixelCache = new Array(WORLD_SIZE * WORLD_SIZE);
+        var modifiedPixels = new Set();
         var saveTimer = null;
         var autoSaveTimer = null;
-        var saveInterval = 30000; // 30秒自动保存
+        var saveInterval = 30000;
         var lastSaveTime = Date.now();
         var modifiedCount = 0;
         var isSaving = false;
-
-        // 渲染优化
         var renderTimer = null;
         var needsRender = false;
         var lastRenderArea = null;
-
-        // DOM元素
         var canvas = document.getElementById('pixelCanvas');
         var ctx = canvas.getContext('2d');
         var loader = document.getElementById('loader');
@@ -292,581 +117,438 @@
         var statusDisplay = document.getElementById('statusDisplay');
         var modifiedDisplay = document.getElementById('modifiedDisplay');
         var saveCountdown = document.getElementById('saveCountdown');
-
-        // 创建Supabase客户端
         var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // 工具函数
-        function getVisibleArea() {
-            var startX = Math.max(0, offsetX - Math.floor(CANVAS_WIDTH / 2));
-            var endX = Math.min(WORLD_SIZE, startX + CANVAS_WIDTH);
-            var startY = Math.max(0, offsetY - Math.floor(CANVAS_HEIGHT / 2));
-            var endY = Math.min(WORLD_SIZE, startY + CANVAS_HEIGHT);
-            
-            // 确保开始坐标正确
-            if (endX - startX < CANVAS_WIDTH) {
-                startX = Math.max(0, endX - CANVAS_WIDTH);
-            }
-            if (endY - startY < CANVAS_HEIGHT) {
-                startY = Math.max(0, endY - CANVAS_HEIGHT);
-            }
-            
-            return {
-                startX: startX,
-                endX: endX,
-                startY: startY,
-                endY: endY
-            };
+        function getVisibleArea(){
+            var startX = Math.max(0,offsetX-Math.floor(CANVAS_WIDTH/2));
+            var endX = Math.min(WORLD_SIZE,startX+CANVAS_WIDTH);
+            var startY = Math.max(0,offsetY-Math.floor(CANVAS_HEIGHT/2));
+            var endY = Math.min(WORLD_SIZE,startY+CANVAS_HEIGHT);
+            if(endX-startX<CANVAS_WIDTH){startX=Math.max(0,endX-CANVAS_WIDTH)}
+            if(endY-startY<CANVAS_HEIGHT){startY=Math.max(0,endY-CANVAS_HEIGHT)}
+            return{startX:startX,endX:endX,startY:startY,endY:endY}
         }
-
-        function worldToCanvas(worldX, worldY) {
-            var area = getVisibleArea();
-            var canvasX = (worldX - area.startX) * PIXEL_SIZE;
-            var canvasY = (worldY - area.startY) * PIXEL_SIZE;
-            return { x: Math.round(canvasX), y: Math.round(canvasY) };
+        function worldToCanvas(worldX,worldY){
+            var area=getVisibleArea();
+            var canvasX=(worldX-area.startX)*PIXEL_SIZE;
+            var canvasY=(worldY-area.startY)*PIXEL_SIZE;
+            return{x:Math.round(canvasX),y:Math.round(canvasY)}
         }
-
-        function canvasToWorld(canvasX, canvasY) {
-            var area = getVisibleArea();
-            var worldX = area.startX + Math.floor(canvasX / PIXEL_SIZE);
-            var worldY = area.startY + Math.floor(canvasY / PIXEL_SIZE);
-            
-            return {
-                worldX: Math.max(0, Math.min(worldX, WORLD_SIZE - 1)),
-                worldY: Math.max(0, Math.min(worldY, WORLD_SIZE - 1))
-            };
+        function canvasToWorld(canvasX,canvasY){
+            var area=getVisibleArea();
+            var worldX=area.startX+Math.floor(canvasX/PIXEL_SIZE);
+            var worldY=area.startY+Math.floor(canvasY/PIXEL_SIZE);
+            return{worldX:Math.max(0,Math.min(worldX,WORLD_SIZE-1)),worldY:Math.max(0,Math.min(worldY,WORLD_SIZE-1))}
         }
-
-        function getPixelIndex(worldX, worldY) {
-            return worldX * WORLD_SIZE + worldY;
+        function getPixelIndex(worldX,worldY){return worldX*WORLD_SIZE+worldY}
+        function updateModifiedDisplay(){
+            modifiedDisplay.textContent=modifiedPixels.size;
+            updateSaveCountdown()
         }
-
-        function updateModifiedDisplay() {
-            modifiedDisplay.textContent = modifiedPixels.size;
-            updateSaveCountdown();
+        function updateSaveCountdown(){
+            var remaining=Math.ceil((saveInterval-(Date.now()-lastSaveTime))/1000);
+            if(remaining<0)remaining=0;
+            saveCountdown.textContent=remaining+'秒'
         }
-
-        function updateSaveCountdown() {
-            var remaining = Math.ceil((saveInterval - (Date.now() - lastSaveTime)) / 1000);
-            if (remaining < 0) remaining = 0;
-            saveCountdown.textContent = remaining + '秒';
-        }
-
-        // 初始化 - 加载所有像素到缓存
-        function init() {
-            console.log("初始化全缓存版画板");
-            console.log("世界尺寸:", WORLD_SIZE, "x", WORLD_SIZE, "=", WORLD_SIZE * WORLD_SIZE, "像素");
-            
-            // 事件监听
-            document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('keyup', handleKeyUp);
-            
-            canvas.addEventListener('mousedown', handleMouseDown);
-            canvas.addEventListener('mousemove', handleMouseMove);
-            canvas.addEventListener('mouseup', handleMouseUp);
-            canvas.addEventListener('mouseleave', handleMouseUp);
-            
-            canvas.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-            });
-            
-            // 工具按钮事件
-            brushBtn.onclick = function() {
-                currentTool = 'brush';
+        function getDistance(x1,y1,x2,y2){return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2))}
+        function init(){
+            document.addEventListener('keydown',handleKeyDown);
+            document.addEventListener('keyup',handleKeyUp);
+            canvas.addEventListener('mousedown',handleMouseDown);
+            canvas.addEventListener('mousemove',handleMouseMove);
+            canvas.addEventListener('mouseup',handleMouseUp);
+            canvas.addEventListener('mouseleave',handleMouseUp);
+            canvas.addEventListener('touchstart',handleTouchStart,{passive:false});
+            canvas.addEventListener('touchmove',handleTouchMove,{passive:false});
+            canvas.addEventListener('touchend',handleTouchEnd);
+            canvas.addEventListener('touchcancel',handleTouchEnd);
+            brushBtn.onclick=function(){
+                currentTool='brush';
                 brushBtn.classList.add('active');
                 eraserBtn.classList.remove('active');
-                toolDisplay.textContent = '画笔';
-                canvas.style.cursor = 'crosshair';
+                toolDisplay.textContent='画笔';
+                canvas.style.cursor='crosshair'
             };
-            
-            eraserBtn.onclick = function() {
-                currentTool = 'eraser';
+            eraserBtn.onclick=function(){
+                currentTool='eraser';
                 brushBtn.classList.remove('active');
                 eraserBtn.classList.add('active');
-                toolDisplay.textContent = '橡皮擦';
-                canvas.style.cursor = 'crosshair';
+                toolDisplay.textContent='橡皮擦';
+                canvas.style.cursor='crosshair'
             };
-            
-            // 颜色选择器
-            colorPicker.onchange = function(e) {
-                currentColor = e.target.value;
-                colorDisplay.textContent = currentColor;
+            colorPicker.onchange=function(e){
+                currentColor=e.target.value;
+                colorDisplay.textContent=currentColor
             };
-            
-            // 视图控制按钮
-            document.getElementById('centerBtn').onclick = centerView;
-            document.getElementById('saveViewBtn').onclick = saveView;
-            document.getElementById('loadViewBtn').onclick = loadView;
-            document.getElementById('forceSaveBtn').onclick = forceSave;
-            
-            // 初始加载所有像素
+            document.getElementById('centerBtn').onclick=centerView;
+            document.getElementById('saveViewBtn').onclick=saveView;
+            document.getElementById('loadViewBtn').onclick=loadView;
+            document.getElementById('forceSaveBtn').onclick=forceSave;
             loadAllPixels();
-            
-            // 启动自动保存计时器
-            startAutoSave();
-            
-            console.log("全缓存版初始化完成");
+            startAutoSave()
         }
-
-        function clearCanvas() {
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        function clearCanvas(){
+            ctx.fillStyle='#FFFFFF';
+            ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
         }
-
-        // 加载所有像素到缓存
-        function loadAllPixels() {
-            isLoading = true;
-            loader.style.display = 'block';
-            statusDisplay.textContent = '加载所有像素...';
-            
-            console.log("开始加载所有像素...");
-            
-            // 分批加载，每批10000个像素
-            var batchSize = 10000;
-            var totalPixels = WORLD_SIZE * WORLD_SIZE;
-            var loadedCount = 0;
-            var startTime = Date.now();
-            
-            function loadBatch(startId) {
-                var endId = Math.min(startId + batchSize, totalPixels);
-                
-                supabase
-                    .from('draw')
-                    .select('id, col')
-                    .gte('id', startId)
-                    .lt('id', endId)
-                    .then(response => {
-                        if (response.data) {
-                            // 批量处理像素
-                            response.data.forEach(pixel => {
-                                pixelCache[pixel.id] = pixel.col;
-                            });
-                            loadedCount += response.data.length;
-                        }
-                        
-                        // 更新状态
-                        var progress = Math.round((loadedCount / totalPixels) * 100);
-                        statusDisplay.textContent = '加载中 ' + progress + '% (' + loadedCount + '/' + totalPixels + ')';
-                        
-                        // 如果还有更多数据，继续加载
-                        if (endId < totalPixels) {
-                            setTimeout(() => loadBatch(endId), 10); // 小延迟避免阻塞
-                        } else {
-                            // 加载完成
-                            var loadTime = Date.now() - startTime;
-                            console.log("所有像素加载完成! 耗时:", loadTime + "ms");
-                            console.log("加载了", loadedCount, "个像素");
-                            
-                            isLoading = false;
-                            loader.style.display = 'none';
-                            statusDisplay.textContent = '就绪';
-                            
-                            // 初始渲染
-                            scheduleRender();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('加载像素失败:', error);
-                        isLoading = false;
-                        loader.style.display = 'none';
-                        statusDisplay.textContent = '加载失败';
-                        
-                        // 仍然尝试渲染
-                        scheduleRender();
-                    });
+        function loadAllPixels(){
+            isLoading=true;
+            loader.style.display='block';
+            statusDisplay.textContent='加载所有像素...';
+            var batchSize=10000;
+            var totalPixels=WORLD_SIZE*WORLD_SIZE;
+            var loadedCount=0;
+            function loadBatch(startId){
+                var endId=Math.min(startId+batchSize,totalPixels);
+                supabase.from('draw').select('id, col').gte('id',startId).lt('id',endId).then(response=>{
+                    if(response.data){
+                        response.data.forEach(pixel=>{pixelCache[pixel.id]=pixel.col});
+                        loadedCount+=response.data.length
+                    }
+                    var progress=Math.round((loadedCount/totalPixels)*100);
+                    statusDisplay.textContent='加载中 '+progress+'% ('+loadedCount+'/'+totalPixels+')';
+                    if(endId<totalPixels){setTimeout(()=>loadBatch(endId),10)}else{
+                        isLoading=false;
+                        loader.style.display='none';
+                        statusDisplay.textContent='就绪';
+                        scheduleRender()
+                    }
+                }).catch(error=>{
+                    isLoading=false;
+                    loader.style.display='none';
+                    statusDisplay.textContent='加载失败';
+                    scheduleRender()
+                })
             }
-            
-            // 开始加载
-            loadBatch(0);
+            loadBatch(0)
         }
-
-        // 渲染优化 - 使用requestAnimationFrame
-        function scheduleRender() {
-            if (!renderTimer) {
-                renderTimer = requestAnimationFrame(renderVisibleArea);
-                needsRender = true;
+        function scheduleRender(){
+            if(!renderTimer){
+                renderTimer=requestAnimationFrame(renderVisibleArea);
+                needsRender=true
             }
         }
-
-        function renderVisibleArea() {
-            renderTimer = null;
-            
-            var area = getVisibleArea();
-            
-            // 检查是否需要重新渲染
-            if (lastRenderArea &&
-                lastRenderArea.startX === area.startX &&
-                lastRenderArea.endX === area.endX &&
-                lastRenderArea.startY === area.startY &&
-                lastRenderArea.endY === area.endY &&
-                !needsRender) {
-                return;
-            }
-            
-            lastRenderArea = area;
-            needsRender = false;
-            
-            // 渲染可见区域
+        function renderVisibleArea(){
+            renderTimer=null;
+            var area=getVisibleArea();
+            if(lastRenderArea&&lastRenderArea.startX===area.startX&&lastRenderArea.endX===area.endX&&lastRenderArea.startY===area.startY&&lastRenderArea.endY===area.endY&&!needsRender){return}
+            lastRenderArea=area;
+            needsRender=false;
             clearCanvas();
-            
-            var startTime = Date.now();
-            var renderCount = 0;
-            
-            for (var x = area.startX; x < area.endX; x++) {
-                for (var y = area.startY; y < area.endY; y++) {
-                    var index = getPixelIndex(x, y);
-                    var colorNum = pixelCache[index];
-                    
-                    if (colorNum !== undefined && colorNum !== null) {
-                        var canvasPos = worldToCanvas(x, y);
-                        var color = '#' + colorNum.toString(16).padStart(6, '0');
-                        ctx.fillStyle = color;
-                        ctx.fillRect(canvasPos.x, canvasPos.y, PIXEL_SIZE, PIXEL_SIZE);
-                        renderCount++;
+            for(var x=area.startX;x<area.endX;x++){
+                for(var y=area.startY;y<area.endY;y++){
+                    var index=getPixelIndex(x,y);
+                    var colorNum=pixelCache[index];
+                    if(colorNum!==undefined&&colorNum!==null){
+                        var canvasPos=worldToCanvas(x,y);
+                        var color='#'+colorNum.toString(16).padStart(6,'0');
+                        ctx.fillStyle=color;
+                        ctx.fillRect(canvasPos.x,canvasPos.y,PIXEL_SIZE,PIXEL_SIZE)
                     }
                 }
             }
-            
-            var renderTime = Date.now() - startTime;
-            if (renderTime > 16) {
-                console.log("渲染", renderCount, "个像素，耗时", renderTime, "ms");
+        }
+        function handleKeyDown(e){
+            if(e.code==='Space'){
+                isSpacePressed=true;
+                canvas.style.cursor='grab';
+                e.preventDefault()
             }
         }
-
-        // 键盘事件
-        function handleKeyDown(e) {
-            if (e.code === 'Space') {
-                isSpacePressed = true;
-                canvas.style.cursor = 'grab';
-                e.preventDefault();
+        function handleKeyUp(e){
+            if(e.code==='Space'){
+                isSpacePressed=false;
+                canvas.style.cursor='crosshair'
             }
         }
-
-        function handleKeyUp(e) {
-            if (e.code === 'Space') {
-                isSpacePressed = false;
-                canvas.style.cursor = 'crosshair';
-            }
-        }
-
-        // 鼠标事件
-        function handleMouseDown(e) {
+        function handleMouseDown(e){
             e.preventDefault();
-            
-            var rect = canvas.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
-            
-            // 检查是否是移动模式
-            if (isSpacePressed || e.button === 2) {
-                isDragging = true;
-                isRightMouseDown = (e.button === 2);
-                lastMouseX = e.clientX;
-                lastMouseY = e.clientY;
-                canvas.style.cursor = 'grabbing';
-                return;
+            var rect=canvas.getBoundingClientRect();
+            var x=e.clientX-rect.left;
+            var y=e.clientY-rect.top;
+            if(isSpacePressed){
+                isDragging=true;
+                lastMouseX=e.clientX;
+                lastMouseY=e.clientY;
+                canvas.style.cursor='grabbing';
+                return
             }
-            
-            if (e.button === 0) { // 左键
-                var pos = canvasToWorld(x, y);
-                isDrawing = true;
-                drawPixel(pos.worldX, pos.worldY);
-                lastDrawX = pos.worldX;
-                lastDrawY = pos.worldY;
+            if(e.button===2){return}
+            if(e.button===0){
+                var pos=canvasToWorld(x,y);
+                isDrawing=true;
+                drawPixel(pos.worldX,pos.worldY);
+                lastDrawX=pos.worldX;
+                lastDrawY=pos.worldY
             }
         }
-
-        function handleMouseMove(e) {
+        function handleMouseMove(e){
             e.preventDefault();
-            
-            var rect = canvas.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
-            var pos = canvasToWorld(x, y);
-            
-            // 更新坐标显示
-            coordDisplay.textContent = '(' + pos.worldX + ', ' + pos.worldY + ')';
-            
-            // 移动画布
-            if (isDragging && (isSpacePressed || isRightMouseDown)) {
-                var deltaX = e.clientX - lastMouseX;
-                var deltaY = e.clientY - lastMouseY;
-                
-                offsetX -= Math.round(deltaX);
-                offsetY -= Math.round(deltaY);
-                
-                // 边界检查
-                var halfWidth = Math.floor(CANVAS_WIDTH / 2);
-                var halfHeight = Math.floor(CANVAS_HEIGHT / 2);
-                
-                offsetX = Math.max(halfWidth, Math.min(offsetX, WORLD_SIZE - 1 - halfWidth));
-                offsetY = Math.max(halfHeight, Math.min(offsetY, WORLD_SIZE - 1 - halfHeight));
-                
-                lastMouseX = e.clientX;
-                lastMouseY = e.clientY;
-                
-                // 立即重新渲染（无延迟）
+            var rect=canvas.getBoundingClientRect();
+            var x=e.clientX-rect.left;
+            var y=e.clientY-rect.top;
+            var pos=canvasToWorld(x,y);
+            coordDisplay.textContent='('+pos.worldX+', '+pos.worldY+')';
+            if(isDragging&&isSpacePressed){
+                var deltaX=e.clientX-lastMouseX;
+                var deltaY=e.clientY-lastMouseY;
+                offsetX-=Math.round(deltaX);
+                offsetY-=Math.round(deltaY);
+                var halfWidth=Math.floor(CANVAS_WIDTH/2);
+                var halfHeight=Math.floor(CANVAS_HEIGHT/2);
+                offsetX=Math.max(halfWidth,Math.min(offsetX,WORLD_SIZE-1-halfWidth));
+                offsetY=Math.max(halfHeight,Math.min(offsetY,WORLD_SIZE-1-halfHeight));
+                lastMouseX=e.clientX;
+                lastMouseY=e.clientY;
                 scheduleRender();
-                return;
+                return
             }
-            
-            // 连续绘制
-            if (isDrawing && e.buttons === 1) {
-                if (lastDrawX !== pos.worldX || lastDrawY !== pos.worldY) {
-                    drawLine(lastDrawX, lastDrawY, pos.worldX, pos.worldY);
-                    lastDrawX = pos.worldX;
-                    lastDrawY = pos.worldY;
+            if(isDrawing&&e.buttons===1){
+                if(lastDrawX!==pos.worldX||lastDrawY!==pos.worldY){
+                    drawLine(lastDrawX,lastDrawY,pos.worldX,pos.worldY);
+                    lastDrawX=pos.worldX;
+                    lastDrawY=pos.worldY
                 }
             }
         }
-
-        function handleMouseUp(e) {
-            if (isDragging) {
-                isDragging = false;
-                if (e.button === 2) {
-                    isRightMouseDown = false;
-                }
-                canvas.style.cursor = isSpacePressed ? 'grab' : 'crosshair';
+        function handleMouseUp(e){
+            if(isDragging){
+                isDragging=false;
+                canvas.style.cursor=isSpacePressed?'grab':'crosshair'
             }
-            
-            if (isDrawing) {
-                isDrawing = false;
-                lastDrawX = -1;
-                lastDrawY = -1;
+            if(isDrawing){
+                isDrawing=false;
+                lastDrawX=-1;
+                lastDrawY=-1
             }
         }
-
-        // 绘制函数
-        function drawLine(x1, y1, x2, y2) {
-            var dx = Math.abs(x2 - x1);
-            var dy = Math.abs(y2 - y1);
-            var sx = (x1 < x2) ? 1 : -1;
-            var sy = (y1 < y2) ? 1 : -1;
-            var err = dx - dy;
-            
-            var currentX = x1;
-            var currentY = y1;
-            
-            while (true) {
-                drawPixel(currentX, currentY);
-                
-                if (currentX === x2 && currentY === y2) break;
-                var e2 = 2 * err;
-                if (e2 > -dy) {
-                    err -= dy;
-                    currentX += sx;
-                }
-                if (e2 < dx) {
-                    err += dx;
-                    currentY += sy;
-                }
+        function handleTouchStart(e){
+            e.preventDefault();
+            var rect=canvas.getBoundingClientRect();
+            var touches=e.touches;
+            if(touches.length===1){
+                isTouching=true;
+                var touch=touches[0];
+                lastTouchX=touch.clientX;
+                lastTouchY=touch.clientY;
+                touchStartTime=Date.now();
+                initialOffsetX=offsetX;
+                initialOffsetY=offsetY;
+                var x=touch.clientX-rect.left;
+                var y=touch.clientY-rect.top;
+                var pos=canvasToWorld(x,y);
+                isDrawing=true;
+                drawPixel(pos.worldX,pos.worldY);
+                lastDrawX=pos.worldX;
+                lastDrawY=pos.worldY
+            }else if(touches.length===2){
+                isPinching=true;
+                isDrawing=false;
+                var touch1=touches[0];
+                var touch2=touches[1];
+                initialPinchDistance=getDistance(touch1.clientX,touch1.clientY,touch2.clientX,touch2.clientY);
+                initialOffsetX=offsetX;
+                initialOffsetY=offsetY;
+                lastTouchX=(touch1.clientX+touch2.clientX)/2;
+                lastTouchY=(touch1.clientY+touch2.clientY)/2
             }
         }
-
-        function drawPixel(worldX, worldY) {
-            if (worldX < 0 || worldX >= WORLD_SIZE || worldY < 0 || worldY >= WORLD_SIZE) return;
-            
+        function handleTouchMove(e){
+            e.preventDefault();
+            var rect=canvas.getBoundingClientRect();
+            var touches=e.touches;
+            if(touches.length===1&&isTouching){
+                var touch=touches[0];
+                var x=touch.clientX-rect.left;
+                var y=touch.clientY-rect.top;
+                var pos=canvasToWorld(x,y);
+                coordDisplay.textContent='('+pos.worldX+', '+pos.worldY+')';
+                if(isDrawing&&lastDrawX!==pos.worldX||lastDrawY!==pos.worldY){
+                    drawLine(lastDrawX,lastDrawY,pos.worldX,pos.worldY);
+                    lastDrawX=pos.worldX;
+                    lastDrawY=pos.worldY
+                }
+                lastTouchX=touch.clientX;
+                lastTouchY=touch.clientY
+            }else if(touches.length===2&&isPinching){
+                var touch1=touches[0];
+                var touch2=touches[1];
+                var currentDistance=getDistance(touch1.clientX,touch1.clientY,touch2.clientX,touch2.clientY);
+                var centerX=(touch1.clientX+touch2.clientX)/2;
+                var centerY=(touch1.clientY+touch2.clientY)/2;
+                var deltaX=centerX-lastTouchX;
+                var deltaY=centerY-lastTouchY;
+                offsetX-=Math.round(deltaX*1.5);
+                offsetY-=Math.round(deltaY*1.5);
+                var halfWidth=Math.floor(CANVAS_WIDTH/2);
+                var halfHeight=Math.floor(CANVAS_HEIGHT/2);
+                offsetX=Math.max(halfWidth,Math.min(offsetX,WORLD_SIZE-1-halfWidth));
+                offsetY=Math.max(halfHeight,Math.min(offsetY,WORLD_SIZE-1-halfHeight));
+                lastTouchX=centerX;
+                lastTouchY=centerY;
+                scheduleRender()
+            }
+        }
+        function handleTouchEnd(e){
+            e.preventDefault();
+            if(isTouching&&Date.now()-touchStartTime<200){
+                isDrawing=false;
+                lastDrawX=-1;
+                lastDrawY=-1
+            }
+            isTouching=false;
+            isPinching=false;
+            isDrawing=false;
+            lastDrawX=-1;
+            lastDrawY=-1
+        }
+        function drawLine(x1,y1,x2,y2){
+            var dx=Math.abs(x2-x1);
+            var dy=Math.abs(y2-y1);
+            var sx=(x1<x2)?1:-1;
+            var sy=(y1<y2)?1:-1;
+            var err=dx-dy;
+            var currentX=x1;
+            var currentY=y1;
+            while(true){
+                drawPixel(currentX,currentY);
+                if(currentX===x2&&currentY===y2)break;
+                var e2=2*err;
+                if(e2>-dy){err-=dy;currentX+=sx}
+                if(e2<dx){err+=dx;currentY+=sy}
+            }
+        }
+        function drawPixel(worldX,worldY){
+            if(worldX<0||worldX>=WORLD_SIZE||worldY<0||worldY>=WORLD_SIZE)return;
             var colorNum;
-            if (currentTool === 'eraser') {
-                colorNum = null; // 橡皮擦设置为null
-            } else {
-                colorNum = parseInt(currentColor.replace('#', ''), 16);
+            if(currentTool==='eraser'){
+                colorNum=null
+            }else{
+                colorNum=parseInt(currentColor.replace('#',''),16)
             }
-            
-            var index = getPixelIndex(worldX, worldY);
-            var oldColor = pixelCache[index];
-            
-            // 检查颜色是否改变
-            if (oldColor !== colorNum) {
-                // 更新缓存
-                pixelCache[index] = colorNum;
-                
-                // 添加到修改列表
+            var index=getPixelIndex(worldX,worldY);
+            var oldColor=pixelCache[index];
+            if(oldColor!==colorNum){
+                pixelCache[index]=colorNum;
                 modifiedPixels.add(index);
                 updateModifiedDisplay();
-                
-                // 立即在画布上绘制
-                var canvasPos = worldToCanvas(worldX, worldY);
-                if (canvasPos.x >= 0 && canvasPos.x < CANVAS_WIDTH && 
-                    canvasPos.y >= 0 && canvasPos.y < CANVAS_HEIGHT) {
-                    
-                    var color = colorNum === null ? '#FFFFFF' : '#' + colorNum.toString(16).padStart(6, '0');
-                    ctx.fillStyle = color;
-                    ctx.fillRect(canvasPos.x, canvasPos.y, PIXEL_SIZE, PIXEL_SIZE);
+                var canvasPos=worldToCanvas(worldX,worldY);
+                if(canvasPos.x>=0&&canvasPos.x<CANVAS_WIDTH&&canvasPos.y>=0&&canvasPos.y<CANVAS_HEIGHT){
+                    var color=colorNum===null?'#FFFFFF':'#'+colorNum.toString(16).padStart(6,'0');
+                    ctx.fillStyle=color;
+                    ctx.fillRect(canvasPos.x,canvasPos.y,PIXEL_SIZE,PIXEL_SIZE)
                 }
             }
         }
-
-        // 自动保存系统
-        function startAutoSave() {
-            // 每30秒检查是否需要保存
-            autoSaveTimer = setInterval(() => {
-                if (modifiedPixels.size > 0 && !isSaving) {
-                    saveModifiedPixels();
+        function startAutoSave(){
+            autoSaveTimer=setInterval(()=>{
+                if(modifiedPixels.size>0&&!isSaving){
+                    saveModifiedPixels()
                 }
-                updateSaveCountdown();
-            }, 1000);
+                updateSaveCountdown()
+            },1000)
         }
-
-        function forceSave() {
-            if (modifiedPixels.size > 0 && !isSaving) {
-                saveModifiedPixels();
-            } else if (modifiedPixels.size === 0) {
-                statusDisplay.textContent = '没有需要保存的修改';
-                setTimeout(() => statusDisplay.textContent = '就绪', 1000);
+        function forceSave(){
+            if(modifiedPixels.size>0&&!isSaving){
+                saveModifiedPixels()
+            }else if(modifiedPixels.size===0){
+                statusDisplay.textContent='没有需要保存的修改';
+                setTimeout(()=>statusDisplay.textContent='就绪',1000)
             }
         }
-
-        function saveModifiedPixels() {
-            if (isSaving) return;
-            
-            isSaving = true;
-            saveStatus.style.display = 'block';
-            statusDisplay.textContent = '保存中...';
-            
-            var pixelsToSave = Array.from(modifiedPixels);
-            var updates = [];
-            var deletes = [];
-            
-            console.log("开始保存", pixelsToSave.length, "个修改的像素");
-            
-            // 准备更新和删除数据
-            pixelsToSave.forEach(index => {
-                var colorNum = pixelCache[index];
-                
-                if (colorNum === null) {
-                    deletes.push(index);
-                } else {
-                    updates.push({
-                        id: index,
-                        col: colorNum
-                    });
+        function saveModifiedPixels(){
+            if(isSaving)return;
+            isSaving=true;
+            saveStatus.style.display='block';
+            statusDisplay.textContent='保存中...';
+            var pixelsToSave=Array.from(modifiedPixels);
+            var updates=[];
+            var deletes=[];
+            pixelsToSave.forEach(index=>{
+                var colorNum=pixelCache[index];
+                if(colorNum===null){
+                    deletes.push(index)
+                }else{
+                    updates.push({id:index,col:colorNum})
                 }
             });
-            
-            var savePromises = [];
-            
-            // 批量更新
-            if (updates.length > 0) {
-                savePromises.push(
-                    supabase
-                        .from('draw')
-                        .upsert(updates, { onConflict: 'id' })
-                        .then(response => {
-                            if (response.error) {
-                                console.error('保存失败:', response.error);
-                                return false;
-                            }
-                            return true;
-                        })
-                );
+            var savePromises=[];
+            if(updates.length>0){
+                savePromises.push(supabase.from('draw').upsert(updates,{onConflict:'id'}).then(response=>{
+                    if(response.error){return false}
+                    return true
+                }))
             }
-            
-            // 批量删除
-            if (deletes.length > 0) {
-                savePromises.push(
-                    supabase
-                        .from('draw')
-                        .delete()
-                        .in('id', deletes)
-                        .then(response => {
-                            if (response.error) {
-                                console.error('删除失败:', response.error);
-                                return false;
-                            }
-                            return true;
-                        })
-                );
+            if(deletes.length>0){
+                savePromises.push(supabase.from('draw').delete().in('id',deletes).then(response=>{
+                    if(response.error){return false}
+                    return true
+                }))
             }
-            
-            // 等待所有保存操作完成
-            Promise.all(savePromises).then(results => {
-                var success = results.every(r => r !== false);
-                
-                if (success) {
-                    // 清空修改列表
+            Promise.all(savePromises).then(results=>{
+                var success=results.every(r=>r!==false);
+                if(success){
                     modifiedPixels.clear();
                     updateModifiedDisplay();
-                    lastSaveTime = Date.now();
-                    
-                    statusDisplay.textContent = '已保存 ' + pixelsToSave.length + ' 个像素';
-                    console.log("保存成功:", pixelsToSave.length, "个像素");
-                } else {
-                    statusDisplay.textContent = '保存失败';
+                    lastSaveTime=Date.now();
+                    statusDisplay.textContent='已保存 '+pixelsToSave.length+' 个像素'
+                }else{
+                    statusDisplay.textContent='保存失败'
                 }
-                
-                isSaving = false;
-                saveStatus.style.display = 'none';
-                
-                setTimeout(() => {
-                    if (statusDisplay.textContent.includes('保存')) {
-                        statusDisplay.textContent = '就绪';
+                isSaving=false;
+                saveStatus.style.display='none';
+                setTimeout(()=>{
+                    if(statusDisplay.textContent.includes('保存')){
+                        statusDisplay.textContent='就绪'
                     }
-                }, 2000);
-            });
+                },2000)
+            })
         }
-
-        // 视图控制
-        function centerView() {
-            offsetX = 500;
-            offsetY = 500;
+        function centerView(){
+            offsetX=500;
+            offsetY=500;
             scheduleRender();
-            statusDisplay.textContent = '已回到中心';
-            setTimeout(() => statusDisplay.textContent = '就绪', 1000);
+            statusDisplay.textContent='已回到中心';
+            setTimeout(()=>statusDisplay.textContent='就绪',1000)
         }
-
-        function saveView() {
-            try {
-                localStorage.setItem('paintView', JSON.stringify({
-                    offsetX: offsetX,
-                    offsetY: offsetY,
-                    currentColor: currentColor,
-                    currentTool: currentTool
-                }));
-                statusDisplay.textContent = '位置已保存';
-                setTimeout(() => statusDisplay.textContent = '就绪', 1000);
-            } catch (e) {
-                statusDisplay.textContent = '保存失败';
+        function saveView(){
+            try{
+                localStorage.setItem('paintView',JSON.stringify({offsetX:offsetX,offsetY:offsetY,currentColor:currentColor,currentTool:currentTool}));
+                statusDisplay.textContent='位置已保存';
+                setTimeout(()=>statusDisplay.textContent='就绪',1000)
+            }catch(e){
+                statusDisplay.textContent='保存失败'
             }
         }
-
-        function loadView() {
-            try {
-                var saved = localStorage.getItem('paintView');
-                if (saved) {
-                    var view = JSON.parse(saved);
-                    offsetX = view.offsetX || 500;
-                    offsetY = view.offsetY || 500;
-                    currentColor = view.currentColor || '#000000';
-                    currentTool = view.currentTool || 'brush';
-                    
-                    colorPicker.value = currentColor;
-                    colorDisplay.textContent = currentColor;
-                    
-                    if (currentTool === 'brush') {
-                        brushBtn.click();
-                    } else {
-                        eraserBtn.click();
+        function loadView(){
+            try{
+                var saved=localStorage.getItem('paintView');
+                if(saved){
+                    var view=JSON.parse(saved);
+                    offsetX=view.offsetX||500;
+                    offsetY=view.offsetY||500;
+                    currentColor=view.currentColor||'#000000';
+                    currentTool=view.currentTool||'brush';
+                    colorPicker.value=currentColor;
+                    colorDisplay.textContent=currentColor;
+                    if(currentTool==='brush'){
+                        brushBtn.click()
+                    }else{
+                        eraserBtn.click()
                     }
-                    
                     scheduleRender();
-                    statusDisplay.textContent = '位置已加载';
-                    setTimeout(() => statusDisplay.textContent = '就绪', 1000);
-                } else {
-                    statusDisplay.textContent = '无保存的位置';
+                    statusDisplay.textContent='位置已加载';
+                    setTimeout(()=>statusDisplay.textContent='就绪',1000)
+                }else{
+                    statusDisplay.textContent='无保存的位置'
                 }
-            } catch (e) {
-                statusDisplay.textContent = '加载失败';
+            }catch(e){
+                statusDisplay.textContent='加载失败'
             }
         }
-
-        // 页面加载完成
-        window.onload = function() {
+        window.onload=function(){
             init();
-            document.title = '冬日绘版-HZY';
-            console.log("全缓存版页面加载完成");
-        };
+            document.title='冬日绘版-HZY'
+        }
     </script>
 </body>
-
 </html>
