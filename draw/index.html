@@ -60,8 +60,8 @@
             border-radius: 5px;
             overflow: hidden;
             background: #fff;
-            width: 800px;
-            height: 600px;
+            width: 600px;
+            height: 400px;
         }
 
         #pixelCanvas {
@@ -74,7 +74,7 @@
             border-radius: 10px;
             padding: 15px;
             margin: 20px auto;
-            max-width: 800px;
+            max-width: 600px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -204,12 +204,12 @@
                 <p>• 左键拖动：绘制/擦除</p>
                 <p>• 右键拖动：移动画布</p>
                 <p>• 空格+左键：移动画布</p>
-                <p>• 30秒自动保存 | 所有像素已缓存</p>
+                <p>• 30秒自动保存 | 所有像素都缓存</p>
             </div>
         </div>
 
         <div class="canvas-container" id="canvasContainer">
-            <canvas id="pixelCanvas" width="800" height="600"></canvas>
+            <canvas id="pixelCanvas" width="600" height="400"></canvas>
             <div class="loader" id="loader">加载中...</div>
             <div class="save-status" id="saveStatus">保存中...</div>
         </div>
@@ -240,8 +240,8 @@
         var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZm51YnN2aHFkbXNpeWNqZ29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5NjE0NjUsImV4cCI6MjA4MzUzNzQ2NX0.a6X9e_rnOv33JMN7g7OIm5TlGIXQLWlO5hR0BjOuVYU';
 
         // 画板参数 - 1000x1000
-        var CANVAS_WIDTH = 800;
-        var CANVAS_HEIGHT = 600;
+        var CANVAS_WIDTH = 600;
+        var CANVAS_HEIGHT = 400;
         var PIXEL_SIZE = 1;
         var WORLD_SIZE = 1000; // 1000x1000像素
         
