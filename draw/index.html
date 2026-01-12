@@ -148,6 +148,32 @@
             font-size: 0.9em;
             color: #666;
         }
+
+        /* 加载指示器 */
+        .loader {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+        }
+
+        /* 保存状态 */
+        .save-status {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+        }
     </style>
 </head>
 
@@ -156,8 +182,8 @@
     <main style="padding: 20px;">
         <div class="link-card">
             <h2 class="center">冬日绘版-HZY</h2>
-            <p class="center">1万×1万像素画板</p>
-            <p class="center pixel-info">不卡顿了</p>
+            <p class="center">1000×1000像素画板</p>
+            <p class="center pixel-info">全缓存版 - 无闪屏，30秒自动保存</p>
         </div>
 
         <div class="tools-panel">
@@ -171,24 +197,29 @@
                 <button class="view-btn" id="centerBtn">回到中心</button>
                 <button class="view-btn" id="saveViewBtn">保存位置</button>
                 <button class="view-btn" id="loadViewBtn">加载位置</button>
+                <button class="view-btn" id="forceSaveBtn">立即保存</button>
             </div>
 
             <div class="help-text">
                 <p>• 左键拖动：绘制/擦除</p>
                 <p>• 右键拖动：移动画布</p>
                 <p>• 空格+左键：移动画布</p>
+                <p>• 30秒自动保存 | 所有像素已缓存</p>
             </div>
         </div>
 
         <div class="canvas-container" id="canvasContainer">
             <canvas id="pixelCanvas" width="800" height="600"></canvas>
+            <div class="loader" id="loader">加载中...</div>
+            <div class="save-status" id="saveStatus">保存中...</div>
         </div>
 
         <div class="status-bar">
-            <p>坐标: <span id="coordDisplay">(5000, 5000)</span></p>
+            <p>坐标: <span id="coordDisplay">(500, 500)</span></p>
             <p>工具: <span id="toolDisplay">画笔</span></p>
             <p>颜色: <span id="colorDisplay">#000000</span></p>
-            <p>状态: <span id="statusDisplay">就绪</span></p>
+            <p>状态: <span id="statusDisplay">就绪</span> | 修改: <span id="modifiedDisplay">0</span></p>
+            <p>下次保存: <span id="saveCountdown">30秒</span></p>
         </div>
 
         <div class="link-card">
@@ -197,6 +228,7 @@
             <p>2. 在画布上左键点击或拖动绘制</p>
             <p>3. 右键拖动或空格+左键拖动移动画布</p>
             <p>4. 使用颜色选择器选择颜色</p>
+            <p style="color: #4CAF50;">优化：全像素缓存，零闪屏，30秒自动保存</p>
         </div>
     </main>
 
@@ -207,11 +239,11 @@
         var SUPABASE_URL = 'https://idfnubsvhqdmsiycjgof.supabase.co';
         var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZm51YnN2aHFkbXNpeWNqZ29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5NjE0NjUsImV4cCI6MjA4MzUzNzQ2NX0.a6X9e_rnOv33JMN7g7OIm5TlGIXQLWlO5hR0BjOuVYU';
 
-        // 画板参数
+        // 画板参数 - 1000x1000
         var CANVAS_WIDTH = 800;
         var CANVAS_HEIGHT = 600;
         var PIXEL_SIZE = 1;
-        var WORLD_SIZE = 10000;
+        var WORLD_SIZE = 1000; // 1000x1000像素
         
         var VISIBLE_WIDTH = CANVAS_WIDTH;
         var VISIBLE_HEIGHT = CANVAS_HEIGHT;
@@ -219,9 +251,8 @@
         // 状态变量
         var currentTool = 'brush';
         var currentColor = '#000000';
-        var offsetX = 5000;
-        var offsetY = 5000;
-        var updateInterval;
+        var offsetX = 500; // 中心位置
+        var offsetY = 500;
         var isDragging = false;
         var isSpacePressed = false;
         var isRightMouseDown = false;
@@ -230,11 +261,28 @@
         var isDrawing = false;
         var lastDrawX = -1;
         var lastDrawY = -1;
+        var isLoading = false;
+
+        // 全像素缓存系统
+        var pixelCache = new Array(WORLD_SIZE * WORLD_SIZE); // 所有像素的缓存
+        var modifiedPixels = new Set(); // 已修改但未保存的像素
+        var saveTimer = null;
+        var autoSaveTimer = null;
+        var saveInterval = 30000; // 30秒自动保存
+        var lastSaveTime = Date.now();
+        var modifiedCount = 0;
+        var isSaving = false;
+
+        // 渲染优化
+        var renderTimer = null;
+        var needsRender = false;
+        var lastRenderArea = null;
 
         // DOM元素
         var canvas = document.getElementById('pixelCanvas');
         var ctx = canvas.getContext('2d');
-        var canvasContainer = document.getElementById('canvasContainer');
+        var loader = document.getElementById('loader');
+        var saveStatus = document.getElementById('saveStatus');
         var brushBtn = document.getElementById('brushBtn');
         var eraserBtn = document.getElementById('eraserBtn');
         var colorPicker = document.getElementById('colorPicker');
@@ -242,22 +290,32 @@
         var toolDisplay = document.getElementById('toolDisplay');
         var colorDisplay = document.getElementById('colorDisplay');
         var statusDisplay = document.getElementById('statusDisplay');
+        var modifiedDisplay = document.getElementById('modifiedDisplay');
+        var saveCountdown = document.getElementById('saveCountdown');
 
         // 创建Supabase客户端
         var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // 工具函数
         function getVisibleArea() {
-            var startX = offsetX - Math.floor(VISIBLE_WIDTH / 2);
-            var endX = startX + VISIBLE_WIDTH;
-            var startY = offsetY - Math.floor(VISIBLE_HEIGHT / 2);
-            var endY = startY + VISIBLE_HEIGHT;
+            var startX = Math.max(0, offsetX - Math.floor(CANVAS_WIDTH / 2));
+            var endX = Math.min(WORLD_SIZE, startX + CANVAS_WIDTH);
+            var startY = Math.max(0, offsetY - Math.floor(CANVAS_HEIGHT / 2));
+            var endY = Math.min(WORLD_SIZE, startY + CANVAS_HEIGHT);
+            
+            // 确保开始坐标正确
+            if (endX - startX < CANVAS_WIDTH) {
+                startX = Math.max(0, endX - CANVAS_WIDTH);
+            }
+            if (endY - startY < CANVAS_HEIGHT) {
+                startY = Math.max(0, endY - CANVAS_HEIGHT);
+            }
             
             return {
-                startX: Math.max(0, startX),
-                endX: Math.min(endX, WORLD_SIZE),
-                startY: Math.max(0, startY),
-                endY: Math.min(endY, WORLD_SIZE)
+                startX: startX,
+                endX: endX,
+                startY: startY,
+                endY: endY
             };
         }
 
@@ -265,7 +323,7 @@
             var area = getVisibleArea();
             var canvasX = (worldX - area.startX) * PIXEL_SIZE;
             var canvasY = (worldY - area.startY) * PIXEL_SIZE;
-            return { x: canvasX, y: canvasY };
+            return { x: Math.round(canvasX), y: Math.round(canvasY) };
         }
 
         function canvasToWorld(canvasX, canvasY) {
@@ -279,9 +337,25 @@
             };
         }
 
-        // 初始化
+        function getPixelIndex(worldX, worldY) {
+            return worldX * WORLD_SIZE + worldY;
+        }
+
+        function updateModifiedDisplay() {
+            modifiedDisplay.textContent = modifiedPixels.size;
+            updateSaveCountdown();
+        }
+
+        function updateSaveCountdown() {
+            var remaining = Math.ceil((saveInterval - (Date.now() - lastSaveTime)) / 1000);
+            if (remaining < 0) remaining = 0;
+            saveCountdown.textContent = remaining + '秒';
+        }
+
+        // 初始化 - 加载所有像素到缓存
         function init() {
-            console.log("初始化开始");
+            console.log("初始化全缓存版画板");
+            console.log("世界尺寸:", WORLD_SIZE, "x", WORLD_SIZE, "=", WORLD_SIZE * WORLD_SIZE, "像素");
             
             // 事件监听
             document.addEventListener('keydown', handleKeyDown);
@@ -298,7 +372,6 @@
             
             // 工具按钮事件
             brushBtn.onclick = function() {
-                console.log("点击画笔按钮");
                 currentTool = 'brush';
                 brushBtn.classList.add('active');
                 eraserBtn.classList.remove('active');
@@ -307,7 +380,6 @@
             };
             
             eraserBtn.onclick = function() {
-                console.log("点击橡皮擦按钮");
                 currentTool = 'eraser';
                 brushBtn.classList.remove('active');
                 eraserBtn.classList.add('active');
@@ -325,17 +397,140 @@
             document.getElementById('centerBtn').onclick = centerView;
             document.getElementById('saveViewBtn').onclick = saveView;
             document.getElementById('loadViewBtn').onclick = loadView;
+            document.getElementById('forceSaveBtn').onclick = forceSave;
             
-            // 初始加载
-            clearCanvas();
-            loadCanvasData();
+            // 初始加载所有像素
+            loadAllPixels();
             
-            console.log("初始化完成");
+            // 启动自动保存计时器
+            startAutoSave();
+            
+            console.log("全缓存版初始化完成");
         }
 
         function clearCanvas() {
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+
+        // 加载所有像素到缓存
+        function loadAllPixels() {
+            isLoading = true;
+            loader.style.display = 'block';
+            statusDisplay.textContent = '加载所有像素...';
+            
+            console.log("开始加载所有像素...");
+            
+            // 分批加载，每批10000个像素
+            var batchSize = 10000;
+            var totalPixels = WORLD_SIZE * WORLD_SIZE;
+            var loadedCount = 0;
+            var startTime = Date.now();
+            
+            function loadBatch(startId) {
+                var endId = Math.min(startId + batchSize, totalPixels);
+                
+                supabase
+                    .from('draw')
+                    .select('id, col')
+                    .gte('id', startId)
+                    .lt('id', endId)
+                    .then(response => {
+                        if (response.data) {
+                            // 批量处理像素
+                            response.data.forEach(pixel => {
+                                pixelCache[pixel.id] = pixel.col;
+                            });
+                            loadedCount += response.data.length;
+                        }
+                        
+                        // 更新状态
+                        var progress = Math.round((loadedCount / totalPixels) * 100);
+                        statusDisplay.textContent = '加载中 ' + progress + '% (' + loadedCount + '/' + totalPixels + ')';
+                        
+                        // 如果还有更多数据，继续加载
+                        if (endId < totalPixels) {
+                            setTimeout(() => loadBatch(endId), 10); // 小延迟避免阻塞
+                        } else {
+                            // 加载完成
+                            var loadTime = Date.now() - startTime;
+                            console.log("所有像素加载完成! 耗时:", loadTime + "ms");
+                            console.log("加载了", loadedCount, "个像素");
+                            
+                            isLoading = false;
+                            loader.style.display = 'none';
+                            statusDisplay.textContent = '就绪';
+                            
+                            // 初始渲染
+                            scheduleRender();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加载像素失败:', error);
+                        isLoading = false;
+                        loader.style.display = 'none';
+                        statusDisplay.textContent = '加载失败';
+                        
+                        // 仍然尝试渲染
+                        scheduleRender();
+                    });
+            }
+            
+            // 开始加载
+            loadBatch(0);
+        }
+
+        // 渲染优化 - 使用requestAnimationFrame
+        function scheduleRender() {
+            if (!renderTimer) {
+                renderTimer = requestAnimationFrame(renderVisibleArea);
+                needsRender = true;
+            }
+        }
+
+        function renderVisibleArea() {
+            renderTimer = null;
+            
+            var area = getVisibleArea();
+            
+            // 检查是否需要重新渲染
+            if (lastRenderArea &&
+                lastRenderArea.startX === area.startX &&
+                lastRenderArea.endX === area.endX &&
+                lastRenderArea.startY === area.startY &&
+                lastRenderArea.endY === area.endY &&
+                !needsRender) {
+                return;
+            }
+            
+            lastRenderArea = area;
+            needsRender = false;
+            
+            // 渲染可见区域
+            clearCanvas();
+            
+            var startTime = Date.now();
+            var renderCount = 0;
+            
+            for (var x = area.startX; x < area.endX; x++) {
+                for (var y = area.startY; y < area.endY; y++) {
+                    var index = getPixelIndex(x, y);
+                    var colorNum = pixelCache[index];
+                    
+                    if (colorNum !== undefined && colorNum !== null) {
+                        var canvasPos = worldToCanvas(x, y);
+                        var color = '#' + colorNum.toString(16).padStart(6, '0');
+                        ctx.fillStyle = color;
+                        ctx.fillRect(canvasPos.x, canvasPos.y, PIXEL_SIZE, PIXEL_SIZE);
+                        renderCount++;
+                    }
+                }
+            }
+            
+            var renderTime = Date.now() - startTime;
+            if (renderTime > 16) {
+                console.log("渲染", renderCount, "个像素，耗时", renderTime, "ms");
+            }
         }
 
         // 键盘事件
@@ -364,7 +559,6 @@
             
             // 检查是否是移动模式
             if (isSpacePressed || e.button === 2) {
-                console.log("开始移动画布");
                 isDragging = true;
                 isRightMouseDown = (e.button === 2);
                 lastMouseX = e.clientX;
@@ -374,7 +568,6 @@
             }
             
             if (e.button === 0) { // 左键
-                console.log("开始绘制，工具:", currentTool);
                 var pos = canvasToWorld(x, y);
                 isDrawing = true;
                 drawPixel(pos.worldX, pos.worldY);
@@ -403,15 +596,17 @@
                 offsetY -= Math.round(deltaY);
                 
                 // 边界检查
-                offsetX = Math.max(Math.floor(VISIBLE_WIDTH / 2), 
-                                 Math.min(offsetX, WORLD_SIZE - 1 - Math.floor(VISIBLE_WIDTH / 2)));
-                offsetY = Math.max(Math.floor(VISIBLE_HEIGHT / 2), 
-                                 Math.min(offsetY, WORLD_SIZE - 1 - Math.floor(VISIBLE_HEIGHT / 2)));
+                var halfWidth = Math.floor(CANVAS_WIDTH / 2);
+                var halfHeight = Math.floor(CANVAS_HEIGHT / 2);
+                
+                offsetX = Math.max(halfWidth, Math.min(offsetX, WORLD_SIZE - 1 - halfWidth));
+                offsetY = Math.max(halfHeight, Math.min(offsetY, WORLD_SIZE - 1 - halfHeight));
                 
                 lastMouseX = e.clientX;
                 lastMouseY = e.clientY;
                 
-                loadCanvasData();
+                // 立即重新渲染（无延迟）
+                scheduleRender();
                 return;
             }
             
@@ -471,133 +666,165 @@
         function drawPixel(worldX, worldY) {
             if (worldX < 0 || worldX >= WORLD_SIZE || worldY < 0 || worldY >= WORLD_SIZE) return;
             
-            var color, colorNum;
+            var colorNum;
             if (currentTool === 'eraser') {
-                color = '#FFFFFF';
-                colorNum = null;
-                console.log("擦除像素:", worldX, worldY);
+                colorNum = null; // 橡皮擦设置为null
             } else {
-                color = currentColor;
-                colorNum = parseInt(color.replace('#', ''), 16);
-                console.log("绘制像素:", worldX, worldY, "颜色:", color);
+                colorNum = parseInt(currentColor.replace('#', ''), 16);
             }
             
-            // 绘制到画布
-            var canvasPos = worldToCanvas(worldX, worldY);
+            var index = getPixelIndex(worldX, worldY);
+            var oldColor = pixelCache[index];
             
-            if (canvasPos.x >= 0 && canvasPos.x < CANVAS_WIDTH && 
-                canvasPos.y >= 0 && canvasPos.y < CANVAS_HEIGHT) {
-                ctx.fillStyle = color;
-                ctx.fillRect(canvasPos.x, canvasPos.y, PIXEL_SIZE, PIXEL_SIZE);
-            }
-            
-            // 保存到数据库
-            savePixelToDatabase(worldX, worldY, colorNum);
-        }
-
-        function savePixelToDatabase(worldX, worldY, colorNum) {
-            var id = worldX * WORLD_SIZE + worldY;
-            
-            if (colorNum === null) {
-                // 删除像素
-                supabase
-                    .from('draw')
-                    .delete()
-                    .eq('id', id)
-                    .then(function(response) {
-                        if (response.error) {
-                            console.error('删除像素失败:', response.error);
-                            statusDisplay.textContent = '删除失败';
-                        } else {
-                            statusDisplay.textContent = '已删除';
-                            setTimeout(function() {
-                                statusDisplay.textContent = '就绪';
-                            }, 1000);
-                        }
-                    });
-            } else {
-                // 更新或插入像素
-                supabase
-                    .from('draw')
-                    .upsert({
-                        id: id,
-                        col: colorNum
-                    }, {
-                        onConflict: 'id'
-                    })
-                    .then(function(response) {
-                        if (response.error) {
-                            console.error('保存像素失败:', response.error);
-                            statusDisplay.textContent = '保存失败';
-                        } else {
-                            statusDisplay.textContent = '已保存';
-                            setTimeout(function() {
-                                statusDisplay.textContent = '就绪';
-                            }, 1000);
-                        }
-                    });
-            }
-        }
-
-        function loadCanvasData() {
-            statusDisplay.textContent = '加载中...';
-            
-            var area = getVisibleArea();
-            var minId = area.startX * WORLD_SIZE + area.startY;
-            var maxId = area.endX * WORLD_SIZE + area.endY;
-            
-            // 清空画布
-            clearCanvas();
-            
-            supabase
-                .from('draw')
-                .select('id, col')
-                .gte('id', minId)
-                .lt('id', maxId)
-                .then(function(response) {
-                    if (response.data) {
-                        response.data.forEach(function(pixel) {
-                            var id = pixel.id;
-                            var worldY = id % WORLD_SIZE;
-                            var worldX = (id - worldY) / WORLD_SIZE;
-                            
-                            var canvasPos = worldToCanvas(worldX, worldY);
-                            var color = '#' + pixel.col.toString(16).padStart(6, '0');
-                            
-                            ctx.fillStyle = color;
-                            ctx.fillRect(canvasPos.x, canvasPos.y, PIXEL_SIZE, PIXEL_SIZE);
-                        });
-                    }
+            // 检查颜色是否改变
+            if (oldColor !== colorNum) {
+                // 更新缓存
+                pixelCache[index] = colorNum;
+                
+                // 添加到修改列表
+                modifiedPixels.add(index);
+                updateModifiedDisplay();
+                
+                // 立即在画布上绘制
+                var canvasPos = worldToCanvas(worldX, worldY);
+                if (canvasPos.x >= 0 && canvasPos.x < CANVAS_WIDTH && 
+                    canvasPos.y >= 0 && canvasPos.y < CANVAS_HEIGHT) {
                     
-                    statusDisplay.textContent = '就绪';
-                })
-                .catch(function(error) {
-                    console.error('加载像素失败:', error);
-                    statusDisplay.textContent = '加载失败';
-                });
+                    var color = colorNum === null ? '#FFFFFF' : '#' + colorNum.toString(16).padStart(6, '0');
+                    ctx.fillStyle = color;
+                    ctx.fillRect(canvasPos.x, canvasPos.y, PIXEL_SIZE, PIXEL_SIZE);
+                }
+            }
+        }
+
+        // 自动保存系统
+        function startAutoSave() {
+            // 每30秒检查是否需要保存
+            autoSaveTimer = setInterval(() => {
+                if (modifiedPixels.size > 0 && !isSaving) {
+                    saveModifiedPixels();
+                }
+                updateSaveCountdown();
+            }, 1000);
+        }
+
+        function forceSave() {
+            if (modifiedPixels.size > 0 && !isSaving) {
+                saveModifiedPixels();
+            } else if (modifiedPixels.size === 0) {
+                statusDisplay.textContent = '没有需要保存的修改';
+                setTimeout(() => statusDisplay.textContent = '就绪', 1000);
+            }
+        }
+
+        function saveModifiedPixels() {
+            if (isSaving) return;
+            
+            isSaving = true;
+            saveStatus.style.display = 'block';
+            statusDisplay.textContent = '保存中...';
+            
+            var pixelsToSave = Array.from(modifiedPixels);
+            var updates = [];
+            var deletes = [];
+            
+            console.log("开始保存", pixelsToSave.length, "个修改的像素");
+            
+            // 准备更新和删除数据
+            pixelsToSave.forEach(index => {
+                var colorNum = pixelCache[index];
+                
+                if (colorNum === null) {
+                    deletes.push(index);
+                } else {
+                    updates.push({
+                        id: index,
+                        col: colorNum
+                    });
+                }
+            });
+            
+            var savePromises = [];
+            
+            // 批量更新
+            if (updates.length > 0) {
+                savePromises.push(
+                    supabase
+                        .from('draw')
+                        .upsert(updates, { onConflict: 'id' })
+                        .then(response => {
+                            if (response.error) {
+                                console.error('保存失败:', response.error);
+                                return false;
+                            }
+                            return true;
+                        })
+                );
+            }
+            
+            // 批量删除
+            if (deletes.length > 0) {
+                savePromises.push(
+                    supabase
+                        .from('draw')
+                        .delete()
+                        .in('id', deletes)
+                        .then(response => {
+                            if (response.error) {
+                                console.error('删除失败:', response.error);
+                                return false;
+                            }
+                            return true;
+                        })
+                );
+            }
+            
+            // 等待所有保存操作完成
+            Promise.all(savePromises).then(results => {
+                var success = results.every(r => r !== false);
+                
+                if (success) {
+                    // 清空修改列表
+                    modifiedPixels.clear();
+                    updateModifiedDisplay();
+                    lastSaveTime = Date.now();
+                    
+                    statusDisplay.textContent = '已保存 ' + pixelsToSave.length + ' 个像素';
+                    console.log("保存成功:", pixelsToSave.length, "个像素");
+                } else {
+                    statusDisplay.textContent = '保存失败';
+                }
+                
+                isSaving = false;
+                saveStatus.style.display = 'none';
+                
+                setTimeout(() => {
+                    if (statusDisplay.textContent.includes('保存')) {
+                        statusDisplay.textContent = '就绪';
+                    }
+                }, 2000);
+            });
         }
 
         // 视图控制
         function centerView() {
-            offsetX = 5000;
-            offsetY = 5000;
-            loadCanvasData();
+            offsetX = 500;
+            offsetY = 500;
+            scheduleRender();
             statusDisplay.textContent = '已回到中心';
-            setTimeout(function() {
-                statusDisplay.textContent = '就绪';
-            }, 1000);
+            setTimeout(() => statusDisplay.textContent = '就绪', 1000);
         }
 
         function saveView() {
             try {
                 localStorage.setItem('paintView', JSON.stringify({
                     offsetX: offsetX,
-                    offsetY: offsetY
+                    offsetY: offsetY,
+                    currentColor: currentColor,
+                    currentTool: currentTool
                 }));
                 statusDisplay.textContent = '位置已保存';
-                setTimeout(function() {
-                    statusDisplay.textContent = '就绪';
-                }, 1000);
+                setTimeout(() => statusDisplay.textContent = '就绪', 1000);
             } catch (e) {
                 statusDisplay.textContent = '保存失败';
             }
@@ -608,13 +835,23 @@
                 var saved = localStorage.getItem('paintView');
                 if (saved) {
                     var view = JSON.parse(saved);
-                    offsetX = view.offsetX || 5000;
-                    offsetY = view.offsetY || 5000;
-                    loadCanvasData();
+                    offsetX = view.offsetX || 500;
+                    offsetY = view.offsetY || 500;
+                    currentColor = view.currentColor || '#000000';
+                    currentTool = view.currentTool || 'brush';
+                    
+                    colorPicker.value = currentColor;
+                    colorDisplay.textContent = currentColor;
+                    
+                    if (currentTool === 'brush') {
+                        brushBtn.click();
+                    } else {
+                        eraserBtn.click();
+                    }
+                    
+                    scheduleRender();
                     statusDisplay.textContent = '位置已加载';
-                    setTimeout(function() {
-                        statusDisplay.textContent = '就绪';
-                    }, 1000);
+                    setTimeout(() => statusDisplay.textContent = '就绪', 1000);
                 } else {
                     statusDisplay.textContent = '无保存的位置';
                 }
@@ -627,7 +864,7 @@
         window.onload = function() {
             init();
             document.title = '冬日绘版-HZY';
-            console.log("页面加载完成");
+            console.log("全缓存版页面加载完成");
         };
     </script>
 </body>
