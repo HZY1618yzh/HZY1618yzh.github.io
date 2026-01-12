@@ -1,16 +1,105 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
-
-<url>
-  <loc>https://hzy.us.kg/</loc>
-  <lastmod>2026-01-12T08:59:01+00:00</lastmod>
-</url>
-
-
+<?xml version="1.0" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://hzy.us.kg</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/articles</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/articles/qwsx</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/articles/st-ytmz</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/draw</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/draw/update</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/game</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/game/gungame</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/game/ismanjustdownhun</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/game/meg</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/game/tuixiangzi</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/game/zhiwudazhanjiangshi</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/tools</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/tools/bzsp</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/tools/eckill</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/tools/eckill/download</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hzy.us.kg/tools/lgfw</loc>
+    <lastmod>2026-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
