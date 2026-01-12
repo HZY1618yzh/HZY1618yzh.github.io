@@ -119,15 +119,15 @@
         
         function worldToCanvas(worldX,worldY){
             var area=getVisibleArea();
-            var canvasX=(worldX-area.startX)*PIXEL_SIZE;
-            var canvasY=(worldY-area.startY)*PIXEL_SIZE;
-            return{x:Math.round(canvasX),y:Math.round(canvasY)}
+            var canvasX=Math.floor((worldX-area.startX)*PIXEL_SIZE);
+            var canvasY=Math.floor((worldY-area.startY)*PIXEL_SIZE);
+            return{x:canvasX,y:canvasY}
         }
         
         function canvasToWorld(canvasX,canvasY){
             var area=getVisibleArea();
-            var worldX=area.startX+Math.floor(canvasX/PIXEL_SIZE);
-            var worldY=area.startY+Math.floor(canvasY/PIXEL_SIZE);
+            var worldX=area.startX+Math.round(canvasX/PIXEL_SIZE);
+            var worldY=area.startY+Math.round(canvasY/PIXEL_SIZE);
             return{worldX:Math.max(0,Math.min(worldX,WORLD_SIZE-1)),worldY:Math.max(0,Math.min(worldY,WORLD_SIZE-1))}
         }
         
@@ -233,7 +233,7 @@
                         var canvasPos=worldToCanvas(x,y);
                         var color='#'+colorNum.toString(16).padStart(6,'0');
                         ctx.fillStyle=color;
-                        ctx.fillRect(canvasPos.x,canvasPos.y,PIXEL_SIZE,PIXEL_SIZE)
+                        ctx.fillRect(canvasPos.x,canvasPos.y,PIXEL_SIZE,PIXEL_SIZE);
                     }
                 }
             }
