@@ -17,6 +17,10 @@ function initSidebar() {
                         <i class="nav-icon fas fa-newspaper"></i>\
                         <span class="nav-text">文章</span>\
                     </li>\
+                    <li class="nav-item" onclick="window.location=\'/articles\'">\
+                        <i class="nav-icon fas fa-blog"></i>\
+                        <span class="nav-text">静态文章</span>\
+                    </li>\
                     <li class="nav-item" onclick="window.location=\'/draw\'">\
                         <i class="nav-icon fas fa-paintbrush"></i>\
                         <span class="nav-text">冬日绘版</span>\
