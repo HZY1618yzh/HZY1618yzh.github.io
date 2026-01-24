@@ -38,6 +38,7 @@ function initSidebar() {
                     <a class="nav-mtext" href=\'https://oj.hzy.us.kg\'>HZYOJ</a>\
                     <a class="nav-mtext" href=\'https://oi-wiki.hzy.us.kg\'>OI-wiki</a>\
                     <a class="nav-mtext" href=\'https://download.hzy.us.kg\'>下载</a>\
+                    <a class="nav-mtext" href=\'https://sponsor.hzy.us.kg\'>赞助</a>\
                     <a class="nav-mtext" href=\'https://www.luogu.com.cn/user/1394471\' target="_blank">洛谷主页</a>\
                     <a class="nav-mtext" href=\'https://github.com/HZY1618yzh\' target="_blank">github主页</a>\
                     <a class="nav-mtext" href=\'https://www.luogu.com.cn/team/99897\' target="_blank">小狗出题组</a>\
