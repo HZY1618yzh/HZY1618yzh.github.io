@@ -12,6 +12,7 @@ a {
 }
 
 .sidebar {
+    padding: 20px 0px;
     position: fixed;
     top: 0;
     left: 0;
@@ -28,20 +29,21 @@ a {
     width: 200px;
 }
 
-.sidebar-nav {
-    list-style: none;
-    padding: 20px 0;
+.sidebar > * {
+    display: block;
+    width: 100%;
 }
 
 .nav-item {
     position: relative;
-    padding: 15px;
     display: flex;
     align-items: center;
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
+    padding: 12px 17.5px;
     min-height: 24px;
     cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    line-height: 24px;
 }
 
 .nav-item:hover {
@@ -49,30 +51,90 @@ a {
 }
 
 .nav-icon {
-    min-width: 24px;
+    width: 24px;
+    height: 24px;
     color: #495057;
     font-size: 18px;
-    margin-right: 20px;
     flex-shrink: 0;
     display: flex;
+    align-items: center;
     justify-content: center;
+    margin-right: 0;
+    line-height: 1;
+}
+
+.sidebar:hover .nav-icon {
+    margin-right: 15px;
 }
 
 .nav-text {
     color: #343a40;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: normal;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease 0.1s;
+    flex: 1;
+    min-width: 0;
+    display: none;
+    max-width: 140px;
 }
 
-.sidebar:hover .nav-text {
-    opacity: 1;
+.nav-mtext {
+    color: #343a40;
+    font-size: 15px;
+    font-weight: normal;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 8px 15px;
+    min-height: 20px;
+    line-height: 1;
+    display: none;
+    max-width: 140px;
+}
+
+.nav-mtitle {
+    color: #343a40;
+    font-size: 13px;
+    font-weight: bolder;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 12px 15px;
+    min-height: 24px;
+    display: none;
+    max-width: 140px;
+}
+
+.sidebar:hover .nav-text,
+.sidebar:hover .nav-mtext,
+.sidebar:hover .nav-mtitle {
+    display: block;
+}
+
+.nav-mtext:not(a),
+.nav-mtitle:not(a) {
+    cursor: default;
+    pointer-events: none;
+}
+
+.nav-mtext:not(a):hover,
+.nav-mtitle:not(a):hover {
+    background-color: transparent;
+}
+
+a.nav-mtext:hover,
+a.nav-item:hover {
+    background-color: #f0f2f5;
 }
 
 .nav-divider {
     height: 1px;
     background-color: #e9ecef;
-    margin: 10px 15px;
+    margin: 10px 15px 20px 15px;
+    display: block;
+    margin-left: 15px;
+    margin-right: 15px;
+    width: auto;
 }
