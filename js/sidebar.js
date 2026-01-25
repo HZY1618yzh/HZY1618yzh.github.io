@@ -53,7 +53,7 @@ function adpl(){
     pljs.setAttribute('data-repo-id', 'R_kgDOPhoQ2w');
     pljs.setAttribute('data-category', 'General');
     pljs.setAttribute('data-category-id', 'DIC_kwDOPhoQ284C1ZIn');
-    pljs.setAttribute('data-mapping', 'url');
+    pljs.setAttribute('data-mapping', 'pathname');
     pljs.setAttribute('data-strict', '0');
     pljs.setAttribute('data-reactions-enabled', '1');
     pljs.setAttribute('data-emit-metadata', '0');
