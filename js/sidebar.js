@@ -35,7 +35,7 @@ function initSidebar() {
                     </a>\
                     <nav class="nav-divider"></nav>\
                     <div class="nav-mtitle">链接</div>\
-                    <a class="nav-mtext" href=\'https://oj.hzy.us.kg\'>HZYOJ</a>\
+                    <a class="nav-mtext" href=\'https://hydro.ac/d/HZY1618yzh/\'>HZYOJ</a>\
                     <a class="nav-mtext" href=\'https://oi-wiki.hzy.us.kg\'>OI-wiki</a>\
                     <a class="nav-mtext" href=\'https://download.hzy.us.kg\'>下载</a>\
                     <a class="nav-mtext" href=\'https://sponsor.hzy.us.kg\'>赞助</a>\
@@ -57,7 +57,7 @@ function adpl(){
     pljs.setAttribute('data-strict', '0');
     pljs.setAttribute('data-reactions-enabled', '1');
     pljs.setAttribute('data-emit-metadata', '0');
-    pljs.setAttribute('data-input-position', 'bottom');
+    pljs.setAttribute('data-input-position', 'top');
     pljs.setAttribute('data-theme', 'preferred_color_scheme');
     pljs.setAttribute('data-lang', 'zh-CN');
     pljs.setAttribute('crossorigin', 'anonymous');
