@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>404-HZY</title>
+    <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh的个人主页">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.title = 'Loding... 404-HZY';</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
+</head>
+
+<body>
+    <div id="nav"></div>
+    <main style="padding: 20px;">
+        <p>额，好像没有这个页面诶~</p>
+        <br>
+        <p>你可以给我投稿哦！</p>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            function wait(islod, chyt) {
+                var interval = setInterval(function () {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+            wait(
+                function () { return document.readyState === 'complete'; },
+                '404-HZY'
+            );
+        });
+    </script>
+</body>
+
+</html>
