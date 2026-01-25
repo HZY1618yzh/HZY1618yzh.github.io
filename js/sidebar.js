@@ -46,8 +46,26 @@ function initSidebar() {
                     <a class="nav-mtext" href=\'mailto: i@hzy.us.kg\'>邮箱</a>\
             </nav>';
 }
+function adpl(){
+    var pljs = document.createElement('script');
+    pljs.setAttribute('src', 'https://giscus.app/client.js');
+    pljs.setAttribute('data-repo', 'HZY1618yzh/HZY1618yzh.github.io');
+    pljs.setAttribute('data-repo-id', 'R_kgDOPhoQ2w');
+    pljs.setAttribute('data-category', 'Show and tell');
+    pljs.setAttribute('data-category-id', 'DIC_kwDOPhoQ284C1ZIq');
+    pljs.setAttribute('data-mapping', 'pathname');
+    pljs.setAttribute('data-strict', '0');
+    pljs.setAttribute('data-reactions-enabled', '1');
+    pljs.setAttribute('data-emit-metadata', '0');
+    pljs.setAttribute('data-input-position', 'bottom');
+    pljs.setAttribute('data-theme', 'preferred_color_scheme');
+    pljs.setAttribute('data-lang', 'zh-CN');
+    pljs.setAttribute('crossorigin', 'anonymous');
+    pljs.setAttribute('async', ' ');
+    document.body.appendChild(pljs);
+}
 document.addEventListener('DOMContentLoaded', function () {
-    initSidebar();
+    initSidebar();adpl();
     const sidebar = document.querySelector('.sidebar');
     sidebar.addEventListener('mouseleave', function() {
         setTimeout(() => {
