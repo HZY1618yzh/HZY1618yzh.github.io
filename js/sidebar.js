@@ -51,7 +51,7 @@ function adpl(){
     pljs.setAttribute('src', 'https://giscus.app/client.js');
     pljs.setAttribute('data-repo', 'HZY1618yzh/HZY1618yzh.github.io');
     pljs.setAttribute('data-repo-id', 'R_kgDOPhoQ2w');
-    pljs.setAttribute('data-category', 'Show and tell');
+    pljs.setAttribute('data-category', 'General');
     pljs.setAttribute('data-category-id', 'DIC_kwDOPhoQ284C1ZIq');
     pljs.setAttribute('data-mapping', 'pathname');
     pljs.setAttribute('data-strict', '0');
