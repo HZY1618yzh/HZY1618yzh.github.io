@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏|海龟汤</title>
+    <script>
+        document.title = 'Loding... 游戏|海龟汤';
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-card a {
+            position: relative;
+            z-index: 1;
+            color: black !important;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .special-card {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ff5252;
+            box-shadow: 0 4px 20px rgba(255, 82, 82, 0.4);
+        }
+
+        .special-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.1) 10px,
+                    rgba(255, 255, 255, 0.1) 20px);
+            animation: shine 3s infinite linear;
+            z-index: 0;
+        }
+
+        .special-card a {
+            position: relative;
+            z-index: 1;
+            color: white !important;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .special-card img {
+            filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        @keyframes shine {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .version-table thead tr {
+            background-color: #4a6cf7;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .version-table th,
+        .version-table td {
+            padding: 12px 15px;
+        }
+
+        .version-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .version-table tbody tr:nth-of-type(even) {
+            background-color: #f8f9fa;
+        }
+
+        .version-table tbody tr:last-of-type {
+            border-bottom: 2px solid #4a6cf7;
+        }
+
+        .version-table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-not-supported {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .game-description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a5568;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav"></div>
+    <main style="padding: 20px;">
+        <h1>海龟汤游戏</h1>
+        <div class="link-card special-card">
+            <a href="https://download.hzy.us.kg/hgt.exe" download>
+                <i class="fas fa-download" style="margin-right: 10px;"></i>
+                立即下载最新版本（github慢速版）
+            </a>
+        </div>
+        <div class="link-card">
+            <h2><i class="fas fa-info-circle"></i> 游戏介绍</h2>
+            <p>海龟汤是一款经典的益智游戏，玩家需要通过提问问题来探索汤底。</p>
+            <p>游戏特点：</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>锻炼逻辑思维</li>
+                <li>简单易上手，难精通</li>
+                <li>可以适当提示和获取答案</li>
+            </ul>
+        </div>
+        <div class="link-card">
+            <h2><i class="fas fa-history"></i> 版本历史</h2>
+            <p>以下是海龟汤游戏的版本更新记录：</p>
+
+            <table class="version-table">
+                <thead>
+                    <tr>
+                        <th>下载链接</th>
+                        <th>版本号</th>
+                        <th>更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="status-badge status-not-supported"><a href="" download>下载地址</a></span>
+                        </td>
+                        <td>1.0</td>
+                        <td>api 调用内容</td>
+                    </tr>
+                </tbody>
+            </table>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<style>.hljs {background: #fafafa;padding: 0 !important;line-height: 1.5 !important;}</style>
+            <details>
+                <summary>点击展开/收起源代码</summary>
+<pre style="position:relative;background:#fafafa;border:1px solid #ddd;padding:16px;margin:16px 0;border-radius:6px;overflow-x:auto;font-family:'Courier New',monospace;"><button style="position:absolute;top:8px;right:8px;background:#fafafa;color:#fafafa;border:none;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;line-height:0;height:24px;box-sizing:border-box;transition:all 0.2s ease;" onmouseover="this.style.background='#ddd';this.style.color='#555';" onmouseout="this.style.background='#fafafa';this.style.color='#fafafa';" onclick="const code=this.nextElementSibling.textContent;const textarea=document.createElement('textarea');textarea.value=code;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);this.innerHTML='<i class=&quot;fas fa-check&quot;></i>';setTimeout(()=>{this.innerHTML='<i class=&quot;fas fa-copy&quot;></i>'},2000)"><i class="fas fa-copy"></i></button><code style="display:block;padding-right:50px;">"""
+智谱清言智能体API调用 - 单会话版本
+程序启动时自动创建会话，整个运行期间使用同一个会话
+程序退出时自动结束会话
+"""
+
+import requests
+import json
+import time
+import os
+import sys
+import atexit
+from typing import Optional
+
+class ChatGLMAssistant:
+    """智谱清言智能体客户端（单会话版本）"""
+    
+    def __init__(self, api_key: str, api_secret: str, assistant_id: str):
+        """
+        初始化并自动创建会话
+        
+        Args:
+            api_key: API Key
+            api_secret: API Secret
+            assistant_id: 智能体ID
+        """
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.assistant_id = assistant_id
+        self.base_url = "https://chatglm.cn/chatglm/assistant-api/v1"
+        self.token = None
+        self.token_expiry = 0
+        self.conversation_id = None
+        self.session_started = False
+        
+        # 注册退出时的清理函数
+        atexit.register(self.cleanup)
+        
+        # 程序启动时自动初始化会话
+        self._initialize_session()
+    
+    def _initialize_session(self):
+        """程序启动时初始化会话"""
+        print("🔄 正在初始化游戏会话...")
+        
+        # 1. 获取token
+        token = self._get_token()
+        if not token:
+            print("❌ 无法获取访问令牌")
+            sys.exit(1)
+        
+        # 2. 发送初始消息来创建会话
+        try:
+            response = requests.post(
+                f"{self.base_url}/stream_sync",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "assistant_id": self.assistant_id,
+                    "prompt": "开始游戏"
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("status") == 0:
+                    # 获取并保存会话ID
+                    result_data = result.get("result", {})
+                    self.conversation_id = result_data.get("conversation_id")
+                    
+                    if self.conversation_id:
+                        print(f"✅ 游戏会话已创建 (ID: {self.conversation_id[:16]}...)")
+                        self.session_started = True
+                        print("🎮 游戏会话已准备就绪")
+                    else:
+                        print("❌ 未能获取会话ID")
+                else:
+                    print(f"❌ 会话创建失败: {result.get('message', '未知错误')}")
+            else:
+                print(f"❌ HTTP错误: {response.status_code}")
+                
+        except Exception as e:
+            print(f"❌ 会话初始化失败: {str(e)}")
+            sys.exit(1)
+    
+    def cleanup(self):
+        """程序退出时清理会话"""
+        if not self.session_started:
+            return
+            
+        print("\n" + "=" * 60)
+        print("🧹 正在结束游戏会话...")
+        
+        try:
+            # 发送结束消息（可选，让智能体知道会话结束）
+            if self.conversation_id:
+                try:
+                    token = self._get_token()
+                    if token:
+                        requests.post(
+                            f"{self.base_url}/stream_sync",
+                            headers={
+                                "Authorization": f"Bearer {token}",
+                                "Content-Type": "application/json"
+                            },
+                            json={
+                                "assistant_id": self.assistant_id,
+                                "prompt": "游戏结束，谢谢！",
+                                "conversation_id": self.conversation_id
+                            },
+                            timeout=10
+                        )
+                except:
+                    pass  # 忽略结束消息的发送错误
+            
+            # 清理变量
+            self.conversation_id = None
+            self.session_started = False
+            print("✅ 游戏会话已结束")
+            
+        except Exception as e:
+            print(f"⚠️  清理时出现错误: {e}")
+    
+    def _get_token(self) -> Optional[str]:
+        """获取Access Token"""
+        if self.token and time.time() < self.token_expiry:
+            return self.token
+            
+        try:
+            response = requests.post(
+                f"{self.base_url}/get_token",
+                json={"api_key": self.api_key, "api_secret": self.api_secret},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == 0 and "result" in data:
+                    self.token = data["result"]["access_token"]
+                    self.token_expiry = time.time() + data["result"]["expires_in"] - 300
+                    return self.token
+        except Exception as e:
+            print(f"获取Token失败: {e}")
+            
+        return None
+    
+    def ask(self, question: str) -> str:
+        """
+        向智能体提问（使用已创建的会话）
+        
+        Args:
+            question: 问题内容
+            
+        Returns:
+            智能体的回答
+        """
+        if not self.session_started or not self.conversation_id:
+            return "❌ 游戏会话未就绪，请重新启动程序"
+        
+        # 1. 获取token
+        token = self._get_token()
+        if not token:
+            return "❌ 无法获取访问令牌"
+        
+        # 2. 准备请求数据（使用已有的conversation_id保持连续对话）
+        data = {
+            "assistant_id": self.assistant_id,
+            "prompt": question,
+            "conversation_id": self.conversation_id
+        }
+        
+        # 3. 发送请求
+        try:
+            response = requests.post(
+                f"{self.base_url}/stream_sync",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json"
+                },
+                json=data,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                if result.get("status") == 0:
+                    # 解析响应内容
+                    result_data = result.get("result", {})
+                    output_data = result_data.get("output", [])
+                    texts = []
+                    
+                    for item in output_data:
+                        contents = item.get("content", [])
+                        for content in contents:
+                            text = content.get("text", "")
+                            if text:
+                                texts.append(text)
+                    
+                    return "\n".join(texts) if texts else "（无文本回复）"
+                else:
+                    return f"❌ 请求失败: {result.get('message', '未知错误')}"
+            else:
+                return f"❌ HTTP错误: {response.status_code}"
+                
+        except Exception as e:
+            return f"❌ 请求异常: {str(e)}"
+
+
+def main():
+    """主函数 - 交互式聊天"""
+    print("=" * 60)
+    print("🎮 海龟汤推理游戏")
+    print("=" * 60)
+    
+    # ============ 配置信息 ============
+    API_KEY = "dba39ba556a621b9"
+    API_SECRET = "679c8b2d0addc4534a9cb2716cd2e62b"
+    ASSISTANT_ID = "66c8622fbda33842f88580d0"
+    # ================================
+    
+    try:
+        # 创建智能体实例（会自动初始化会话）
+        assistant = ChatGLMAssistant(API_KEY, API_SECRET, ASSISTANT_ID)
+        
+        if not assistant.session_started:
+            print("❌ 游戏初始化失败，请检查配置后重试")
+            return
+        
+        print("\n💡 游戏说明:")
+        print("  - 我是游戏主持人，会给出一个谜题（汤面）")
+        print("  - 你可以通过提问来获取线索、提示、答案")
+        print("  - 当你认为知道答案时，可以直接说出答案")
+        print("  - 输入 '/quit' 可以随时结束游戏")
+        print("-" * 60)
+        print("🎤 现在，请输入游戏开始，并选择难度和剧情")
+        print("=" * 60)
+        
+        while True:
+            try:
+                # 获取用户输入
+                user_input = input("\n 你: ").strip()
+                
+                # 处理退出命令
+                if user_input.lower() in ['/quit', '/exit', 'quit', 'exit', '退出']:
+                    print("\n感谢游玩！再见！")
+                    break
+                
+                # 处理帮助命令
+                if user_input.lower() in ['/help', '/?', '帮助']:
+                    print("智能体设置\n用户说海龟汤的类型和\"开始游戏\"的时候，自动生成一个海龟汤，输出汤面，用户开始提问\n##回答要求:\n每次根据用户的问题回答正确的答案，\n如果用户想要\"提示\"，可以适当的给出一些提示;\n如果用户把海带汤的汤底解决的到90%的时候用户想要\"答案\"则把正确答案告诉他。\n##类型包括:\n简单(鸳鸯锅)，中等难度，复杂（黑锅）;\n恐怖，普通，爱情;\n")
+                    continue
+                
+                # 忽略空输入
+                if not user_input:
+                    continue
+                
+                # 显示等待提示
+                print(" 智能体: ", end="", flush=True)
+                
+                # 获取智能体回复
+                response = assistant.ask(user_input)
+                print(response)
+                
+            except KeyboardInterrupt:
+                print("\n\n🛑 游戏被中断")
+                break
+            except Exception as e:
+                print(f"\n❌ 发生错误: {str(e)}")
+                
+    except Exception as e:
+        print(f"\n❌ 程序启动失败: {str(e)}")
+        print("请检查:")
+        print("1. 网络连接是否正常")
+        print("2. API配置是否正确")
+        print("3. 智能体是否可用")
+
+
+# 直接运行主函数
+if __name__ == "__main__":
+    main()</code></pre>
+            </details>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function wait(islod, chyt) {
+                const interval = setInterval(() => {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+            wait(
+                () => document.readyState === 'complete',
+                '游戏|海龟汤'
+            );
+        });
+    </script>
+</body>
+
+</html>
