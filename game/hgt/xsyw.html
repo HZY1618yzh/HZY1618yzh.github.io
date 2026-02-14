@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>海龟汤 · HZY的推理游戏</title>
+    <meta name="keywords" content="HZY 海龟汤 推理游戏">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.title = 'Loding... 海龟汤 · HZY的推理游戏';</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
+            min-height: 100vh;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .game-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-title i {
+            color: #e0e0e0;
+        }
+
+        .status-badge {
+            background: #f0f2f5;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            color: black;
+        }
+
+        .session-id {
+            background: #f0f2f5;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #555;
+            font-family: monospace;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .info-panel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-panel p {
+            margin: 8px 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-panel .emoji-bullet {
+            color: #2c3e50;
+            margin-right: 8px;
+        }
+
+        .chat-window {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0e0e0;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-window:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 15px;
+            line-height: 1.5;
+            font-size: 1rem;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            background: #2c3e50;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            color: white;
+        }
+
+        .message.assistant {
+            background: #e9eef2;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            color: #2c3e50;
+        }
+
+        .message.system {
+            background: #f8f9fa;
+            align-self: center;
+            font-size: 0.9rem;
+            color: #666;
+            border: 1px dashed #ccc;
+            text-align: center;
+            max-width: 95%;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 12px;
+            background: white;
+            border-radius: 15px;
+            padding: 6px;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-area input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #333;
+            font-size: 1rem;
+            padding: 12px 16px;
+        }
+
+        .input-area input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .input-area button {
+            background: #2c3e50;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .input-area button:hover:not(:disabled) {
+            background: #1e2b37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3);
+        }
+
+        .input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #95a5a6;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            gap: 10px;
+        }
+
+        .footer-actions button {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #2c3e50;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-actions button:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-color: #2c3e50;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 16px;
+            background: #e9eef2;
+            border-radius: 15px;
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #2c3e50;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 8px;
+            min-height: 20px;
+            font-size: 0.9rem;
+            padding-left: 4px;
+        }
+
+        code {
+            background: #f0f2f5;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .input-area {
+                flex-direction: column;
+            }
+            
+            .input-area button {
+                width: 100%;
+            }
+            
+            .footer-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav"></div>
+    <main style="padding: 20px;">
+        <h1>🐢 海龟汤推理游戏</h1>
+
+        <div class="game-card">
+            <div class="game-header">
+                <div class="game-title">
+                    <i class="fas fa-brain"></i> 游戏状态
+                </div>
+                <div class="status-badge" id="sessionStatus">⚙️ 初始化中...</div>
+            </div>
+            <div class="session-id" id="sessionIdDisplay" style="display: inline-block;">⚡ 会话: 无</div>
+        </div>
+
+        <div class="info-panel">
+            <p><span class="emoji-bullet">🧠</span> 我是游戏主持人，请先发言！</p>
+            <p><span class="emoji-bullet">💬</span> 输入「开始游戏」并选择难度/剧情，我会给出汤面。</p>
+            <p><span class="emoji-bullet">❓</span> 之后可以提问、要提示、直接猜答案。</p>
+            <p><span class="emoji-bullet">🔚</span> 输入 <code>/quit</code> 结束游戏。</p>
+        </div>
+
+        <!-- 聊天区域 -->
+        <div class="chat-window" id="chatWindow">
+            <div class="message system">
+                🎬 欢迎！会话已就绪。<br>请你先发言，例如「开始游戏，我要一个恐怖的海龟汤」。
+            </div>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="输入你的推理、提问或/quit..." autofocus>
+            <button id="sendBtn" disabled>发送</button>
+        </div>
+
+        <div class="footer-actions">
+            <button id="helpBtn"><i class="fas fa-question-circle"></i> 帮助</button>
+            <button id="newGameBtn"><i class="fas fa-sync-alt"></i> 重新开始</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/pro.js"></script>
+
+    <script>
+        (function() {
+            // ---------- 配置 ----------
+            const API_KEY = "dba39ba556a621b9";
+            const API_SECRET = "679c8b2d0addc4534a9cb2716cd2e62b";
+            const ASSISTANT_ID = "66c8622fbda33842f88580d0";
+            const BASE_URL = "https://chatglm.cn/chatglm/assistant-api/v1";
+
+            // ---------- 全局状态 ----------
+            let token = null;
+            let tokenExpiry = 0;
+            let conversationId = null;
+            let sessionStarted = false;
+
+            // DOM 元素
+            const chatWindow = document.getElementById('chatWindow');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const sessionStatus = document.getElementById('sessionStatus');
+            const sessionIdDisplay = document.getElementById('sessionIdDisplay');
+            const errorDiv = document.getElementById('errorMessage');
+            const helpBtn = document.getElementById('helpBtn');
+            const newGameBtn = document.getElementById('newGameBtn');
+
+            function setError(msg) {
+                errorDiv.innerText = msg;
+                setTimeout(() => { if (errorDiv.innerText === msg) errorDiv.innerText = ''; }, 5000);
+            }
+
+            function addMessage(content, role = 'assistant') {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${role}`;
+                msgDiv.innerText = content;
+                chatWindow.appendChild(msgDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            function addSystemMessage(content) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message system';
+                msgDiv.innerText = content;
+                chatWindow.appendChild(msgDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            let typingIndicator = null;
+            function showTyping() {
+                if (typingIndicator) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'message assistant';
+                wrapper.style.padding = '10px 16px';
+                wrapper.id = 'typingIndicator';
+                const indicator = document.createElement('div');
+                indicator.className = 'typing-indicator';
+                indicator.innerHTML = '<span></span><span></span><span></span>';
+                wrapper.appendChild(indicator);
+                chatWindow.appendChild(wrapper);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                typingIndicator = wrapper;
+            }
+
+            function removeTyping() {
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                    typingIndicator = null;
+                }
+            }
+
+            // ---------- 获取token ----------
+            async function fetchToken() {
+                if (token && Date.now() / 1000 < tokenExpiry) {
+                    return token;
+                }
+                try {
+                    const resp = await fetch(`${BASE_URL}/get_token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ api_key: API_KEY, api_secret: API_SECRET })
+                    });
+                    const data = await resp.json();
+                    if (data.status === 0 && data.result) {
+                        token = data.result.access_token;
+                        tokenExpiry = Date.now() / 1000 + data.result.expires_in - 300;
+                        return token;
+                    } else {
+                        throw new Error(data.message || '获取token失败');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    return null;
+                }
+            }
+
+            // ---------- 初始化会话 ----------
+            async function initializeSession() {
+                sessionStatus.innerText = '⏳ 创建会话...';
+                sendBtn.disabled = true;
+
+                const tk = await fetchToken();
+                if (!tk) {
+                    addSystemMessage('❌ 无法获取访问令牌，请检查网络或配置');
+                    sessionStatus.innerText = '❌ 无令牌';
+                    return false;
+                }
+
+                sessionStarted = true;
+                sessionStatus.innerText = '✅ 就绪，等待你的第一句话';
+                sessionIdDisplay.innerText = '⚡ 会话: 等待创建';
+                sendBtn.disabled = false;
+                
+                addSystemMessage('✅ 游戏会话已创建，请你先发言！输入「开始游戏」选择难度和剧情。');
+                return true;
+            }
+
+            // ---------- 向智能体提问 ----------
+            async function askAssistant(question) {
+                if (!sessionStarted) {
+                    addSystemMessage('⚠️ 游戏会话尚未就绪，请稍后或点“重新开始”。');
+                    return null;
+                }
+
+                const tk = await fetchToken();
+                if (!tk) {
+                    addSystemMessage('❌ 无法获取访问令牌，操作取消');
+                    return null;
+                }
+
+                try {
+                    showTyping();
+                    
+                    const requestBody = {
+                        assistant_id: ASSISTANT_ID,
+                        prompt: question
+                    };
+                    
+                    if (conversationId) {
+                        requestBody.conversation_id = conversationId;
+                    }
+                    
+                    const resp = await fetch(`${BASE_URL}/stream_sync`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${tk}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    removeTyping();
+
+                    if (resp.status === 200) {
+                        const data = await resp.json();
+                        if (data.status === 0) {
+                            if (!conversationId && data.result?.conversation_id) {
+                                conversationId = data.result.conversation_id;
+                                sessionIdDisplay.innerText = `⚡ 会话: ${conversationId.substring(0,12)}...`;
+                                sessionStatus.innerText = '✅ 游戏中';
+                                addSystemMessage(`📝 新会话已建立，继续推理吧！`);
+                            }
+                            
+                            const output = data.result?.output || [];
+                            let combined = '';
+                            for (const item of output) {
+                                for (const content of item.content || []) {
+                                    if (content.text) combined += content.text + '\n';
+                                }
+                            }
+                            return combined.trim() || '(智能体返回空白)';
+                        } else {
+                            setError(`请求失败: ${data.message || '未知'}`);
+                            return `❌ 智能体错误: ${data.message || ''}`;
+                        }
+                    } else {
+                        setError(`HTTP错误 ${resp.status}`);
+                        return `❌ 网络错误 (${resp.status})`;
+                    }
+                } catch (e) {
+                    removeTyping();
+                    setError(`请求异常: ${e.message}`);
+                    return `❌ 通信异常: ${e.message}`;
+                }
+            }
+
+            // ---------- 发送消息处理 ----------
+            async function handleSend() {
+                const text = userInput.value.trim();
+                if (!text) return;
+
+                if (text.toLowerCase() === '/quit' || text === '退出' || text === 'exit') {
+                    await endSessionGracefully();
+                    addSystemMessage('👋 游戏结束。你可以点“重新开始”再次游戏。');
+                    userInput.value = '';
+                    return;
+                }
+
+                addMessage(text, 'user');
+                userInput.value = '';
+
+                const reply = await askAssistant(text);
+                if (reply) {
+                    addMessage(reply, 'assistant');
+                }
+            }
+
+            // ---------- 结束会话 ----------
+            async function endSessionGracefully() {
+                if (!conversationId) return;
+
+                try {
+                    const tk = await fetchToken();
+                    if (tk) {
+                        await fetch(`${BASE_URL}/stream_sync`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${tk}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                assistant_id: ASSISTANT_ID,
+                                prompt: '游戏结束，谢谢！',
+                                conversation_id: conversationId
+                            })
+                        });
+                    }
+                } catch (e) {}
+
+                conversationId = null;
+                sessionStarted = false;
+                sessionStatus.innerText = '⏸️ 已结束';
+                sessionIdDisplay.innerText = '⚡ 会话: 无';
+            }
+
+            // ---------- 重新开始 ----------
+            async function restartSession() {
+                sendBtn.disabled = true;
+                userInput.disabled = true;
+                addSystemMessage('🔄 正在重新创建游戏会话...');
+
+                await endSessionGracefully();
+
+                sessionStatus.innerText = '⏳ 重新连接';
+                conversationId = null;
+
+                const success = await initializeSession();
+                if (!success) {
+                    addSystemMessage('❌ 重新创建会话失败，请稍后重试。');
+                }
+                userInput.disabled = false;
+                userInput.focus();
+            }
+
+            // ---------- 帮助 ----------
+            function showHelp() {
+                addSystemMessage(
+                    '📋 智能体设定：\n' +
+                    '用户说海龟汤的类型和"开始游戏"时，自动生成海龟汤，输出汤面。\n' +
+                    '回答要求：\n' +
+                    '· 根据用户的问题回答\n' +
+                    '· 若用户要"提示"，适当给出提示\n' +
+                    '· 若用户要"答案"且推理到90%左右，则告知答案\n' +
+                    '类型包括：简单(鸳鸯锅)、中等、复杂(黑锅)；恐怖、普通、爱情。'
+                );
+            }
+
+            // ---------- 页面启动 ----------
+            window.addEventListener('load', async () => {
+                sendBtn.disabled = true;
+                userInput.disabled = false;
+                const ok = await initializeSession();
+                if (!ok) {
+                    addSystemMessage('⚠️ 初始会话失败，但你可以尝试手动重新开始。');
+                }
+                userInput.focus();
+
+                // 设置标题加载完成
+                document.title = '海龟汤 · HZY的推理游戏';
+            });
+
+            window.addEventListener('beforeunload', function() {
+                if (conversationId) {
+                    try {
+                        navigator.sendBeacon(
+                            `${BASE_URL}/stream_sync`,
+                            new Blob([JSON.stringify({
+                                assistant_id: ASSISTANT_ID,
+                                prompt: '游戏结束，谢谢！',
+                                conversation_id: conversationId
+                            })], { type: 'application/json' })
+                        );
+                    } catch (e) {}
+                }
+            });
+
+            // 绑定事件
+            sendBtn.addEventListener('click', handleSend);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !sendBtn.disabled) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            });
+
+            helpBtn.addEventListener('click', showHelp);
+            newGameBtn.addEventListener('click', restartSession);
+        })();
+    </script>
+</body>
+
+</html>
