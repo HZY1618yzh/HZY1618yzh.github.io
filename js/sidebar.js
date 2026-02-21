@@ -37,6 +37,7 @@ function initSidebar() {
                     <div class="nav-mtitle">链接</div>\
                     <a class="nav-mtext" href=\'https://qm.qq.com/q/vw2qfMF2GQ\'>交流群</a>\
                     <a class="nav-mtext" href=\'https://oj.hzy.us.kg/\'>HZYOJ</a>\
+                    <a class="nav-mtext" href=\'https://mio.hzy.us.kg/\'>mio 语言</a>\
                     <a class="nav-mtext" href=\'https://oi-wiki.hzy.us.kg\'>OI-wiki</a>\
                     <a class="nav-mtext" href=\'https://download.hzy.us.kg\'>下载</a>\
                     <a class="nav-mtext" href=\'https://sponsor.hzy.us.kg\'>赞助</a>\
