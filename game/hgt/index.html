@@ -259,42 +259,10 @@ class ChatGLMAssistant:
             print("❌ 无法获取访问令牌")
             sys.exit(1)
         
-        # 2. 发送初始消息来创建会话
-        try:
-            response = requests.post(
-                f"{self.base_url}/stream_sync",
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "assistant_id": self.assistant_id,
-                    "prompt": "开始游戏"
-                },
-                timeout=30
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                if result.get("status") == 0:
-                    # 获取并保存会话ID
-                    result_data = result.get("result", {})
-                    self.conversation_id = result_data.get("conversation_id")
-                    
-                    if self.conversation_id:
-                        print(f"✅ 游戏会话已创建 (ID: {self.conversation_id[:16]}...)")
-                        self.session_started = True
-                        print("🎮 游戏会话已准备就绪")
-                    else:
-                        print("❌ 未能获取会话ID")
-                else:
-                    print(f"❌ 会话创建失败: {result.get('message', '未知错误')}")
-            else:
-                print(f"❌ HTTP错误: {response.status_code}")
-                
-        except Exception as e:
-            print(f"❌ 会话初始化失败: {str(e)}")
-            sys.exit(1)
+        # 2. 只获取token，不发送初始消息（用户先发言）
+        self.session_started = True
+        print("✅ 游戏会话已创建，等待你的第一句话")
+        print("🎮 游戏会话已准备就绪")
     
     def cleanup(self):
         """程序退出时清理会话"""
@@ -367,7 +335,7 @@ class ChatGLMAssistant:
         Returns:
             智能体的回答
         """
-        if not self.session_started or not self.conversation_id:
+        if not self.session_started:
             return "❌ 游戏会话未就绪，请重新启动程序"
         
         # 1. 获取token
@@ -375,12 +343,15 @@ class ChatGLMAssistant:
         if not token:
             return "❌ 无法获取访问令牌"
         
-        # 2. 准备请求数据（使用已有的conversation_id保持连续对话）
+        # 2. 准备请求数据（如果是第一次对话，不传conversation_id）
         data = {
             "assistant_id": self.assistant_id,
-            "prompt": question,
-            "conversation_id": self.conversation_id
+            "prompt": question
         }
+        
+        # 如果有会话ID，则传入保持对话连续
+        if self.conversation_id:
+            data["conversation_id"] = self.conversation_id
         
         # 3. 发送请求
         try:
@@ -398,6 +369,11 @@ class ChatGLMAssistant:
                 result = response.json()
                 
                 if result.get("status") == 0:
+                    # 如果是第一次对话，保存conversation_id
+                    if not self.conversation_id and result.get("result", {}).get("conversation_id"):
+                        self.conversation_id = result["result"]["conversation_id"]
+                        print(f"✅ 新会话已创建 (ID: {self.conversation_id[:16]}...)")
+                    
                     # 解析响应内容
                     result_data = result.get("result", {})
                     output_data = result_data.get("output", [])
