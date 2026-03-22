@@ -33,6 +33,10 @@ function initSidebar() {
                         <i class="nav-icon fas fa-hand-holding-usd"></i>\
                         <span class="nav-text">爱发电</span>\
                     </a>\
+                    <a class="nav-item" href=\'/news\'>\
+                        <i class="nav-icon fas fa-fire"></i>\
+                        <span class="nav-text">新闻</span>\
+                    </a>\
                     <nav class="nav-divider"></nav>\
                     <div class="nav-mtitle">链接</div>\
                     <a class="nav-mtext" href=\'https://qm.qq.com/q/vw2qfMF2GQ\'>交流群</a>\
