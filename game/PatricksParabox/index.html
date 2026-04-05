@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏|Patricks Parabox</title>
+    <script>
+        document.title = 'Loding... 游戏|Patricks Parabox';
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-card a {
+            position: relative;
+            z-index: 1;
+            color: black !important;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .special-card {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ff5252;
+            box-shadow: 0 4px 20px rgba(255, 82, 82, 0.4);
+        }
+
+        .special-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.1) 10px,
+                    rgba(255, 255, 255, 0.1) 20px);
+            animation: shine 3s infinite linear;
+            z-index: 0;
+        }
+
+        .special-card a {
+            position: relative;
+            z-index: 1;
+            color: white !important;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .special-card img {
+            filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        @keyframes shine {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .version-table thead tr {
+            background-color: #4a6cf7;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .version-table th,
+        .version-table td {
+            padding: 12px 15px;
+        }
+
+        .version-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .version-table tbody tr:nth-of-type(even) {
+            background-color: #f8f9fa;
+        }
+
+        .version-table tbody tr:last-of-type {
+            border-bottom: 2px solid #4a6cf7;
+        }
+
+        .version-table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-not-supported {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .game-description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a5568;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav"></div>
+    <main style="padding: 20px;">
+        <h1>Patricks Parabox</h1>
+        <div class="link-card special-card">
+            <a href="https://download.hzy.us.kg/ppbox.exe"
+                download>
+                <i class="fas fa-download" style="margin-right: 10px;"></i>
+                立即下载最新版本（github慢速版）
+            </a>
+        </div>
+        <div class="link-card">
+            <h2><i class="fas fa-info-circle"></i> 游戏介绍</h2>
+            <p>Patricks Parabox 是一款经典的益智游戏，玩家需要控制角色推动箱子到指定位置。</p>
+            <p>游戏特点：</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>锻炼逻辑思维和空间规划能力</li>
+                <li>简单易上手，难精通</li>
+                <li>多个关卡设计，挑战性逐步增加</li>
+            </ul>
+        </div>
+        <div class="link-card">
+            <h2><i class="fas fa-history"></i> 版本历史</h2>
+            <p>以下是 Patricks Parabox 游戏的版本更新记录：</p>
+
+            <table class="version-table">
+                <thead>
+                    <tr>
+                        <th>下载链接</th>
+                        <th>版本号</th>
+                        <th>更新内容</th>
+                    </tr>
+                </thead>
+				<tbody>
+					<tr>
+						<td><span class="status-badge status-not-supported"><a href="https://cdn.jsdelivr.net/gh/HZY1618yzh/download@main/ppbox.zip" download>下载链接</a></span></td>
+						<td>无</td>
+						<td>github加速下载，速度对标</td>
+					</tr>
+					<tr>
+						<td><span class="status-badge status-not-supported"><a href="https://download.hzy.us.kg/ppbox.zip" download>下载链接</a></span></td>
+						<td>无</td>
+						<td>github下载，速度比较慢</td>
+					</tr>
+				</tbody>
+		</table>
+
+            <p style="margin-top: 20px; text-align: center; font-style: italic;">未完待续...</p>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function wait(islod, chyt) {
+                const interval = setInterval(() => {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+            wait(
+                () => document.readyState === 'complete',
+                '游戏|Patricks Parabox'
+            );
+        });
+    </script>
+</body>
+
+</html>
