@@ -24,6 +24,10 @@ function initSidebar() {
                         <i class="nav-icon fas fa-paintbrush"></i>\
                         <span class="nav-text">冬日绘版</span>\
                     </a>\
+                    <a class="nav-item" href=\'/flinks\'>\
+                        <i class="nav-icon fa-solid fa-link"></i>\
+                        <span class="nav-text">友链</span>\
+                    </a>\
                     <nav class="nav-divider"></nav>\
                     <a class="nav-item" href=\'https://github.com/HZY1618yzh/home\'>\
                         <i class="nav-icon fab fa-github"></i>\

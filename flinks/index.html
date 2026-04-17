@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>友链-HZY</title>
+    <meta name="keywords" content="HZY HZY1618yzh HZY1618yzh鐨勪釜浜轰富椤�">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.title = 'Loding... 友链-HZY';</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/sidebar.css" crossorigin="anonymous">
+    <script src="/js/sidebar.js"></script>
+    <link rel="icon" href="https://cdn.luogu.com.cn/upload/usericon/1394471.png">
+	<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-card a {
+            position: relative;
+            z-index: 1;
+            color: black !important;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+	</style>
+</head>
+
+<body>
+    <div id="nav"></div>
+    <main style="padding: 20px;">
+		<h1>友链</h1>
+		<div class="link-card">
+			<a href="https://viki.moe" class="tools-link">viki.moe</a>
+		</div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            function wait(islod, chyt) {
+                var interval = setInterval(function () {
+                    if (islod()) {
+                        document.title = chyt;
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+            wait(
+                function () { return document.readyState === 'complete'; },
+                '友链-HZY'
+            );
+        });
+    </script>
+</body>
+
+</html>
